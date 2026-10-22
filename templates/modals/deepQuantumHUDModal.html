@@ -1,0 +1,167 @@
+<div id="deepQuantumHUDModal" style="position:fixed; inset:0; z-index:999999; background:radial-gradient(circle at center, rgba(6, 15, 32, 0.98) 0%, rgba(2, 6, 18, 0.99) 100%); backdrop-filter:blur(24px); display:none; flex-direction:column; padding:18px 26px; font-family:'JetBrains Mono', 'Outfit', monospace; color:#f1f5f9; overflow:hidden;">
+    
+    <!-- War Room Top Header -->
+    <div style="display:flex; align-items:center; justify-content:space-between; padding-bottom:12px; border-bottom:1px solid rgba(56,189,248,0.25); flex-shrink:0;">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <div style="width:38px; height:38px; border-radius:10px; background:linear-gradient(135deg, #0284c7, #9333ea); display:flex; align-items:center; justify-content:center; font-size:1.3rem; box-shadow:0 0 18px rgba(56,189,248,0.4);">
+          ⚡
+        </div>
+        <div>
+          <div style="display:flex; align-items:center; gap:10px;">
+            <span style="font-size:1.2rem; font-weight:800; letter-spacing:1px; color:#ffffff;">D.E.E.P AGENT WAR ROOM &amp; CODE EXECUTION BOARD</span>
+            <span style="padding:2px 8px; border-radius:12px; font-size:0.68rem; font-weight:700; background:rgba(74,222,128,0.15); border:1px solid rgba(74,222,128,0.4); color:#4ade80;">● SOVEREIGN ENGINE ACTIVE</span>
+          </div>
+          <div style="font-size:0.75rem; color:#94a3b8; margin-top:2px;">Commander: <strong>Mr. Ramadeep Singh</strong> • Greater Sudbury, ON • NVIDIA RTX A2000 8GB GDDR6 (CUDA 13.2)</div>
+        </div>
+      </div>
+
+      <div style="display:flex; align-items:center; gap:10px;">
+        <button id="btnAutoEvolveSkills" onclick="triggerAutoEvolutionScan()" style="background:rgba(168,85,247,0.18); border:1px solid rgba(168,85,247,0.45); color:#c084fc; border-radius:8px; padding:7px 14px; font-size:0.78rem; font-weight:700; cursor:pointer; display:flex; align-items:center; gap:6px; transition:all 0.2s;">
+          ⚡ Auto-Evolve &amp; Upgrade Skills
+        </button>
+        <button onclick="refreshWarRoomTelemetry()" style="background:rgba(56,189,248,0.12); border:1px solid rgba(56,189,248,0.35); color:#38bdf8; border-radius:8px; padding:7px 14px; font-size:0.78rem; font-weight:700; cursor:pointer; display:flex; align-items:center; gap:6px; transition:all 0.2s;">
+          🔄 Refresh Telemetry
+        </button>
+        <button onclick="toggleDeepQuantumHUD(false)" style="background:rgba(239,68,68,0.15); border:1px solid rgba(239,68,68,0.4); color:#f87171; border-radius:8px; padding:7px 16px; font-size:0.82rem; font-weight:700; cursor:pointer; transition:all 0.2s;">
+          ✕ EXIT WAR ROOM
+        </button>
+      </div>
+    </div>
+
+    <!-- War Room 3-Column Workstation Grid -->
+    <div style="display:grid; grid-template-columns:310px 1fr 320px; gap:16px; flex:1; min-height:0; margin-top:14px; overflow:hidden;">
+      
+      <!-- COLUMN 1: LIVE DAEMONS & SERVICES WATCHDOG -->
+      <div style="display:flex; flex-direction:column; gap:12px; overflow-y:auto; padding-right:4px;">
+        <div style="background:rgba(15,23,42,0.7); border:1px solid rgba(56,189,248,0.25); border-radius:12px; padding:14px;">
+          <div style="font-size:0.75rem; font-weight:700; color:#38bdf8; text-transform:uppercase; letter-spacing:1px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;">
+            <span>🤖 Active Daemons (6)</span>
+            <span style="color:#4ade80; font-size:0.7rem;">ALL HEALTHY</span>
+          </div>
+          <div id="warRoomDaemonsList" style="display:flex; flex-direction:column; gap:8px;">
+            <div style="font-size:0.75rem; color:#94a3b8;">Loading daemons status...</div>
+          </div>
+        </div>
+
+        <div style="background:rgba(15,23,42,0.7); border:1px solid rgba(74,222,128,0.25); border-radius:12px; padding:14px;">
+          <div style="font-size:0.75rem; font-weight:700; color:#4ade80; text-transform:uppercase; letter-spacing:1px; margin-bottom:10px;">
+            🐘 PostgreSQL 18.4 (deep_db)
+          </div>
+          <div style="display:flex; flex-direction:column; gap:6px; font-size:0.78rem;">
+            <div style="display:flex; justify-content:space-between;">
+              <span style="color:#94a3b8;">Active Public Tables:</span>
+              <strong id="wrDbTables" style="color:#ffffff;">22 Tables</strong>
+            </div>
+            <div style="display:flex; justify-content:space-between;">
+              <span style="color:#94a3b8;">Engine Latency:</span>
+              <strong id="wrDbLatency" style="color:#4ade80;">&lt; 1.5 ms</strong>
+            </div>
+            <div style="display:flex; justify-content:space-between;">
+              <span style="color:#94a3b8;">Storage:</span>
+              <strong style="color:#ffffff;">Local NVMe SSD</strong>
+            </div>
+          </div>
+        </div>
+
+        <div style="background:rgba(15,23,42,0.7); border:1px solid rgba(168,85,247,0.25); border-radius:12px; padding:14px;">
+          <div style="font-size:0.75rem; font-weight:700; color:#c084fc; text-transform:uppercase; letter-spacing:1px; margin-bottom:8px;">
+            📦 Git Workspace Status
+          </div>
+          <div style="display:flex; flex-direction:column; gap:6px; font-size:0.78rem;">
+            <div style="display:flex; justify-content:space-between;">
+              <span style="color:#94a3b8;">Branch:</span>
+              <strong id="wrGitBranch" style="color:#38bdf8;">master</strong>
+            </div>
+            <div style="display:flex; justify-content:space-between;">
+              <span style="color:#94a3b8;">Status:</span>
+              <strong id="wrGitStatus" style="color:#4ade80;">Clean (0 uncommitted)</strong>
+            </div>
+          </div>
+          <button onclick="executeWarRoomCmd('git status -s; git log -1 --oneline')" style="margin-top:10px; width:100%; font-size:0.72rem; padding:5px; background:rgba(168,85,247,0.15); border:1px solid rgba(168,85,247,0.35); color:#c084fc; border-radius:6px; cursor:pointer; font-weight:600;">Run Git Log Check ↗</button>
+        </div>
+      </div>
+
+      <!-- COLUMN 2: REAL-TIME HOST TERMINAL STREAM & COMMAND DISPATCHER -->
+      <div style="display:flex; flex-direction:column; background:#070d18; border:1px solid rgba(56,189,248,0.3); border-radius:12px; overflow:hidden;">
+        <!-- Terminal Header -->
+        <div style="display:flex; align-items:center; justify-content:space-between; padding:8px 14px; background:rgba(15,23,42,0.9); border-bottom:1px solid rgba(255,255,255,0.08);">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span style="color:#38bdf8; font-size:0.8rem; font-weight:700;">💻 DIRECT HOST EXECUTION LOG</span>
+            <span style="font-size:0.68rem; color:#94a3b8;">(PowerShell / REST Traces)</span>
+          </div>
+          <div style="display:flex; gap:6px;">
+            <button onclick="clearWarRoomTerminal()" style="background:transparent; border:1px solid rgba(255,255,255,0.15); color:#94a3b8; border-radius:4px; font-size:0.7rem; padding:2px 8px; cursor:pointer;">Clear</button>
+            <button onclick="executeWarRoomCmd('python -V; node -v; npx -v')" style="background:rgba(56,189,248,0.15); border:1px solid rgba(56,189,248,0.35); color:#38bdf8; border-radius:4px; font-size:0.7rem; padding:2px 8px; cursor:pointer;">Runtime Versions</button>
+            <button onclick="executeWarRoomCmd('ollama ps')" style="background:rgba(168,85,247,0.15); border:1px solid rgba(168,85,247,0.35); color:#c084fc; border-radius:4px; font-size:0.7rem; padding:2px 8px; cursor:pointer;">Ollama PS</button>
+            <button onclick="triggerAutoEvolutionScan()" style="background:rgba(168,85,247,0.22); border:1px solid rgba(168,85,247,0.45); color:#c084fc; border-radius:4px; font-size:0.7rem; padding:2px 8px; cursor:pointer; font-weight:700;">⚡ Evolve Skills</button>
+          </div>
+        </div>
+
+        <!-- Terminal Output Streamport -->
+        <div id="warRoomTerminalLogs" style="flex:1; padding:12px; overflow-y:auto; font-family:'JetBrains Mono', monospace; font-size:0.82rem; line-height:1.5; color:#a5f3fc; background:#040812; white-space:pre-wrap; word-break:break-all;">[WAR ROOM READY] Workstation engine initialized.
+All 35 Institutional APIs &amp; 19 MCP servers online.
+NVIDIA RTX A2000 GPU acceleration enabled (CUDA 13.2).
+Type any PowerShell or Python command below to execute directly on the PC:</div>
+
+        <!-- Direct Host Command Input Bar -->
+        <div style="display:flex; gap:8px; padding:10px; background:rgba(15,23,42,0.95); border-top:1px solid rgba(56,189,248,0.25);">
+          <span style="display:flex; align-items:center; color:#38bdf8; font-weight:700; font-size:0.85rem;">PS &gt;</span>
+          <input type="text" id="warRoomCmdInput" placeholder="Type PowerShell command (e.g. dir, git status, ollama ps, python scratch/test_all_public_apis.py)..." style="flex:1; background:rgba(4,8,18,0.85); border:1px solid rgba(56,189,248,0.3); border-radius:6px; padding:8px 12px; color:#fff; font-family:'JetBrains Mono', monospace; font-size:0.82rem; outline:none;" onkeydown="if(event.key==='Enter') executeWarRoomInputCmd()">
+          <button onclick="executeWarRoomInputCmd()" style="background:linear-gradient(135deg, #0284c7, #38bdf8); border:none; color:#000; font-weight:700; border-radius:6px; padding:0 18px; font-size:0.82rem; cursor:pointer;">Run ↵</button>
+        </div>
+      </div>
+
+      <!-- COLUMN 3: HARDWARE VITALS & INSTANT ACTIONS -->
+      <div style="display:flex; flex-direction:column; gap:12px; overflow-y:auto; padding-right:4px;">
+        <div style="background:rgba(15,23,42,0.7); border:1px solid rgba(56,189,248,0.25); border-radius:12px; padding:14px;">
+          <div style="font-size:0.75rem; font-weight:700; color:#38bdf8; text-transform:uppercase; letter-spacing:1px; margin-bottom:10px;">
+            📊 Live Workstation Vitals
+          </div>
+          <div style="display:flex; flex-direction:column; gap:8px; font-size:0.78rem;">
+            <div>
+              <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+                <span style="color:#94a3b8;">Intel 14 Cores / 20 Threads:</span>
+                <strong id="wrCpuLoad" style="color:#ffffff;">0%</strong>
+              </div>
+              <div style="height:6px; background:rgba(255,255,255,0.08); border-radius:3px; overflow:hidden;"><div id="wrCpuBar" style="height:100%; width:0%; background:#38bdf8; transition:width 0.3s;"></div></div>
+            </div>
+
+            <div>
+              <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+                <span style="color:#94a3b8;">RAM (32 GB Capacity):</span>
+                <strong id="wrRamUsage" style="color:#facc15;">--%</strong>
+              </div>
+              <div style="height:6px; background:rgba(255,255,255,0.08); border-radius:3px; overflow:hidden;"><div id="wrRamBar" style="height:100%; width:0%; background:#facc15; transition:width 0.3s;"></div></div>
+            </div>
+
+            <div style="display:flex; justify-content:space-between; padding-top:4px;">
+              <span style="color:#94a3b8;">NVIDIA RTX A2000 VRAM:</span>
+              <strong style="color:#c084fc;">8 GB GDDR6</strong>
+            </div>
+
+            <div style="display:flex; justify-content:space-between;">
+              <span style="color:#94a3b8;">NVMe Free Storage:</span>
+              <strong id="wrDiskFree" style="color:#4ade80;">-- GB</strong>
+            </div>
+          </div>
+        </div>
+
+        <div style="background:rgba(15,23,42,0.7); border:1px solid rgba(234,179,8,0.25); border-radius:12px; padding:14px;">
+          <div style="font-size:0.75rem; font-weight:700; color:#facc15; text-transform:uppercase; letter-spacing:1px; margin-bottom:10px;">
+            ⚡ Quick Diagnostics &amp; Tools
+          </div>
+          <div style="display:flex; flex-direction:column; gap:8px;">
+            <button onclick="executeWarRoomCmd('python scratch/pre_launch_verification.py')" style="padding:7px 10px; font-size:0.75rem; font-weight:600; background:rgba(16,185,129,0.15); border:1px solid rgba(16,185,129,0.35); color:#10b981; border-radius:6px; cursor:pointer; text-align:left;">
+              ✅ Run Full 5-Step System Verification
+            </button>
+            <button onclick="executeWarRoomCmd('python scratch/test_all_public_apis.py')" style="padding:7px 10px; font-size:0.75rem; font-weight:600; background:rgba(56,189,248,0.15); border:1px solid rgba(56,189,248,0.35); color:#38bdf8; border-radius:6px; cursor:pointer; text-align:left;">
+              🌐 Probe All 35 Public Institutional APIs
+            </button>
+            <button onclick="executeWarRoomCmd('powershell -Command &quot;Get-Process python, ollama* | Select-Object Id, ProcessName, WorkingSet64&quot;')" style="padding:7px 10px; font-size:0.75rem; font-weight:600; background:rgba(168,85,247,0.15); border:1px solid rgba(168,85,247,0.35); color:#c084fc; border-radius:6px; cursor:pointer; text-align:left;">
+              🔍 Inspect Python &amp; Ollama Process Tree
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>

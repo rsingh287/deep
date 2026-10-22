@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PC AI Brain — 3D Anatomical Neural Mesh Visualizer</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, sans-serif; }
+        body { background: #040914; color: #e2e8f0; overflow-x: hidden; min-height: 100vh; }
+        header { text-align: center; padding: 18px; background: rgba(8, 14, 28, 0.85); backdrop-filter: blur(12px); border-bottom: 1px solid #1e293b; }
+        h1 { font-size: 2.2rem; background: linear-gradient(90deg, #38bdf8, #818cf8, #f43f5e); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        p.subtitle { color: #94a3b8; font-size: 0.95rem; margin-top: 5px; }
+
+        .visual-container { display: flex; flex-wrap: wrap; justify-content: center; align-items: flex-start; padding: 20px; gap: 20px; max-width: 1550px; margin: 0 auto; }
+        .canvas-box { position: relative; width: 780px; height: 560px; background: #060c19; border-radius: 16px; border: 1px solid #1e293b; box-shadow: 0 0 50px rgba(56, 189, 248, 0.25); overflow: hidden; cursor: grab; }
+        canvas { width: 100%; height: 100%; }
+
+        .inspector-tooltip { position: absolute; top: 20px; left: 20px; background: rgba(10, 17, 34, 0.95); backdrop-filter: blur(14px); border: 1px solid #38bdf8; padding: 16px; border-radius: 12px; max-width: 340px; box-shadow: 0 10px 35px rgba(0, 0, 0, 0.85); display: none; pointer-events: none; transition: opacity 0.2s ease; z-index: 10; }
+        .inspector-tooltip h3 { color: #38bdf8; font-size: 1.1rem; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
+        .inspector-tooltip p { font-size: 0.85rem; color: #cbd5e1; line-height: 1.4; margin-top: 4px; }
+        .inspector-badge { display: inline-block; background: rgba(56, 189, 248, 0.2); color: #38bdf8; font-size: 0.75rem; padding: 3px 10px; border-radius: 6px; font-weight: bold; margin-top: 8px; }
+
+        .stats-box { flex: 1; min-width: 340px; max-width: 550px; background: #0b1222; border-radius: 16px; border: 1px solid #1e293b; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .stats-box h2 { color: #38bdf8; font-size: 1.4rem; margin-bottom: 15px; border-bottom: 1px solid #1e293b; padding-bottom: 10px; }
+
+        .node-card { display: flex; justify-content: space-between; align-items: center; background: #111a2e; padding: 12px 16px; border-radius: 10px; margin-bottom: 10px; border-left: 4px solid #38bdf8; cursor: pointer; transition: transform 0.2s, border-color 0.2s; }
+        .node-card:hover { transform: translateX(5px); border-left-color: #f43f5e; }
+        .node-card.active { border-left-color: #10b981; }
+        .node-card.orange { border-left-color: #f97316; }
+        .node-card.pink { border-left-color: #ec4899; }
+
+        .node-title { font-weight: 600; font-size: 0.95rem; }
+        .node-sub { font-size: 0.8rem; color: #94a3b8; }
+        .status-badge { background: rgba(16, 185, 129, 0.15); color: #34d399; font-size: 0.75rem; padding: 4px 10px; border-radius: 12px; font-weight: bold; border: 1px solid rgba(52, 211, 153, 0.3); }
+
+        .hint-bar { text-align: center; font-size: 0.85rem; color: #38bdf8; margin-bottom: 15px; font-weight: 500; }
+        footer { text-align: center; padding: 15px; color: #64748b; font-size: 0.85rem; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>🧠 3D Anatomical Human Brain Neural Network</h1>
+        <p class="subtitle">Realistic 3D Cerebral Hemispheres, Gyri Folds & Synaptic Pipelines Mapping Your PC's Hardware & AI Engines</p>
+    </header>
+
+    <div class="visual-container">
+        <div class="canvas-box" id="canvasBox">
+            <canvas id="brainCanvas"></canvas>
+            <div class="inspector-tooltip" id="tooltip">
+                <h3 id="tooltipTitle">⚡ Brain Synapse Selected</h3>
+                <p id="tooltipDesc">Click any neuron dot on the 3D Anatomical Brain Mesh to inspect its live technical role.</p>
+                <div class="inspector-badge" id="tooltipBadge">CEREBRAL_LOBE</div>
+            </div>
+        </div>
+
+        <div class="stats-box">
+            <h2>🧠 Anatomical Brain Lobes & PC Engines</h2>
+            <div class="hint-bar">👉 Tip: Click any glowing synapse on the 3D Brain model to inspect it!</div>
+
+            <div class="node-card active" onclick="selectLobe('Frontal Lobe (Executive Core)', 'Controls decision making, intent routing, and deep learning model generation.', 'FRONTAL_LOBE_CORE')">
+                <div>
+                    <div class="node-title">🧠 Frontal Lobe — Executive Core</div>
+                    <div class="node-sub">FastAPI Orchestrator & PyTorch Engine</div>
+                </div>
+                <span class="status-badge">EXECUTIVE</span>
+            </div>
+
+            <div class="node-card active" onclick="selectLobe('Temporal Lobe (Memory Cortex)', 'Stores long-term PostgreSQL 18 tables & chapter progress in memory.db.', 'TEMPORAL_MEMORY')">
+                <div>
+                    <div class="node-title">🐘 Temporal Lobe — Memory Cortex</div>
+                    <div class="node-sub">PostgreSQL 18 DB & memory.db Cache</div>
+                </div>
+                <span class="status-badge">MEMORY</span>
+            </div>
+
+            <div class="node-card orange" onclick="selectLobe('Occipital Lobe (Visual & Analytics)', 'Renders Power BI dashboards, Matplotlib charts, and OpenCV image detection.', 'OCCIPITAL_VISUAL')">
+                <div>
+                    <div class="node-title">📊 Occipital Lobe — Visual & Analytics</div>
+                    <div class="node-sub">Power BI Reports & Visual Charts</div>
+                </div>
+                <span class="status-badge">VISUAL</span>
+            </div>
+
+            <div class="node-card pink" onclick="selectLobe('Parietal Lobe (Sensory Ingestion)', 'Ingests 9 dataset modalities and scans file/folder attachments.', 'PARIETAL_SENSORY')">
+                <div>
+                    <div class="node-title">📁 Parietal Lobe — Ingestion Cortex</div>
+                    <div class="node-sub">Multimodal Engine & File Attachments</div>
+                </div>
+                <span class="status-badge">SENSORY</span>
+            </div>
+
+            <div class="node-card orange" onclick="selectLobe('Cerebellum & Brainstem (Motor System)', 'Executes Playwright browser job applications & Kasa Wi-Fi lighting.', 'MOTOR_AUTOMATION')">
+                <div>
+                    <div class="node-title">⚡ Cerebellum — Motor & Automation</div>
+                    <div class="node-sub">DOM Job Finder & Kasa Smart Lighting</div>
+                </div>
+                <span class="status-badge">MOTOR</span>
+            </div>
+        </div>
+    </div>
+
+    <div style="text-align: center; margin: 20px;">
+        <button onclick="fetchGraph()" style="background: #38bdf8; color: #000; padding: 10px 20px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-bottom: 20px;">Load Live Property Graph (Graph RAG)</button>
+    </div>
+    <div id="mermaid-container" style="max-width: 1550px; margin: 0 auto 40px auto; background: #060c19; padding: 20px; border-radius: 16px; border: 1px solid #1e293b; display: none; text-align: center; overflow-x: auto;">
+        <h2 style="color: #38bdf8; margin-bottom: 15px;">PC Workstation Property Graph</h2>
+        <div id="mermaid-graph" class="mermaid"></div>
+    </div>
+
+    <footer>
+        Antigravity Local AI Workstation Ecosystem • 3D Anatomical Neural Network Engine
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <script>
+        mermaid.initialize({ startOnLoad: false, theme: 'dark' });
+
+        async function fetchGraph() {
+            const btn = document.querySelector('button[onclick="fetchGraph()"]');
+            btn.innerText = "Generating Graph...";
+            try {
+                const response = await fetch('/api/system/graph');
+                const data = await response.json();
+                if (data.success) {
+                    const mermaidLines = data.graph.match(/```mermaid([\s\S]*?)```/)[1].trim();
+                    document.getElementById('mermaid-graph').innerHTML = mermaidLines;
+                    document.getElementById('mermaid-container').style.display = 'block';
+                    await mermaid.run({
+                        nodes: [document.getElementById('mermaid-graph')]
+                    });
+                } else {
+                    alert("Failed to load graph: " + data.error);
+                }
+            } catch (err) {
+                alert("Error fetching graph.");
+            }
+            btn.innerText = "Load Live Property Graph (Graph RAG)";
+        }
+
+        const canvas = document.getElementById('brainCanvas');
+        const ctx = canvas.getContext('2d');
+        const tooltip = document.getElementById('tooltip');
+        const tooltipTitle = document.getElementById('tooltipTitle');
+        const tooltipDesc = document.getElementById('tooltipDesc');
+        const tooltipBadge = document.getElementById('tooltipBadge');
+
+        function resize() {
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight;
+        }
+        resize();
+        window.addEventListener('resize', resize);
+
+        const nodes = [];
+        const numParticles = 380;
+        let selectedNode = null;
+        let angleY = 0;
+
+        // Generate 3D Anatomical Human Brain Point Cloud Geometry
+        for (let i = 0; i < numParticles; i++) {
+            const u = Math.random() * Math.PI * 2;
+            const v = Math.random() * Math.PI - Math.PI / 2;
+
+            // Base ellipsoid dimensions for left/right cerebral hemispheres
+            const side = Math.random() > 0.5 ? 1 : -1;
+            let x = (110 * Math.cos(v) * Math.cos(u)) + (side * 45);
+            let y = 90 * Math.sin(v);
+            let z = 140 * Math.cos(v) * Math.sin(u);
+
+            // Add Gyri & Sulci folds (Brain surface convolutions)
+            const fold = Math.sin(u * 6) * Math.cos(v * 5) * 14;
+            x += fold;
+            y += fold * 0.8;
+            z += fold;
+
+            // Cerebellum (Lower Back)
+            if (Math.random() < 0.18) {
+                x = (Math.random() - 0.5) * 110;
+                y = 65 + Math.random() * 40;
+                z = -70 - Math.random() * 50;
+            }
+
+            // Brainstem (Bottom Center)
+            if (Math.random() < 0.08) {
+                x = (Math.random() - 0.5) * 35;
+                y = 90 + Math.random() * 65;
+                z = -10 + (Math.random() - 0.5) * 30;
+            }
+
+            // Determine Lobe Label
+            let lobeName = "🧠 Frontal Lobe Synapse";
+            let desc = "Executes core AI logic, PyTorch neural networks, and decision pipelines.";
+            let badge = "FRONTAL_CORE";
+            let color = "#38bdf8";
+
+            if (z < -30 && y < 40) {
+                lobeName = "🐘 Temporal Memory Synapse";
+                desc = "Reads and writes to PostgreSQL 18 database (localhost:5432) and SQLite memory.db.";
+                badge = "TEMPORAL_MEMORY";
+                color = "#10b981";
+            } else if (z < -50 && y >= 40) {
+                lobeName = "📊 Occipital Visual Synapse";
+                desc = "Generates Power BI dashboards, Matplotlib visual charts, and OpenCV image processing.";
+                badge = "OCCIPITAL_VISUAL";
+                color = "#f97316";
+            } else if (y > 60) {
+                lobeName = "⚡ Cerebellum Motor Synapse";
+                desc = "Triggers Playwright DOM browser job applications and Kasa Wi-Fi RGB hardware commands.";
+                badge = "MOTOR_SYSTEM";
+                color = "#f43f5e";
+            } else if (y < -30) {
+                lobeName = "📁 Parietal Sensory Synapse";
+                desc = "Scans 9 dataset modalities and parses local file/folder attachments.";
+                badge = "PARIETAL_SENSORY";
+                color = "#818cf8";
+            }
+
+            nodes.push({ x, y, z, baseX: x, baseY: y, baseZ: z, color, lobeName, desc, badge, radius: Math.random() * 2.2 + 1.2 });
+        }
+
+        // Mouse click interaction
+        canvas.addEventListener('click', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const mouseX = e.clientX - rect.left;
+            const mouseY = e.clientY - rect.top;
+
+            let closest = null;
+            let minDistance = 25;
+
+            nodes.forEach(node => {
+                const dx = node.projX - mouseX;
+                const dy = node.projY - mouseY;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+
+                if (dist < minDistance) {
+                    minDistance = dist;
+                    closest = node;
+                }
+            });
+
+            if (closest) {
+                selectedNode = closest;
+                tooltipTitle.innerText = closest.lobeName;
+                tooltipDesc.innerText = closest.desc;
+                tooltipBadge.innerText = closest.badge;
+                tooltip.style.display = 'block';
+            } else {
+                selectedNode = null;
+                tooltip.style.display = 'none';
+            }
+        });
+
+        function selectLobe(title, desc, badge) {
+            tooltipTitle.innerText = title;
+            tooltipDesc.innerText = desc;
+            tooltipBadge.innerText = badge;
+            tooltip.style.display = 'block';
+            selectedNode = nodes[Math.floor(Math.random() * nodes.length)];
+        }
+
+        function animate() {
+            ctx.fillStyle = 'rgba(6, 12, 25, 0.3)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2 - 10;
+            angleY += 0.008;
+
+            const cosY = Math.cos(angleY);
+            const sinY = Math.sin(angleY);
+
+            // Project 3D points to 2D screen coordinates
+            nodes.forEach(node => {
+                const rx = node.baseX * cosY - node.baseZ * sinY;
+                const rz = node.baseX * sinY + node.baseZ * cosY;
+                const ry = node.baseY;
+
+                const scale = 320 / (320 + rz);
+                node.projX = centerX + rx * scale;
+                node.projY = centerY + ry * scale;
+                node.projScale = scale;
+                node.projZ = rz;
+            });
+
+            // Draw Synaptic Connections
+            for (let i = 0; i < nodes.length; i += 2) {
+                for (let j = i + 1; j < nodes.length; j += 3) {
+                    const dx = nodes[i].projX - nodes[j].projX;
+                    const dy = nodes[i].projY - nodes[j].projY;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+
+                    if (dist < 42) {
+                        ctx.beginPath();
+                        ctx.moveTo(nodes[i].projX, nodes[i].projY);
+                        ctx.lineTo(nodes[j].projX, nodes[j].projY);
+                        const alpha = (1 - dist / 42) * 0.25 * nodes[i].projScale;
+                        ctx.strokeStyle = nodes[i].color === '#f43f5e' ? `rgba(244, 63, 94, ${alpha})` : `rgba(56, 189, 248, ${alpha})`;
+                        ctx.lineWidth = 0.7 * nodes[i].projScale;
+                        ctx.stroke();
+                    }
+                }
+            }
+
+            // Sort by Z for proper depth rendering
+            nodes.sort((a, b) => b.projZ - a.projZ);
+
+            // Render 3D Synapses
+            nodes.forEach(node => {
+                ctx.beginPath();
+                const radius = Math.max(0.8, node.radius * node.projScale);
+                ctx.arc(node.projX, node.projY, radius, 0, Math.PI * 2);
+                ctx.fillStyle = node === selectedNode ? '#10b981' : node.color;
+                ctx.shadowBlur = node === selectedNode ? 22 : 8 * node.projScale;
+                ctx.shadowColor = node === selectedNode ? '#10b981' : node.color;
+                ctx.fill();
+                ctx.shadowBlur = 0;
+
+                if (node === selectedNode) {
+                    ctx.beginPath();
+                    ctx.arc(node.projX, node.projY, radius + 7, 0, Math.PI * 2);
+                    ctx.strokeStyle = '#10b981';
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                }
+            });
+
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+    </script>
+</body>
+</html>

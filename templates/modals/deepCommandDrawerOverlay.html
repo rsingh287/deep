@@ -1,0 +1,149 @@
+<div class="drawer-overlay" id="deepCommandDrawerOverlay" onclick="toggleCommandDrawer(false)">
+    <aside class="command-drawer" id="deepCommandDrawer" onclick="event.stopPropagation()">
+      <div class="drawer-header">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <span style="font-size:1.4rem;">⌘</span>
+          <div>
+            <div style="font-size:0.95rem; font-weight:800; color:#fff; letter-spacing:0.5px;">COMMAND DRAWER</div>
+            <div style="font-size:0.72rem; color:var(--accent-cyan);">D.E.E.P INTELLIGENCE OS v2.4</div>
+          </div>
+        </div>
+        <button class="btn-del-chat" onclick="toggleCommandDrawer(false)" title="Close Drawer (Esc)" style="font-size:1rem; width:30px; height:30px;">✕</button>
+      </div>
+
+      <div class="drawer-body">
+        <!-- Voice Engine Profile Section -->
+        <div>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+            <div class="drawer-section-title" style="margin-bottom:0;">🎙️ Vocal Synthesis Profile</div>
+            <span id="voiceStatusBadge" style="font-size:0.68rem; color:var(--accent-cyan); background:rgba(56,189,248,0.1); border:1px solid rgba(56,189,248,0.25); border-radius:12px; padding:2px 8px; font-weight:600;">Verified Profiles</span>
+          </div>
+          <div class="voice-controls-group" style="width:100%; display:flex; gap:8px; align-items:center;">
+            <select id="voiceSelect" title="Select Voice Profile" style="flex:1; background:rgba(30,41,59,0.85); border:1px solid rgba(56,189,248,0.3); border-radius:10px; padding:8px 12px; color:#fff; font-size:0.82rem; outline:none; cursor:pointer;">
+              <option value="">🎙️ Loading Verified Profiles...</option>
+            </select>
+            <button id="btnTestVoice" onclick="testCurrentVoice()" title="Preview and test current voice" style="display:inline-flex; align-items:center; gap:6px; background:linear-gradient(135deg, rgba(2,132,199,0.9), rgba(3,105,161,0.9)); border:1px solid rgba(56,189,248,0.4); border-radius:10px; padding:8px 14px; color:#fff; font-size:0.8rem; font-weight:700; cursor:pointer; white-space:nowrap; box-shadow:0 2px 8px rgba(2,132,199,0.25); transition:all 0.2s;">
+              <span id="testVoiceIcon">▶</span> Test
+            </button>
+          </div>
+          <div id="voiceDescription" style="font-size:0.72rem; color:var(--text-muted); margin-top:6px; padding:4px 8px; background:rgba(15,23,42,0.6); border-radius:6px; border:1px solid rgba(255,255,255,0.05); min-height:18px;">
+            Natural, clear, futuristic AI workstation assistant.
+          </div>
+
+          <!-- Spoken Voice Answers Toggle -->
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px; padding:8px 12px; background:rgba(15,23,42,0.7); border:1px solid rgba(56,189,248,0.2); border-radius:10px;">
+            <div>
+              <div style="font-size:0.8rem; font-weight:700; color:#fff; display:flex; align-items:center; gap:6px;">
+                <span id="drawerTTSIcon">🔇</span> Spoken Voice Answers
+              </div>
+              <div style="font-size:0.68rem; color:var(--text-muted);">AI speaks responses in selected voice</div>
+            </div>
+            <button id="drawerTTSToggleBtn" onclick="toggleTTS()" style="display:inline-flex; align-items:center; gap:5px; padding:5px 12px; border-radius:8px; border:1px solid rgba(56,189,248,0.3); background:rgba(30,41,59,0.8); color:#94a3b8; font-size:0.75rem; font-weight:700; cursor:pointer; transition:all 0.2s;">
+              <span id="drawerTTSText">OFF</span>
+            </button>
+          </div>
+
+        </div>
+
+        <!-- Subsystem Portals Grid -->
+        <div>
+          <div class="drawer-section-title" style="margin-bottom:8px;">⚡ Mission Control & Subsystems</div>
+          <div class="drawer-subsystem-grid">
+            <div class="drawer-tile" onclick="DeepSubsystems.open('/gurbani', 'Sikh Heritage & Gurbani Engine', 'ੴ'); toggleCommandDrawer(false);" style="border-color:rgba(234,179,8,0.4); background:rgba(234,179,8,0.06);">
+              <span class="drawer-tile-icon" style="color:#facc15; font-size:1.4rem;">ੴ</span>
+              <div class="drawer-tile-title" style="color:#fef08a;">Sikh Heritage & Baani</div>
+              <div class="drawer-tile-desc">Offline Gurbani, Nitnem audio & history</div>
+            </div>
+
+            <div class="drawer-tile" onclick="openDockerControlModal(); toggleCommandDrawer(false);" style="border-color:rgba(14,165,233,0.4); background:rgba(14,165,233,0.06);">
+              <span class="drawer-tile-icon" style="color:#0284c7; font-size:1.4rem;">🐳</span>
+              <div class="drawer-tile-title" style="color:#7dd3fc;">Docker & MCP Gateway</div>
+              <div class="drawer-tile-desc">61+ MCP Tools, Sandbox & Compose Microservices</div>
+            </div>
+
+            <div class="drawer-tile" onclick="DeepSubsystems.open('/pcb', 'PCB Circuit Studio & Factory Simulator', '⚡'); toggleCommandDrawer(false);" style="border-color:rgba(56,189,248,0.4); background:rgba(56,189,248,0.06);">
+              <span class="drawer-tile-icon" style="color:#38bdf8; font-size:1.4rem;">⚡</span>
+              <div class="drawer-tile-title" style="color:#bae6fd;">PCB Circuit Studio</div>
+              <div class="drawer-tile-desc">SPICE sim, Gerbers, BOM & CPL fab package</div>
+            </div>
+
+            <div class="drawer-tile" onclick="DeepSubsystems.open('/knowledge_graph', 'Knowledge Graph & Precision Tools Cockpit', '🧠'); toggleCommandDrawer(false);" style="border-color:rgba(168,85,247,0.4); background:rgba(168,85,247,0.06);">
+              <span class="drawer-tile-icon" style="color:#a855f7; font-size:1.4rem;">🧠</span>
+              <div class="drawer-tile-title" style="color:#e9d5ff;">Knowledge Graph & Tools</div>
+              <div class="drawer-tile-desc">In-place graph mutations, head/tail I/O & trash bin</div>
+            </div>
+
+            <div class="drawer-tile" onclick="toggleDeepQuantumHUD(); toggleCommandDrawer(false);">
+              <span class="drawer-tile-icon" style="color:#0284c7;">⚡</span>
+              <div class="drawer-tile-title">Agent War Room</div>
+              <div class="drawer-tile-desc">Host terminal, daemons & code monitor</div>
+            </div>
+
+            <div class="drawer-tile" onclick="toggleRightPanel(); toggleCommandDrawer(false);">
+              <span class="drawer-tile-icon" style="color:#38bdf8;">🤖</span>
+              <div class="drawer-tile-title">3D AI Buddy</div>
+              <div class="drawer-tile-desc">Interactive Three.js desktop companion</div>
+            </div>
+
+            <div class="drawer-tile" onclick="toggleArtifactCanvas(); toggleCommandDrawer(false);">
+              <span class="drawer-tile-icon" style="color:#c084fc;">🎨</span>
+              <div class="drawer-tile-title">Artifact Canvas</div>
+              <div class="drawer-tile-desc">Live HTML/CSS/JS UI render sandbox</div>
+            </div>
+
+            <div class="drawer-tile" onclick="DeepSubsystems.open('/cyber_defense', 'Cyber Defense Sentinel', '🛡️'); toggleCommandDrawer(false);">
+              <span class="drawer-tile-icon" style="color:#f43f5e;">🛡️</span>
+              <div class="drawer-tile-title">Cyber Defense</div>
+              <div class="drawer-tile-desc">Live firewall & socket security sentinel</div>
+            </div>
+
+            <div class="drawer-tile" onclick="DeepSubsystems.open('/weather', 'Live Weather Doppler Radar', '🌦️'); toggleCommandDrawer(false);">
+              <span class="drawer-tile-icon" style="color:#38bdf8;">🌦️</span>
+              <div class="drawer-tile-title">Weather Radar</div>
+              <div class="drawer-tile-desc">Live Greater Sudbury Doppler radar</div>
+            </div>
+
+            <div class="drawer-tile" onclick="DeepSubsystems.open('/memory', 'Memory Knowledge Base & Facts DB', '🧠'); toggleCommandDrawer(false);">
+              <span class="drawer-tile-icon" style="color:#eab308;">🧠</span>
+              <div class="drawer-tile-title">Memory DB</div>
+              <div class="drawer-tile-desc">Vector knowledge & facts archive</div>
+            </div>
+
+            <div class="drawer-tile" onclick="DeepSubsystems.open('/trading', 'Quantitative Trading Terminal', '📈'); toggleCommandDrawer(false);">
+              <span class="drawer-tile-icon" style="color:#10b981;">📈</span>
+              <div class="drawer-tile-title">Quant Trading</div>
+              <div class="drawer-tile-desc">Live stock algorithms & portfolio</div>
+            </div>
+
+            <div class="drawer-tile" onclick="DeepSubsystems.open('/skills', 'Autonomous Agent Skills Arsenal', '⚡'); toggleCommandDrawer(false);">
+              <span class="drawer-tile-icon" style="color:#f59e0b;">⚡</span>
+              <div class="drawer-tile-title">Skills Arsenal</div>
+              <div class="drawer-tile-desc">427 specialized AI agent capabilities</div>
+            </div>
+
+            <div class="drawer-tile" onclick="DeepSubsystems.open('/jobs', 'Canadian Career & Job Radar', '💼'); toggleCommandDrawer(false);">
+              <span class="drawer-tile-icon" style="color:#a855f7;">💼</span>
+              <div class="drawer-tile-title">Job Radar</div>
+              <div class="drawer-tile-desc">Location-aware Canadian careers</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Terminal, Rollback & Settings Actions -->
+        <div style="margin-top:auto; padding-top:14px; border-top:1px solid rgba(255,255,255,0.08); display:flex; flex-direction:column; gap:8px;">
+          <button onclick="openFeedbackModal(); toggleCommandDrawer(false);" style="background:rgba(16,185,129,0.12); border:1px solid rgba(16,185,129,0.35); border-radius:10px; padding:10px; color:#34d399; font-weight:700; font-size:0.82rem; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px;">
+            <span>🧠</span> Human Feedback & Learned Rules (RLHF)
+          </button>
+          <button onclick="triggerWorkspaceRollback(); toggleCommandDrawer(false);" style="background:rgba(239,68,68,0.12); border:1px solid rgba(239,68,68,0.35); border-radius:10px; padding:10px; color:#f87171; font-weight:700; font-size:0.82rem; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px;">
+            <span>↩️</span> Undo / Rollback Work Done by DEEP
+          </button>
+          <button onclick="toggleBottomPanel(); toggleCommandDrawer(false);" style="background:rgba(56,189,248,0.12); border:1px solid rgba(56,189,248,0.3); border-radius:10px; padding:10px; color:#38bdf8; font-weight:700; font-size:0.82rem; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px;">
+            <span>💻</span> Toggle Host Terminal Console
+          </button>
+          <button onclick="emergencyStop(); toggleCommandDrawer(false);" style="background:rgba(239,68,68,0.15); border:1px solid rgba(239,68,68,0.4); border-radius:10px; padding:10px; color:#ef4444; font-weight:700; font-size:0.82rem; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px;">
+            <span>🛑</span> Emergency Stop All Generation
+          </button>
+        </div>
+      </div>
+    </aside>
+  </div>

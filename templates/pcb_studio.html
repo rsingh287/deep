@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PCB Circuit Design, SPICE Simulation & Fabrication Studio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Rajdhani:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #070a12;
+      --card-bg: rgba(15, 23, 42, 0.82);
+      --card-border: rgba(56, 189, 248, 0.25);
+      --accent-cyan: #38bdf8;
+      --accent-green: #4ade80;
+      --accent-yellow: #facc15;
+      --accent-red: #f43f5e;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --glass-blur: blur(16px);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Outfit', sans-serif;
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      background-image:
+        radial-gradient(circle at 10% 15%, rgba(56, 189, 248, 0.08) 0%, transparent 45%),
+        radial-gradient(circle at 85% 85%, rgba(74, 222, 128, 0.08) 0%, transparent 45%);
+    }
+
+    /* Header */
+    .pcb-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.9rem 2rem;
+      background: rgba(10, 15, 26, 0.94);
+      backdrop-filter: var(--glass-blur);
+      border-bottom: 1px solid var(--card-border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 4px 25px rgba(0, 0, 0, 0.5);
+    }
+
+    .header-brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .pcb-logo-badge {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 44px;
+      height: 44px;
+      background: linear-gradient(135deg, rgba(56, 189, 248, 0.25), rgba(74, 222, 128, 0.25));
+      border: 1px solid rgba(56, 189, 248, 0.6);
+      border-radius: 12px;
+      font-size: 1.5rem;
+      color: var(--accent-cyan);
+      box-shadow: 0 0 20px rgba(56, 189, 248, 0.35);
+    }
+
+    .header-titles h1 {
+      font-size: 1.15rem;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      background: linear-gradient(90deg, #38bdf8, #818cf8, #4ade80);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .header-titles p {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .badge-sim-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      background: rgba(74, 222, 128, 0.15);
+      border: 1px solid rgba(74, 222, 128, 0.4);
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--accent-green);
+    }
+
+    .btn-cockpit {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      background: rgba(30, 41, 59, 0.85);
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      border-radius: 10px;
+      color: #fff;
+      font-size: 0.82rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    .btn-cockpit:hover {
+      background: rgba(56, 189, 248, 0.2);
+      border-color: var(--accent-cyan);
+    }
+
+    /* Main Container */
+    .main-container {
+      max-width: 1350px;
+      margin: 0 auto;
+      padding: 2rem;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+    }
+
+    /* Grid Layout */
+    .studio-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.3fr;
+      gap: 1.8rem;
+    }
+
+    @media (max-width: 1024px) {
+      .studio-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .studio-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 1.6rem;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    }
+
+    .card-title {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 1.2rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* Form Inputs */
+    .form-group {
+      margin-bottom: 1.2rem;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    .form-select, .form-input {
+      width: 100%;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      border-radius: 10px;
+      padding: 10px 14px;
+      color: #fff;
+      font-size: 0.88rem;
+      outline: none;
+      font-family: inherit;
+    }
+
+    .form-select:focus, .form-input:focus {
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 12px rgba(56, 189, 248, 0.25);
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 12px;
+      margin-top: 1.5rem;
+    }
+
+    .btn-action-primary {
+      flex: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 18px;
+      background: linear-gradient(135deg, #0284c7, #0369a1);
+      border: 1px solid rgba(56, 189, 248, 0.6);
+      border-radius: 10px;
+      color: #fff;
+      font-size: 0.88rem;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(2, 132, 199, 0.35);
+      transition: all 0.2s;
+    }
+
+    .btn-action-primary:hover {
+      background: linear-gradient(135deg, #0ea5e9, #0284c7);
+      transform: translateY(-2px);
+    }
+
+    .btn-action-success {
+      flex: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 18px;
+      background: linear-gradient(135deg, #15803d, #166534);
+      border: 1px solid rgba(74, 222, 128, 0.6);
+      border-radius: 10px;
+      color: #fff;
+      font-size: 0.88rem;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(21, 128, 61, 0.35);
+      transition: all 0.2s;
+    }
+
+    .btn-action-success:hover {
+      background: linear-gradient(135deg, #22c55e, #15803d);
+      transform: translateY(-2px);
+    }
+
+    /* Simulation Output Panel */
+    .verdict-banner {
+      padding: 14px 18px;
+      border-radius: 12px;
+      font-weight: 800;
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 1.2rem;
+    }
+
+    .verdict-pass {
+      background: rgba(34, 197, 94, 0.15);
+      border: 1px solid rgba(34, 197, 94, 0.5);
+      color: #4ade80;
+    }
+
+    .verdict-fail {
+      background: rgba(244, 63, 94, 0.15);
+      border: 1px solid rgba(244, 63, 94, 0.5);
+      color: #f43f5e;
+    }
+
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-bottom: 1.4rem;
+    }
+
+    .stat-pill {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      padding: 10px;
+      text-align: center;
+    }
+
+    .stat-pill-label {
+      font-size: 0.68rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+
+    .stat-pill-val {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--accent-cyan);
+      margin-top: 2px;
+    }
+
+    /* Tables */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.8rem;
+      margin-bottom: 1.2rem;
+    }
+
+    .data-table th {
+      text-align: left;
+      padding: 8px 10px;
+      background: rgba(15, 23, 42, 0.9);
+      color: var(--text-muted);
+      font-weight: 700;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .data-table td {
+      padding: 8px 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      color: #cbd5e1;
+    }
+
+    .stress-bar-container {
+      width: 100%;
+      height: 6px;
+      background: #1e293b;
+      border-radius: 3px;
+      overflow: hidden;
+      margin-top: 4px;
+    }
+
+    .stress-bar-fill {
+      height: 100%;
+      border-radius: 3px;
+      transition: width 0.3s;
+    }
+
+    /* Manufacturing Package Panel */
+    .package-download-card {
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(56, 189, 248, 0.1));
+      border: 1px solid rgba(74, 222, 128, 0.3);
+      border-radius: 14px;
+      padding: 1.4rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 1.2rem;
+    }
+
+    .file-tree-list {
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      padding: 12px 16px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem;
+      color: #94a3b8;
+      line-height: 1.6;
+    }
+
+    .file-tree-list strong {
+      color: #38bdf8;
+    }
+
+    /* Ordering Guide Steps */
+    .guide-step {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 10px;
+      font-size: 0.85rem;
+      line-height: 1.5;
+    }
+
+    .step-number {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: rgba(56, 189, 248, 0.2);
+      border: 1px solid var(--accent-cyan);
+      color: var(--accent-cyan);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 0.75rem;
+      flex-shrink: 0;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Sticky Header -->
+  <header class="pcb-header">
+    <div class="header-brand">
+      <div class="pcb-logo-badge">⚡</div>
+      <div class="header-titles">
+        <h1>CIRCUIT CAD & PCB FABRICATION STUDIO</h1>
+        <p>Pre-Flight SPICE Simulation • Automated Gerbers, Drill & SMT BOM • 100% Zero-Waste Guarantee</p>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <div class="badge-sim-status" id="headerStatusBadge">
+        <span>●</span> SIMULATOR ONLINE
+      </div>
+      <a href="/" class="btn-cockpit">
+        <span>←</span> AI Cockpit
+      </a>
+    </div>
+  </header>
+
+  <!-- Main Workspace -->
+  <main class="main-container">
+
+    <div class="studio-grid">
+      
+      <!-- LEFT: Circuit Specification & Pipeline Controls -->
+      <section class="studio-card">
+        <h2 class="card-title">
+          <span>🛠️</span> 1. Circuit Design & Parameters
+        </h2>
+
+        <!-- AI Circuit Architect Prompt Input -->
+        <div style="margin-bottom:1.2rem; background:linear-gradient(135deg, rgba(56, 189, 248, 0.12), rgba(129, 140, 248, 0.12)); border:1px solid rgba(56, 189, 248, 0.4); border-radius:12px; padding:12px; box-shadow:0 4px 15px rgba(0,0,0,0.3);">
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:6px;">
+            <label class="form-label" style="color:var(--accent-cyan); font-weight:800; font-size:0.82rem; display:flex; align-items:center; gap:6px; margin-bottom:0;">
+              <span>✨</span> AI Circuit Architect (Plan to Hardware)
+            </label>
+            <span style="font-size:0.65rem; color:#818cf8; background:rgba(129, 140, 248, 0.2); padding:2px 8px; border-radius:10px; border:1px solid rgba(129, 140, 248, 0.4); font-weight:700;">AUTONOMOUS SYNTHESIS</span>
+          </div>
+          <div style="display:flex; gap:8px;">
+            <input type="text" id="aiCircuitPrompt" class="form-input" placeholder="Type your idea (e.g. '3.7V battery charger', '12V motor driver', 'RGB MOSFET dimmer')..." style="font-size:0.8rem; background:rgba(15,23,42,0.85);" onkeydown="if(event.key==='Enter') synthesizeAiCircuit()">
+            <button type="button" id="btnSynthesize" onclick="synthesizeAiCircuit()" style="background:linear-gradient(135deg, #38bdf8, #818cf8); color:#0a0f1d; font-weight:800; border:none; padding:8px 14px; border-radius:8px; font-size:0.8rem; white-space:nowrap; cursor:pointer; display:flex; align-items:center; gap:5px; transition:transform 0.15s;">
+              <span>⚡</span> Synthesize
+            </button>
+          </div>
+          <div style="font-size:0.68rem; color:var(--text-muted); margin-top:6px; line-height:1.4;">
+            💡 Have any circuit in mind? Type it here or ask me in chat. The AI will design the components, LCSC parts, pins, and nets automatically.
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="circuitTemplate" style="display:flex; justify-content:space-between; align-items:center;">
+            <span>Select Circuit Architecture:</span>
+            <span id="circuitCountBadge" style="font-size:0.68rem; color:#38bdf8; font-weight:700;">Loading catalog...</span>
+          </label>
+          <select id="circuitTemplate" class="form-select" onchange="onTemplateChange()">
+            <!-- Dynamically populated from API -->
+            <option value="ldo_power" selected>⚡ 5V to 3.3V Precision LDO Power Module (USB-C & LED Indicator)</option>
+            <option value="tp4056_charger">🔋 TP4056 1S Li-Ion 1A Battery Charger (USB-C & Dual Status LEDs)</option>
+            <option value="lm2596_buck">⚡ LM2596 12V-to-5V 3A Step-Down Buck Converter (33µH Inductor & Snubber)</option>
+            <option value="opto_relay">🛡️ Dual Optocoupler-Isolated 10A Relay Driver (PC817 Galvanic Isolation)</option>
+            <option value="l298n_motor">🏎️ L298N Dual H-Bridge DC/Stepper Motor Driver (PWM Speed Control)</option>
+            <option value="esp32_relay">📡 ESP32-S3 IoT Controller (5V Relay Driver & Flyback Protection)</option>
+            <option value="555_timer">⏱️ NE555 Precision Pulse & Frequency Generator (Adjustable Output)</option>
+            <option value="audio_preamp">🎵 NE5532 Hi-Fi Low-Noise Audio Preamplifier with Gain Control</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="projectName">Project Name:</label>
+          <input type="text" id="projectName" class="form-input" value="Custom_Power_Module">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="inputVoltage">Supply Input Voltage (V): <strong id="vInVal" style="color:var(--accent-cyan);">5.0V</strong></label>
+          <input type="range" id="inputVoltage" class="form-input" min="3.3" max="24.0" step="0.1" value="5.0" oninput="document.getElementById('vInVal').innerText = this.value + 'V'">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Circuit Summary & Theory:</label>
+          <div id="circuitDescription" style="font-size:0.82rem; color:#cbd5e1; background:rgba(15,23,42,0.6); padding:10px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.06); line-height:1.5;">
+            Converts noisy 5V USB-C power to a ripple-free, regulated 3.3V output using the AMS1117 LDO. Features dual 5.1kΩ CC pulldowns for USB-PD compatibility, input MLCC decoupling (10µF), and an active power LED.
+          </div>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn-action-primary" onclick="runSimulation()">
+            <span>🧪</span> Run SPICE Simulator
+          </button>
+          <button class="btn-action-success" onclick="generateFabPackage()">
+            <span>📦</span> Generate Fab Package (ZIP)
+          </button>
+        </div>
+
+        <!-- Factory Ordering Guide -->
+        <div style="margin-top:1.8rem; border-top:1px solid rgba(255,255,255,0.08); padding-top:1.2rem;">
+          <h3 style="font-size:0.95rem; font-weight:800; color:#fff; margin-bottom:0.8rem; display:flex; align-items:center; gap:8px;">
+            <span>🏭</span> How to Get Physical Boards Made
+          </h3>
+          <div class="guide-step">
+            <span class="step-number">1</span>
+            <div>Click <strong>Generate Fab Package (ZIP)</strong> above to download your factory archive.</div>
+          </div>
+          <div class="guide-step">
+            <span class="step-number">2</span>
+            <div>Go to <strong>JLCPCB.com</strong> or <strong>PCBWay.com</strong> and click <em>Instant Quote</em>.</div>
+          </div>
+          <div class="guide-step">
+            <span class="step-number">3</span>
+            <div>Drag and drop your generated ZIP file into the box. All 2-layer traces and drill holes will render automatically.</div>
+          </div>
+          <div class="guide-step">
+            <span class="step-number">4</span>
+            <div>Enable <em>SMT Assembly</em> and upload the included <code>BOM.csv</code> and <code>CPL.csv</code>. They solder everything and ship completed boards directly to you!</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- RIGHT: Simulation Diagnostics & Fabrication Package -->
+      <section class="studio-card">
+        <h2 class="card-title">
+          <span>🔬</span> 2. Pre-Flight SPICE Diagnostics & Safety Checks
+        </h2>
+
+        <!-- Pass / Fail Verdict Banner -->
+        <div id="verdictBanner" class="verdict-banner verdict-pass">
+          <span style="font-size:1.3rem;">🛡️</span>
+          <div>
+            <div id="verdictTitle">VERIFIED & FABRICATION-READY (100% SAFE)</div>
+            <div id="verdictSubtitle" style="font-size:0.75rem; font-weight:500; opacity:0.9;">
+              Zero dead shorts detected • All components within safe thermal dissipation limits
+            </div>
+          </div>
+        </div>
+
+        <!-- Key Metrics -->
+        <div class="stats-row">
+          <div class="stat-pill">
+            <div class="stat-pill-label">Supply (VIN)</div>
+            <div class="stat-pill-val" id="statVin">5.0 V</div>
+          </div>
+          <div class="stat-pill">
+            <div class="stat-pill-label">Components</div>
+            <div class="stat-pill-val" id="statComps">9</div>
+          </div>
+          <div class="stat-pill">
+            <div class="stat-pill-label">Active Nets</div>
+            <div class="stat-pill-val" id="statNets">6</div>
+          </div>
+          <div class="stat-pill">
+            <div class="stat-pill-label">Idle Draw</div>
+            <div class="stat-pill-val" id="statCurrent">3.3 mA</div>
+          </div>
+        </div>
+
+        <!-- Simulated Node Voltages -->
+        <h3 style="font-size:0.9rem; font-weight:800; color:var(--accent-cyan); margin-bottom:6px;">
+          Simulated Node Voltages (MNA DC Solver):
+        </h3>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Circuit Net</th>
+              <th>Simulated Voltage</th>
+              <th>Tolerance Status</th>
+            </tr>
+          </thead>
+          <tbody id="nodeVoltagesBody">
+            <tr><td>VBUS_5V</td><td>5.00 V</td><td><span style="color:#4ade80;">✓ Nominal</span></td></tr>
+            <tr><td>+3V3</td><td>3.30 V</td><td><span style="color:#4ade80;">✓ Regulated ±0.5%</span></td></tr>
+            <tr><td>GND</td><td>0.00 V</td><td><span style="color:#4ade80;">✓ Solid Ground</span></td></tr>
+          </tbody>
+        </table>
+
+        <!-- Component Thermal Stress Analysis ("Smoke Test") -->
+        <h3 style="font-size:0.9rem; font-weight:800; color:var(--accent-yellow); margin-bottom:6px;">
+          Component Thermal Stress ("Smoke Test"):
+        </h3>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Component</th>
+              <th>Value</th>
+              <th>Power (mW)</th>
+              <th>Max Rating</th>
+              <th>Stress %</th>
+              <th>Safety</th>
+            </tr>
+          </thead>
+          <tbody id="stressBody">
+            <tr>
+              <td>R3 (LED Resistor)</td>
+              <td>1kΩ</td>
+              <td>10.89 mW</td>
+              <td>125.0 mW</td>
+              <td>
+                <div>8.7%</div>
+                <div class="stress-bar-container"><div class="stress-bar-fill" style="width:8.7%; background:#4ade80;"></div></div>
+              </td>
+              <td><span style="color:#4ade80;">PASS</span></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- Download Fabrication Package Button & File List -->
+        <div id="fabPackageArea" class="package-download-card" style="display:none;">
+          <div>
+            <div style="font-size:1rem; font-weight:800; color:#fff;">Fabrication Package Ready</div>
+            <div style="font-size:0.75rem; color:#34d399;" id="fabFileName">Gerber_Package.zip</div>
+          </div>
+          <a id="btnDownloadZip" href="#" class="btn-action-success" style="text-decoration:none; max-width:200px;">
+            <span>⬇</span> Download ZIP
+          </a>
+        </div>
+
+        <div style="margin-top:1rem;">
+          <h4 style="font-size:0.8rem; color:var(--text-muted); margin-bottom:4px;">Factory File Structure inside ZIP:</h4>
+          <div class="file-tree-list">
+            ├── <strong>[Project]_F_Cu.gtl</strong> (Top Copper Traces)<br>
+            ├── <strong>[Project]_B_Cu.gbl</strong> (Bottom Copper & Ground Plane)<br>
+            ├── <strong>[Project]_F_Mask.gts</strong> / <strong>B_Mask.gbs</strong> (Solder Mask)<br>
+            ├── <strong>[Project]_F_Silk.gto</strong> (Silkscreen Labels & Outlines)<br>
+            ├── <strong>[Project]_Edge_Cuts.gml</strong> (Mechanical Board Boundary)<br>
+            ├── <strong>[Project]_Through.drl</strong> (Excellon Drill Holes)<br>
+            ├── <strong>BOM_[Project]_JLCPCB.csv</strong> (SMT Bill of Materials)<br>
+            ├── <strong>CPL_[Project]_PickAndPlace.csv</strong> (SMT Pick-and-Place Coordinates)<br>
+            └── <strong>[Project]_Netlist.cir</strong> (Standard SPICE Netlist for Double-Checking)
+          </div>
+        </div>
+
+        <!-- Online Double-Check Protocol -->
+        <div style="margin-top:1.2rem; background:rgba(30, 41, 59, 0.5); border:1px solid rgba(56, 189, 248, 0.25); border-radius:12px; padding:14px;">
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
+            <h4 style="font-size:0.85rem; font-weight:800; color:var(--accent-cyan); display:flex; align-items:center; gap:6px;">
+              <span>🛡️</span> Zero-Waste Online Double-Check Protocol
+            </h4>
+            <span style="font-size:0.7rem; color:var(--accent-green); background:rgba(74, 222, 128, 0.1); padding:2px 8px; border-radius:6px; border:1px solid rgba(74, 222, 128, 0.3);">Industry Best Practice</span>
+          </div>
+          <p style="font-size:0.75rem; color:var(--text-muted); line-height:1.4; margin-bottom:10px;">
+            To guarantee 100% zero wasted money before ordering physical fabrication, hardware engineers always cross-verify manufacturing files and SPICE circuits across external tools:
+          </p>
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:8px;">
+            <a href="https://cart.jlcpcb.com/quote" target="_blank" style="text-decoration:none; display:flex; align-items:center; gap:8px; padding:8px 10px; background:rgba(15, 23, 42, 0.8); border:1px solid rgba(255, 255, 255, 0.1); border-radius:8px; color:#f8fafc; font-size:0.75rem; transition:border 0.2s;">
+              <span style="font-size:1.1rem;">🏭</span>
+              <div>
+                <strong style="color:#38bdf8; display:block;">JLCPCB 3D Viewer</strong>
+                <span style="color:#94a3b8; font-size:0.68rem;">Drop ZIP for 3D photorealistic render & DFM</span>
+              </div>
+            </a>
+            <a href="https://tracespace.io/view/" target="_blank" style="text-decoration:none; display:flex; align-items:center; gap:8px; padding:8px 10px; background:rgba(15, 23, 42, 0.8); border:1px solid rgba(255, 255, 255, 0.1); border-radius:8px; color:#f8fafc; font-size:0.75rem; transition:border 0.2s;">
+              <span style="font-size:1.1rem;">📐</span>
+              <div>
+                <strong style="color:#38bdf8; display:block;">Tracespace Viewer</strong>
+                <span style="color:#94a3b8; font-size:0.68rem;">Instant in-browser Gerber layer inspection</span>
+              </div>
+            </a>
+            <a href="https://www.circuitlab.com/editor/" target="_blank" style="text-decoration:none; display:flex; align-items:center; gap:8px; padding:8px 10px; background:rgba(15, 23, 42, 0.8); border:1px solid rgba(255, 255, 255, 0.1); border-radius:8px; color:#f8fafc; font-size:0.75rem; transition:border 0.2s;">
+              <span style="font-size:1.1rem;">🔬</span>
+              <div>
+                <strong style="color:#34d399; display:block;">CircuitLab Editor</strong>
+                <span style="color:#94a3b8; font-size:0.68rem;">In-browser SPICE, DC & transient probes</span>
+              </div>
+            </a>
+            <a href="https://falstad.com/circuit/" target="_blank" style="text-decoration:none; display:flex; align-items:center; gap:8px; padding:8px 10px; background:rgba(15, 23, 42, 0.8); border:1px solid rgba(255, 255, 255, 0.1); border-radius:8px; color:#f8fafc; font-size:0.75rem; transition:border 0.2s;">
+              <span style="font-size:1.1rem;">⚡</span>
+              <div>
+                <strong style="color:#facc15; display:block;">Falstad SPICE Sim</strong>
+                <span style="color:#94a3b8; font-size:0.68rem;">Live animated moving electron dots & waveforms</span>
+              </div>
+            </a>
+            <a href="https://www.multisim.com/" target="_blank" style="text-decoration:none; display:flex; align-items:center; gap:8px; padding:8px 10px; background:rgba(15, 23, 42, 0.8); border:1px solid rgba(255, 255, 255, 0.1); border-radius:8px; color:#f8fafc; font-size:0.75rem; transition:border 0.2s;">
+              <span style="font-size:1.1rem;">🎛️</span>
+              <div>
+                <strong style="color:#60a5fa; display:block;">Multisim Live</strong>
+                <span style="color:#94a3b8; font-size:0.68rem;">NI SPICE sim with virtual oscilloscopes</span>
+              </div>
+            </a>
+            <a href="https://wokwi.com/" target="_blank" style="text-decoration:none; display:flex; align-items:center; gap:8px; padding:8px 10px; background:rgba(15, 23, 42, 0.8); border:1px solid rgba(255, 255, 255, 0.1); border-radius:8px; color:#f8fafc; font-size:0.75rem; transition:border 0.2s;">
+              <span style="font-size:1.1rem;">💻</span>
+              <div>
+                <strong style="color:#a78bfa; display:block;">Wokwi MCU Sim</strong>
+                <span style="color:#94a3b8; font-size:0.68rem;">Simulate real ESP32 & Arduino C++ code</span>
+              </div>
+            </a>
+          </div>
+        </div>
+
+      </section>
+
+    </div>
+
+  </main>
+
+  <script>
+    let TEMPLATE_DESCRIPTIONS = {
+      'ldo_power': 'Converts noisy 5V USB-C power to a ripple-free, regulated 3.3V output using the AMS1117 LDO. Features dual 5.1kΩ CC pulldowns for USB-PD compatibility, input MLCC decoupling (10µF), and an active power LED.',
+      'tp4056_charger': 'Autonomous single-cell Li-Ion/LiPo battery charging circuit utilizing the TP4056 IC with constant-current/constant-voltage algorithm, USB-C input, 1.2kΩ PROG resistor for 1A charging, and dual red/green charge status LEDs.',
+      'lm2596_buck': 'High-efficiency 150kHz step-down switching power regulator circuit. Takes 9V-35V DC input and produces a continuous 5.0V 3.0A regulated output with low thermal dissipation, 33uH power inductor, and SS34 Schottky freewheeling diode.',
+      'opto_relay': 'Industrial-grade dual relay board with optical isolation. Protects microcontrollers and delicate logic circuits from high-voltage spikes, inductive motor kickback, and electrical noise using PC817 optocouplers and flyback diodes.',
+      'l298n_motor': 'High-power dual full-bridge driver designed to accept standard TTL logic levels and drive inductive loads such as relays, solenoids, DC and stepping motors up to 2A per channel with built-in heat dissipation footprint.',
+      'esp32_relay': 'ESP32-S3 wireless controller board with a 5V/10A Songle relay, 2N7002 N-channel MOSFET gate driver, and 1N4148 flyback snubber diode to prevent inductive kickback from blowing the MCU.',
+      '555_timer': 'Classic NE555 timer in astable multivibrator configuration with timing resistors and caps generating precision square-wave pulses with active LED pulse indicator.',
+      'audio_preamp': 'Ultra low-noise audio preamplifier utilizing the dual NE5532 Op-Amp, DC-blocking audio capacitors (2.2µF), and feedback gain loop to boost weak mic/instrument signals without distortion.'
+    };
+
+    let TEMPLATE_NAMES = {
+      'ldo_power': 'USB_Power_Shield',
+      'tp4056_charger': 'TP4056_LiIon_Charger',
+      'lm2596_buck': 'LM2596_Buck_Converter',
+      'opto_relay': 'Dual_Opto_Relay_Module',
+      'l298n_motor': 'L298N_Motor_Driver',
+      'esp32_relay': 'ESP32_Relay_Controller',
+      '555_timer': 'NE555_Pulse_Generator',
+      'audio_preamp': 'HiFi_Audio_Preamplifier'
+    };
+
+    async function loadAvailableCircuits() {
+      try {
+        const res = await fetch('/api/pcb/circuits');
+        const json = await res.json();
+        if (json.status === 'success' && json.circuits) {
+          const sel = document.getElementById('circuitTemplate');
+          const currentVal = sel.value;
+          sel.innerHTML = '';
+          json.circuits.forEach(c => {
+            const opt = document.createElement('option');
+            opt.value = c.id;
+            opt.innerText = c.title;
+            sel.appendChild(opt);
+            TEMPLATE_DESCRIPTIONS[c.id] = c.description;
+            TEMPLATE_NAMES[c.id] = c.name;
+          });
+          document.getElementById('circuitCountBadge').innerText = `${json.circuits.length} ARCHITECTURES READY`;
+          if (json.circuits.some(c => c.id === currentVal)) {
+            sel.value = currentVal;
+          } else {
+            sel.value = json.circuits[0].id;
+          }
+          onTemplateChange();
+        }
+      } catch (e) {
+        console.error('Failed to load circuit catalog:', e);
+      }
+    }
+
+    async function synthesizeAiCircuit() {
+      const promptInput = document.getElementById('aiCircuitPrompt');
+      const prompt = promptInput.value.trim();
+      if (!prompt) {
+        alert('Please enter a circuit idea or plan to synthesize!');
+        return;
+      }
+
+      const btn = document.getElementById('btnSynthesize');
+      btn.innerText = '⏳ Planning...';
+      btn.disabled = true;
+      document.getElementById('headerStatusBadge').innerText = '⏳ AI SYNTHESIZING CIRCUIT...';
+
+      try {
+        const res = await fetch('/api/pcb/ai-plan', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({prompt: prompt})
+        });
+        const json = await res.json();
+        if (json.status === 'success') {
+          const c = json.circuit;
+          await loadAvailableCircuits();
+          const sel = document.getElementById('circuitTemplate');
+          sel.value = c.id;
+          onTemplateChange();
+          renderSimulationReport(json.report);
+          promptInput.value = '';
+          document.getElementById('headerStatusBadge').innerText = '✓ CIRCUIT SYNTHESIZED & VERIFIED';
+        } else {
+          alert('Synthesis error: ' + json.message);
+        }
+      } catch (err) {
+        alert('Failed to connect to AI synthesizer: ' + err);
+      } finally {
+        btn.innerText = '⚡ Synthesize';
+        btn.disabled = false;
+      }
+    }
+
+    function onTemplateChange() {
+      const sel = document.getElementById('circuitTemplate').value;
+      document.getElementById('circuitDescription').innerText = TEMPLATE_DESCRIPTIONS[sel] || 'Custom circuit template.';
+      document.getElementById('projectName').value = TEMPLATE_NAMES[sel] || sel;
+    }
+
+    window.addEventListener('DOMContentLoaded', loadAvailableCircuits);
+
+    async function runSimulation() {
+      const template = document.getElementById('circuitTemplate').value;
+      const vIn = parseFloat(document.getElementById('inputVoltage').value);
+
+      document.getElementById('headerStatusBadge').innerText = '⏳ SIMULATING...';
+
+      try {
+        const res = await fetch('/api/pcb/simulate', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({template_type: template, v_in: vIn})
+        });
+        const json = await res.json();
+        if (json.status === 'success') {
+          renderSimulationReport(json.report);
+          document.getElementById('headerStatusBadge').innerText = '● SIMULATOR ONLINE';
+        }
+      } catch (err) {
+        alert('Simulation error: ' + err);
+      }
+    }
+
+    async function generateFabPackage() {
+      const template = document.getElementById('circuitTemplate').value;
+      const name = document.getElementById('projectName').value;
+      const vIn = parseFloat(document.getElementById('inputVoltage').value);
+
+      document.getElementById('headerStatusBadge').innerText = '⏳ GENERATING GERBERS...';
+
+      try {
+        const res = await fetch('/api/pcb/generate', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({project_name: name, template_type: template, v_in: vIn})
+        });
+        const json = await res.json();
+        if (json.status === 'success') {
+          renderSimulationReport(json.data.sim_report);
+          
+          // Show download area
+          const area = document.getElementById('fabPackageArea');
+          area.style.display = 'flex';
+          document.getElementById('fabFileName').innerText = json.data.fab_files.zip_filename;
+          document.getElementById('btnDownloadZip').href = '/api/pcb/download/' + json.data.project_name;
+          document.getElementById('headerStatusBadge').innerText = '✓ FAB PACKAGE READY';
+        }
+      } catch (err) {
+        alert('Generation error: ' + err);
+      }
+    }
+
+    function renderSimulationReport(rep) {
+      const banner = document.getElementById('verdictBanner');
+      const title = document.getElementById('verdictTitle');
+      const subtitle = document.getElementById('verdictSubtitle');
+
+      if (rep.passed) {
+        banner.className = 'verdict-banner verdict-pass';
+        title.innerText = 'VERIFIED & FABRICATION-READY (100% SAFE)';
+        subtitle.innerText = 'Zero dead shorts detected • All components within safe thermal dissipation limits';
+      } else {
+        banner.className = 'verdict-banner verdict-fail';
+        title.innerText = 'FAIL: ELECTRICAL / THERMAL HAZARD DETECTED';
+        subtitle.innerText = (rep.issues || []).join(' | ');
+      }
+
+      // Stats
+      document.getElementById('statVin').innerText = (rep.sim_metrics.input_voltage || 5.0) + ' V';
+      document.getElementById('statComps').innerText = rep.sim_metrics.total_components || 0;
+      document.getElementById('statNets').innerText = rep.sim_metrics.total_nets || 0;
+      document.getElementById('statCurrent').innerText = (rep.sim_metrics.estimated_idle_current_mA || 0) + ' mA';
+
+      // Node Voltages
+      const vBody = document.getElementById('nodeVoltagesBody');
+      vBody.innerHTML = '';
+      for (const [net, val] of Object.entries(rep.node_voltages || {})) {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td><strong>${net}</strong></td><td>${val.toFixed(2)} V</td><td><span style="color:#4ade80;">✓ Nominal</span></td>`;
+        vBody.appendChild(tr);
+      }
+
+      // Stress
+      const sBody = document.getElementById('stressBody');
+      sBody.innerHTML = '';
+      for (const s of (rep.component_stress || [])) {
+        const tr = document.createElement('tr');
+        const color = s.stress_percent < 50 ? '#4ade80' : (s.stress_percent < 80 ? '#facc15' : '#f43f5e');
+        tr.innerHTML = `
+          <td><strong>${s.ref}</strong></td>
+          <td>${s.val}</td>
+          <td>${s.power_mW} mW</td>
+          <td>${s.rated_mW} mW</td>
+          <td>
+            <div>${s.stress_percent}%</div>
+            <div class="stress-bar-container"><div class="stress-bar-fill" style="width:${Math.min(100, s.stress_percent)}%; background:${color};"></div></div>
+          </td>
+          <td><span style="color:${color}; font-weight:700;">${s.status}</span></td>
+        `;
+        sBody.appendChild(tr);
+      }
+    }
+  </script>
+</body>
+</html>

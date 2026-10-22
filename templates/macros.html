@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>D.E.E.P Macro Automation Studio</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #070a12;
+            --panel-bg: rgba(15, 23, 42, 0.75);
+            --border: rgba(56, 189, 248, 0.25);
+            --accent-cyan: #38bdf8;
+            --accent-purple: #a855f7;
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+        }
+
+        body { 
+            background-color: var(--bg-dark); 
+            color: var(--text-main); 
+            font-family: 'JetBrains Mono', Courier, monospace; 
+            padding: 20px; 
+            margin: 0;
+            background-image: 
+                radial-gradient(circle at 15% 50%, rgba(56, 189, 248, 0.05), transparent 25%),
+                radial-gradient(circle at 85% 30%, rgba(168, 85, 247, 0.05), transparent 25%);
+        }
+
+        h1 { 
+            border-bottom: 1px solid var(--border); 
+            padding-bottom: 15px; 
+            color: var(--accent-cyan);
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .container {
+            display: flex;
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .panel {
+            background: var(--panel-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            flex: 1;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+            backdrop-filter: blur(10px);
+        }
+
+        .macro-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .macro-card { 
+            background: rgba(30, 41, 59, 0.6); 
+            padding: 15px; 
+            border-radius: 8px; 
+            border: 1px solid rgba(255,255,255,0.05);
+            transition: all 0.2s;
+        }
+
+        .macro-card:hover {
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.15);
+        }
+
+        .macro-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .macro-title {
+            font-weight: 700;
+            color: #fff;
+            font-size: 1.1rem;
+        }
+
+        .macro-steps {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+
+        button {
+            background: rgba(56, 189, 248, 0.15);
+            border: 1px solid var(--accent-cyan);
+            color: var(--accent-cyan);
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: 700;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+
+        button:hover {
+            background: var(--accent-cyan);
+            color: #000;
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.4);
+        }
+
+        .btn-danger {
+            background: rgba(239, 68, 68, 0.15);
+            border-color: #ef4444;
+            color: #ef4444;
+        }
+
+        .btn-danger:hover {
+            background: #ef4444;
+            color: #fff;
+            box-shadow: 0 0 15px rgba(239, 68, 68, 0.4);
+        }
+
+        .builder-step {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+
+        select, input {
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid var(--border);
+            color: white;
+            padding: 8px;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 0.9rem;
+        }
+
+        input {
+            flex: 1;
+        }
+
+        select:focus, input:focus {
+            outline: none;
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 8px rgba(56, 189, 248, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="container" style="flex-direction: column;">
+        <h1>⚡ Visual Workflow Builder / Macro Automation Studio</h1>
+        <p style="color: var(--text-muted); margin-top: 0;">Welcome, Commander Ramadeep. Construct and manage autonomous workflow chains.</p>
+        
+        <div class="container" style="padding: 0;">
+            <!-- Left Panel: Macro Builder -->
+            <div class="panel" style="flex: 1.5;">
+                <h3 style="margin-top: 0; color: #fff;">🛠️ Create New Workflow</h3>
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; margin-bottom: 8px; color: var(--text-muted);">Workflow Name</label>
+                    <input type="text" id="newMacroName" placeholder="e.g. Good Morning Deep" style="width: 100%; box-sizing: border-box;">
+                </div>
+
+                <div id="builderSteps">
+                    <!-- Steps will be added here -->
+                </div>
+
+                <div style="margin-top: 20px; display: flex; gap: 10px;">
+                    <button onclick="addBuilderStep()" style="border-style: dashed;">+ Add Step</button>
+                    <button onclick="saveMacro()" style="background: linear-gradient(135deg, rgba(56,189,248,0.2), rgba(168,85,247,0.2)); color: #fff; border-color: var(--accent-purple);">💾 Save Workflow</button>
+                </div>
+            </div>
+
+            <!-- Right Panel: Saved Macros -->
+            <div class="panel">
+                <h3 style="margin-top: 0; color: #fff;">📋 Saved Workflows</h3>
+                <div class="macro-list" id="savedMacrosList">
+                    Loading workflows...
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let steps = [];
+
+        function addBuilderStep() {
+            const stepId = Date.now();
+            const stepContainer = document.createElement('div');
+            stepContainer.className = 'builder-step';
+            stepContainer.id = `step-${stepId}`;
+
+            stepContainer.innerHTML = `
+                <div style="background: rgba(255,255,255,0.1); padding: 4px 8px; border-radius: 4px; font-size: 0.8rem;">Step</div>
+                <select id="action-${stepId}" onchange="updatePlaceholder(${stepId})">
+                    <option value="command">Run Command / App</option>
+                    <option value="delay">Delay (seconds)</option>
+                </select>
+                <input type="text" id="target-${stepId}" placeholder="e.g. notepad.exe">
+                <button class="btn-danger" onclick="removeStep(${stepId})" style="padding: 6px 10px;">✕</button>
+            `;
+
+            document.getElementById('builderSteps').appendChild(stepContainer);
+            steps.push(stepId);
+        }
+
+        function removeStep(id) {
+            document.getElementById(`step-${id}`).remove();
+            steps = steps.filter(s => s !== id);
+        }
+
+        function updatePlaceholder(id) {
+            const action = document.getElementById(`action-${id}`).value;
+            const input = document.getElementById(`target-${id}`);
+            if (action === 'command') input.placeholder = "e.g. notepad.exe";
+            if (action === 'delay') input.placeholder = "e.g. 2.5";
+        }
+
+        async function saveMacro() {
+            const name = document.getElementById('newMacroName').value.trim();
+            if (!name) return alert('Please enter a workflow name.');
+            
+            const macroSteps = steps.map(id => ({
+                action: document.getElementById(`action-${id}`).value,
+                target: document.getElementById(`target-${id}`).value
+            })).filter(s => s.target.trim() !== "");
+
+            if (macroSteps.length === 0) return alert('Please add at least one valid step.');
+
+            const macro = {
+                id: 'macro_' + Date.now(),
+                name: name,
+                steps: macroSteps
+            };
+
+            const res = await fetch('/api/macros/save', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(macro)
+            });
+
+            if (res.ok) {
+                document.getElementById('newMacroName').value = "";
+                document.getElementById('builderSteps').innerHTML = "";
+                steps = [];
+                addBuilderStep(); // reset with one step
+                loadMacros();
+            } else {
+                alert('Failed to save macro.');
+            }
+        }
+
+        async function executeMacro(id) {
+            // Find macro data
+            const res = await fetch('/api/macros/list');
+            const macros = await res.json();
+            const macro = macros.find(m => m.id === id);
+            
+            if (macro) {
+                console.log("Executing:", macro.name);
+                await fetch('/api/macros/execute', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ steps: macro.steps })
+                });
+            }
+        }
+
+        async function deleteMacro(id) {
+            if(!confirm("Delete this workflow?")) return;
+            const res = await fetch('/api/macros/delete', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: id })
+            });
+            if (res.ok) loadMacros();
+        }
+
+        async function loadMacros() {
+            const res = await fetch('/api/macros/list');
+            const macros = await res.json();
+            const list = document.getElementById('savedMacrosList');
+            list.innerHTML = "";
+
+            if (macros.length === 0) {
+                list.innerHTML = "<p style='color: var(--text-muted);'>No workflows saved yet.</p>";
+                return;
+            }
+
+            macros.forEach(m => {
+                const stepLines = m.steps.map((s, i) => `➔ ${s.action === 'command' ? 'Run: ' : 'Wait: '}${s.target}`).join('<br>');
+                const card = document.createElement('div');
+                card.className = 'macro-card';
+                card.innerHTML = `
+                    <div class="macro-header">
+                        <div class="macro-title">${m.name}</div>
+                    </div>
+                    <div class="macro-steps">${stepLines}</div>
+                    <div style="display: flex; gap: 8px;">
+                        <button onclick="executeMacro('${m.id}')">▶ Run Now</button>
+                        <button class="btn-danger" onclick="deleteMacro('${m.id}')">Delete</button>
+                    </div>
+                `;
+                list.appendChild(card);
+            });
+        }
+
+        // Init
+        addBuilderStep();
+        loadMacros();
+    </script>
+</body>
+</html>

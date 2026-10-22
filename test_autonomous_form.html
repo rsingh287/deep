@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Customer Inquiry Portal</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; background: #f4f6f9; }
+        .card { background: white; padding: 25px; border-radius: 8px; max-width: 500px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input, select, textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        button { background: #007bff; color: white; border: none; padding: 12px 20px; border-radius: 4px; cursor: pointer; font-size: 16px; }
+        .success-box { display: none; margin-top: 20px; padding: 15px; background: #d4edda; color: #155724; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2>Submit Your Inquiry</h2>
+        <form id="inquiryForm" onsubmit="event.preventDefault(); document.getElementById('successMsg').style.display='block';">
+            <div class="form-group">
+                <label for="applicantName">Full Name</label>
+                <input type="text" id="applicantName" name="full_name" placeholder="Enter your full name" required>
+            </div>
+            <div class="form-group">
+                <label for="contactEmail">Email Address</label>
+                <input type="email" id="contactEmail" name="email" placeholder="name@domain.com" required>
+            </div>
+            <div class="form-group">
+                <label for="contactPhone">Phone Number</label>
+                <input type="tel" id="contactPhone" name="phone" placeholder="(555) 000-0000">
+            </div>
+            <div class="form-group">
+                <label for="inquiryType">Topic</label>
+                <select id="inquiryType" name="topic">
+                    <option value="General">General Inquiry</option>
+                    <option value="Support">Technical Support</option>
+                    <option value="Consulting">AI Consulting</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="messageText">Detailed Message</label>
+                <textarea id="messageText" name="message" rows="4" placeholder="How can we help you?"></textarea>
+            </div>
+            <button type="submit" id="submitBtn">Send Inquiry</button>
+        </form>
+        <div id="successMsg" class="success-box">
+            ✅ <strong>Inquiry Submitted!</strong> Thank you for reaching out.
+        </div>
+    </div>
+</body>
+</html>

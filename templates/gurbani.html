@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ੴ Local Sikh Heritage & Gurbani Engine | 100% Offline</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Rajdhani:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #070a12;
+      --card-bg: rgba(15, 23, 42, 0.78);
+      --card-border: rgba(234, 179, 8, 0.25);
+      --gold-primary: #facc15;
+      --gold-deep: #d97706;
+      --saffron: #f97316;
+      --accent-cyan: #38bdf8;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --glass-blur: blur(16px);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Outfit', sans-serif;
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      background-image:
+        radial-gradient(circle at 10% 15%, rgba(234, 179, 8, 0.08) 0%, transparent 45%),
+        radial-gradient(circle at 85% 80%, rgba(249, 115, 22, 0.08) 0%, transparent 45%);
+    }
+
+    /* Top Sticky Header */
+    .gurbani-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.9rem 2rem;
+      background: rgba(10, 15, 26, 0.94);
+      backdrop-filter: var(--glass-blur);
+      border-bottom: 1px solid var(--card-border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 4px 25px rgba(0, 0, 0, 0.5);
+    }
+
+    .header-brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .ik-onkar-logo {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 44px;
+      height: 44px;
+      background: linear-gradient(135deg, rgba(234, 179, 8, 0.25), rgba(249, 115, 22, 0.25));
+      border: 1px solid rgba(234, 179, 8, 0.6);
+      border-radius: 12px;
+      font-size: 1.8rem;
+      color: var(--gold-primary);
+      box-shadow: 0 0 20px rgba(234, 179, 8, 0.35);
+      user-select: none;
+    }
+
+    .header-titles h1 {
+      font-size: 1.15rem;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      background: linear-gradient(90deg, #fef08a, #f59e0b, #f97316);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .header-titles p {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      letter-spacing: 0.3px;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .badge-offline {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #34d399;
+    }
+
+    .btn-cockpit {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      background: rgba(30, 41, 59, 0.85);
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      border-radius: 10px;
+      color: #fff;
+      font-size: 0.82rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    .btn-cockpit:hover {
+      background: rgba(56, 189, 248, 0.2);
+      border-color: var(--accent-cyan);
+    }
+
+    /* Main Container */
+    .main-container {
+      max-width: 1300px;
+      margin: 0 auto;
+      padding: 2rem;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+    }
+
+    /* Daily Contemplation Card */
+    .contemplation-card {
+      background: linear-gradient(135deg, rgba(20, 29, 50, 0.85), rgba(30, 20, 15, 0.85));
+      border: 1px solid rgba(234, 179, 8, 0.4);
+      border-radius: 18px;
+      padding: 1.8rem 2rem;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    }
+
+    .contemplation-card::before {
+      content: "ੴ";
+      position: absolute;
+      right: 20px;
+      bottom: -30px;
+      font-size: 12rem;
+      color: rgba(234, 179, 8, 0.04);
+      pointer-events: none;
+      user-select: none;
+      font-weight: 900;
+    }
+
+    .contemplation-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .contemplation-tag {
+      font-size: 0.75rem;
+      font-weight: 800;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--gold-primary);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .gurmukhi-verse {
+      font-size: 1.85rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 0.5rem;
+      line-height: 1.4;
+      text-shadow: 0 2px 10px rgba(234, 179, 8, 0.25);
+    }
+
+    .transliteration {
+      font-style: italic;
+      color: #facc15;
+      font-size: 1rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .verse-author {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      margin-bottom: 0.75rem;
+    }
+
+    .verse-meaning {
+      font-size: 1.05rem;
+      color: #e2e8f0;
+      margin-bottom: 0.6rem;
+      line-height: 1.5;
+    }
+
+    .verse-reflection {
+      font-size: 0.88rem;
+      color: #94a3b8;
+      border-left: 3px solid var(--gold-deep);
+      padding-left: 10px;
+      margin-top: 0.5rem;
+    }
+
+    /* Section Headers */
+    .section-title-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .section-title {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* Nitnem Grid */
+    .nitnem-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+      gap: 1.25rem;
+    }
+
+    .baani-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 1.3rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: all 0.25s ease;
+      position: relative;
+    }
+
+    .baani-card:hover {
+      transform: translateY(-3px);
+      border-color: rgba(234, 179, 8, 0.6);
+      box-shadow: 0 8px 24px rgba(234, 179, 8, 0.15);
+    }
+
+    .baani-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 0.6rem;
+    }
+
+    .baani-titles h3 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .baani-gurmukhi {
+      font-size: 0.95rem;
+      color: var(--gold-primary);
+      font-weight: 600;
+    }
+
+    .timing-badge {
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 8px;
+      background: rgba(234, 179, 8, 0.15);
+      border: 1px solid rgba(234, 179, 8, 0.35);
+      color: #fef08a;
+      white-space: nowrap;
+    }
+
+    .baani-author {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+    }
+
+    .baani-theme {
+      font-size: 0.82rem;
+      color: #cbd5e1;
+      line-height: 1.4;
+      margin-bottom: 1rem;
+      flex-grow: 1;
+    }
+
+    .baani-action-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      padding-top: 0.8rem;
+      margin-top: 0.5rem;
+    }
+
+    .btn-play-baani {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 16px;
+      background: linear-gradient(135deg, #d97706, #b45309);
+      border: 1px solid rgba(250, 204, 21, 0.5);
+      border-radius: 8px;
+      color: #fff;
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 2px 10px rgba(217, 119, 6, 0.3);
+      transition: all 0.2s;
+    }
+
+    .btn-play-baani:hover {
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      transform: scale(1.02);
+    }
+
+    .audio-status-pill {
+      font-size: 0.72rem;
+      color: #94a3b8;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    /* Heritage Explorer Tabs */
+    .explorer-tabs {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 6px;
+      margin-bottom: 1.2rem;
+    }
+
+    .tab-btn {
+      padding: 8px 16px;
+      background: rgba(30, 41, 59, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      color: var(--text-muted);
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s;
+    }
+
+    .tab-btn.active, .tab-btn:hover {
+      background: rgba(234, 179, 8, 0.2);
+      border-color: var(--gold-primary);
+      color: #fff;
+    }
+
+    .explorer-content-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 1.8rem;
+    }
+
+    .heritage-item-card {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 1.2rem;
+      margin-bottom: 1rem;
+    }
+
+    .heritage-item-card h4 {
+      font-size: 1.05rem;
+      color: var(--gold-primary);
+      margin-bottom: 0.4rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .heritage-item-card p {
+      font-size: 0.85rem;
+      color: #cbd5e1;
+      line-height: 1.5;
+    }
+
+    /* Toast Notification */
+    #gurbaniToast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid var(--gold-primary);
+      border-radius: 12px;
+      padding: 12px 20px;
+      color: #fff;
+      font-size: 0.88rem;
+      font-weight: 600;
+      display: none;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+      z-index: 1000;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Sticky Header -->
+  <header class="gurbani-header">
+    <div class="header-brand">
+      <div class="ik-onkar-logo">ੴ</div>
+      <div class="header-titles">
+        <h1>SIKH HERITAGE & GURBANI ENGINE</h1>
+        <p>100% Offline • Daily Nitnem Recitation • PC Speakers Native Route</p>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <div class="badge-offline">
+        <span>●</span> 100% LOCAL & OFFLINE
+      </div>
+      <a href="/" class="btn-cockpit">
+        <span>←</span> AI Cockpit
+      </a>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="main-container">
+
+    <!-- Daily Contemplation Card -->
+    <section class="contemplation-card">
+      <div class="contemplation-header">
+        <span class="contemplation-tag">
+          <span>✨</span> ਅੱਜ ਦਾ ਸ਼ਬਦ ਵਿਚਾਰ (Daily Gurbani Contemplation)
+        </span>
+        <button class="btn-cockpit" onclick="speakContemplation()" style="padding:4px 10px; font-size:0.75rem;">
+          🔊 Listen
+        </button>
+      </div>
+
+      <div class="gurmukhi-verse">{{ contemplation.gurmukhi }}</div>
+      <div class="transliteration">{{ contemplation.transliteration }}</div>
+      <div class="verse-author">Source: {{ contemplation.author }}</div>
+      <div class="verse-meaning"><strong>Meaning:</strong> {{ contemplation.meaning }}</div>
+      <div class="verse-reflection"><strong>Contemplation:</strong> {{ contemplation.reflection }}</div>
+    </section>
+
+    <!-- Daily Nitnem Audio Player Grid -->
+    <section>
+      <div class="section-title-row">
+        <h2 class="section-title">
+          <span>🎵</span> Daily Nitnem Recitation (ਨਿਤਨੇਮ ਆਡੀਓ ਪਲੇਅਰ)
+        </h2>
+        <span style="font-size:0.8rem; color:var(--text-muted);">
+          Routes directly to PC Speakers (Realtek Audio)
+        </span>
+      </div>
+
+      <div class="nitnem-grid">
+        {% for b in baanis %}
+        <div class="baani-card" id="card-{{ b.id }}">
+          <div>
+            <div class="baani-top">
+              <div class="baani-titles">
+                <h3>{{ b.title }}</h3>
+                <div class="baani-gurmukhi">{{ b.gurmukhi }}</div>
+              </div>
+              <span class="timing-badge">{{ b.timing.split('(')[0] }}</span>
+            </div>
+
+            <div class="baani-author">By {{ b.author }}</div>
+            <div class="baani-theme">{{ b.theme }}</div>
+          </div>
+
+          <div class="baani-action-bar">
+            <button class="btn-play-baani" onclick="playBaani('{{ b.id }}', '{{ b.title }}')">
+              <span>▶</span> Play Audio
+            </button>
+            <div class="audio-status-pill" id="status-{{ b.id }}">
+              <span>🔊 PC Speakers</span>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </section>
+
+    <!-- Sikh Heritage Knowledge Explorer -->
+    <section>
+      <div class="section-title-row">
+        <h2 class="section-title">
+          <span>📖</span> Sikh Heritage & History Explorer (ਇਤਿਹਾਸ ਤੇ ਫ਼ਲਸਫ਼ਾ)
+        </h2>
+      </div>
+
+      <div class="explorer-tabs">
+        <button class="tab-btn active" onclick="switchTab('gurus')">The 10 Gurus</button>
+        <button class="tab-btn" onclick="switchTab('sahibzade')">Chaar Sahibzade</button>
+        <button class="tab-btn" onclick="switchTab('panj_pyare')">Panj Pyare</button>
+        <button class="tab-btn" onclick="switchTab('takhts')">The 5 Takhts</button>
+        <button class="tab-btn" onclick="switchTab('philosophy')">Mool Mantar & 5 Ks</button>
+      </div>
+
+      <div class="explorer-content-card" id="explorerContent">
+        <!-- Default: Gurus Tab Content -->
+        <div id="tab-gurus">
+          <div class="heritage-item-card">
+            <h4>1. Guru Nanak Dev Ji (1469 – 1539)</h4>
+            <p><strong>Founder of Sikhism.</strong> Composed Japji Sahib, Asa Di Var, and Sidh Gosht. Preached the oneness of the Creator and equality of humanity across 4 great journeys (Udasis). Established the 3 Golden Pillars: Naam Japna, Kirat Karo, and Vand Chhako.</p>
+          </div>
+          <div class="heritage-item-card">
+            <h4>2. Guru Angad Dev Ji (1504 – 1552)</h4>
+            <p>Standardized and popularized the Gurmukhi script. Established youth physical fitness through Mall Akhara (wrestling grounds) and expanded Langar with Mata Khivi Ji.</p>
+          </div>
+          <div class="heritage-item-card">
+            <h4>3. Guru Amar Das Ji (1479 – 1574)</h4>
+            <p>Composed Anand Sahib. Established Goindval Sahib with Baoli Sahib. Forbade Sati and Purdah, created the Manji system (22 administrative centers), and institutionalized 'Pehle Pangat, Phir Sangat'.</p>
+          </div>
+          <div class="heritage-item-card">
+            <h4>4. Guru Ram Das Ji (1534 – 1581)</h4>
+            <p>Founded the holy city of Amritsar (Ramdaspur), excavated the sacred Sarovar, planned Sri Harmandir Sahib, and composed the sacred Lavan hymns for the Anand Karaj marriage ceremony.</p>
+          </div>
+          <div class="heritage-item-card">
+            <h4>5. Guru Arjan Dev Ji (1563 – 1606)</h4>
+            <p>Compiled the Adi Granth in 1604, built Sri Harmandir Sahib with 4 doors open to all castes. Composed Sukhmani Sahib. First Sikh martyr (Shaheed), standing unwavering on burning plates for freedom of truth.</p>
+          </div>
+          <div class="heritage-item-card">
+            <h4>6. Guru Hargobind Ji (1595 – 1644)</h4>
+            <p>Introduced the doctrine of Miri & Piri (temporal and spiritual sovereignty). Founded Sri Akal Takht Sahib in 1606. Transformed Sikhs into Saint-Soldiers and freed 52 kings from Gwalior Fort (Bandi Chhor Divas).</p>
+          </div>
+          <div class="heritage-item-card">
+            <h4>7. Guru Har Rai Ji (1630 – 1661)</h4>
+            <p>Maintained a 2,200 horse cavalry without ever initiating war. Established a legendary botanical medicine dispensary and hospital at Kiratpur Sahib, exemplifying deep compassion for nature and living beings.</p>
+          </div>
+          <div class="heritage-item-card">
+            <h4>8. Guru Har Krishan Ji (1656 – 1664)</h4>
+            <p>The 'Bal Guru' (Child Guru). Served victims of smallpox and cholera in Delhi at Gurdwara Bangla Sahib with divine selfless love, curing thousands.</p>
+          </div>
+          <div class="heritage-item-card">
+            <h4>9. Guru Tegh Bahadur Ji (1621 – 1675)</h4>
+            <p>Revered as 'Hind Di Chadar'. Sacrificed his head at Chandni Chowk, Delhi to safeguard the religious freedom and conscience of Kashmiri Pandits, an unparalleled martyrdom for another faith.</p>
+          </div>
+          <div class="heritage-item-card">
+            <h4>10. Guru Gobind Singh Ji (1666 – 1708)</h4>
+            <p>Created the Khalsa Panth on Vaisakhi 1699 at Anandpur Sahib through Khande Di Pahul. Authored Jaap Sahib, Chaupai Sahib, and Zafarnama. Bestowed eternal Guruship upon Sri Guru Granth Sahib Ji at Nanded.</p>
+          </div>
+          <div class="heritage-item-card" style="border-color: rgba(234, 179, 8, 0.4);">
+            <h4>11. Sri Guru Granth Sahib Ji (Eternal Living Guru)</h4>
+            <p>1,430 Angs, 31 Classical Ragas. Universal Shabad Guru containing hymns of 6 Gurus, 15 Bhagats (Kabir, Ravidas, Farid, Namdev), 11 Bhatts, and 4 Gursikhs, guiding humanity toward universal love and truth.</p>
+          </div>
+        </div>
+
+        <!-- Sahibzade Tab Content -->
+        <div id="tab-sahibzade" style="display:none;">
+          <div class="heritage-item-card" style="border-left:4px solid #ef4444;">
+            <h4>Baba Ajit Singh Ji (18 yrs) & Baba Jujhar Singh Ji (14 yrs)</h4>
+            <p><strong>Battle of Chamkaur Sahib (December 1704):</strong> Eldest two sons of Guru Gobind Singh Ji. Led courageous sorties against overwhelming Mughal forces, defending the fortress of Chamkaur Sahib with superhuman valor and attaining glorious martyrdom on the battlefield.</p>
+          </div>
+          <div class="heritage-item-card" style="border-left:4px solid #f59e0b;">
+            <h4>Baba Zorawar Singh Ji (9 yrs) & Baba Fateh Singh Ji (7 yrs)</h4>
+            <p><strong>Fatehgarh Sahib, Sirhind (December 1704):</strong> The younger two sons. Kept in the freezing Cold Tower (Thanda Burj) with grandmother Mata Gujri Ji. Refused all royal bribes and threats from Nawab Wazir Khan to renounce their faith. Bricked alive with immortal courage for righteousness and human dignity.</p>
+          </div>
+        </div>
+
+        <!-- Panj Pyare Tab Content -->
+        <div id="tab-panj_pyare" style="display:none;">
+          <div class="heritage-item-card">
+            <h4>1. Bhai Daya Singh Ji (Daya Ram from Lahore) — Compassion</h4>
+            <p>First to offer his head at Vaisakhi 1699. Shopkeeper from Lahore, Punjab.</p>
+          </div>
+          <div class="heritage-item-card">
+            <h4>2. Bhai Dharam Singh Ji (Dharam Das from Hastinapur) — Righteousness</h4>
+            <p>Second to step forward. Farmer from Hastinapur/Meerut, Uttar Pradesh.</p>
+          </div>
+          <div class="heritage-item-card">
+            <h4>3. Bhai Himmat Singh Ji (Himmat Rai from Jagannath Puri) — Courage</h4>
+            <p>Third to step forward. Water-carrier from Jagannath Puri, Odisha.</p>
+          </div>
+          <div class="heritage-item-card">
+            <h4>4. Bhai Mohkam Singh Ji (Mohkam Chand from Dwarka) — Determination</h4>
+            <p>Fourth to step forward. Calico printer/tailor from Dwarka, Gujarat.</p>
+          </div>
+          <div class="heritage-item-card">
+            <h4>5. Bhai Sahib Singh Ji (Sahib Chand from Bidar) — Sovereignty</h4>
+            <p>Fifth to step forward. Barber from Bidar, Karnataka.</p>
+          </div>
+        </div>
+
+        <!-- Takhts Tab Content -->
+        <div id="tab-takhts" style="display:none;">
+          <div class="heritage-item-card">
+            <h4>Sri Akal Takht Sahib (Amritsar, Punjab)</h4>
+            <p>Founded by Guru Hargobind Ji in 1606. Supreme temporal seat of the Sikh Panth, facing Sri Harmandir Sahib.</p>
+          </div>
+          <div class="heritage-item-card">
+            <h4>Takht Sri Keshgarh Sahib (Anandpur Sahib, Punjab)</h4>
+            <p>Birthplace of the Khalsa. Where Guru Gobind Singh Ji administered Amrit Sanchar on Vaisakhi 1699.</p>
+          </div>
+          <div class="heritage-item-card">
+            <h4>Takht Sri Damdama Sahib (Talwandi Sabo, Punjab)</h4>
+            <p>Guru Ki Kashi. Where Guru Gobind Singh Ji dictated Sri Guru Granth Sahib Ji to Bhai Mani Singh Ji.</p>
+          </div>
+          <div class="heritage-item-card">
+            <h4>Takht Sri Patna Sahib (Patna, Bihar)</h4>
+            <p>Birthplace and childhood abode of Guru Gobind Singh Ji on the banks of the Ganges.</p>
+          </div>
+          <div class="heritage-item-card">
+            <h4>Takht Sri Hazur Sahib (Nanded, Maharashtra)</h4>
+            <p>Sachkhand. Where Guru Gobind Singh Ji spent his final earthly days and consecrated Sri Guru Granth Sahib Ji as eternal Guru in 1708.</p>
+          </div>
+        </div>
+
+        <!-- Philosophy Tab Content -->
+        <div id="tab-philosophy" style="display:none;">
+          <div class="heritage-item-card">
+            <h4>ੴ Mool Mantar</h4>
+            <p style="font-size:1.1rem; color:#facc15; margin-bottom:8px;">ੴ ਸਤਿ ਨਾਮੁ ਕਰਤਾ ਪੁਰਖੁ ਨਿਰਭਉ ਨਿਰਵੈਰੁ ਅਕਾਲ ਮੂਰਤਿ ਅਜੂਨੀ ਸੈਭੰ ਗੁਰ ਪ੍ਰਸਾਦਿ ॥</p>
+            <p><em>Ik Oankaar Sat Naam Kartaa Purakh Nirbhau Nirvair Akaal Moorat Ajoonee Saibhang Gur Parsaad.</em></p>
+            <p style="margin-top:6px;">One Supreme Reality, Truth by Name, Creative Being, Fearless, Without Enmity, Timeless Form, Unborn, Self-Existent, Realized by Guru's Grace.</p>
+          </div>
+          <div class="heritage-item-card">
+            <h4>The 5 Ks (ਪੰਜ ਕਕਾਰ)</h4>
+            <p>• <strong>Kesh (ਕੇਸ):</strong> Uncut hair — accepting nature's divine perfection.<br>
+            • <strong>Kangha (ਕੰਘਾ):</strong> Wooden comb — cleanliness and mental discipline.<br>
+            • <strong>Kara (ਕੜਾ):</strong> Steel bangle — eternity, morality, and restraint.<br>
+            • <strong>Kachera (ਕਛਹਿਰਾ):</strong> Modesty, fidelity, and preparedness.<br>
+            • <strong>Kirpan (ਕਿਰਪਾਨ):</strong> Grace and defense of the vulnerable against tyranny.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <div id="gurbaniToast"></div>
+
+  <script>
+    function showToast(msg) {
+      const t = document.getElementById('gurbaniToast');
+      t.innerText = msg;
+      t.style.display = 'flex';
+      setTimeout(() => { t.style.display = 'none'; }, 4000);
+    }
+
+    async function playBaani(baaniId, title) {
+      showToast('ੴ Requesting ' + title + ' on PC Speakers...');
+      const statusEl = document.getElementById('status-' + baaniId);
+      if (statusEl) statusEl.innerText = '⏳ Loading...';
+
+      try {
+        const res = await fetch('/api/gurbani/play', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({baani_id: baaniId})
+        });
+        const data = await res.json();
+        if (data.status === 'success') {
+          showToast('ੴ Now Playing: ' + title);
+          if (statusEl) statusEl.innerText = '▶ Playing';
+        } else {
+          showToast('Notice: ' + (data.message || 'Error'));
+          if (statusEl) statusEl.innerText = '⚠️ Error';
+        }
+      } catch (err) {
+        showToast('Connection error: ' + err);
+        if (statusEl) statusEl.innerText = '⚠️ Error';
+      }
+    }
+
+    function switchTab(tabKey) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      event.target.classList.add('active');
+
+      const tabs = ['gurus', 'sahibzade', 'panj_pyare', 'takhts', 'philosophy'];
+      tabs.forEach(t => {
+        const el = document.getElementById('tab-' + t);
+        if (el) el.style.display = (t === tabKey) ? 'block' : 'none';
+      });
+    }
+
+    function speakContemplation() {
+      const verse = `{{ contemplation.meaning }}. {{ contemplation.reflection }}`;
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const u = new SpeechSynthesisUtterance(verse);
+        u.rate = 1.0;
+        window.speechSynthesis.speak(u);
+      }
+    }
+  </script>
+</body>
+</html>

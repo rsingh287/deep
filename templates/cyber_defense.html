@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cyber Sentinel Defense Command - Workstation Security</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Rajdhani:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #070a12;
+      --card-bg: rgba(15, 23, 42, 0.75);
+      --border: rgba(56, 189, 248, 0.2);
+      --accent-cyan: #38bdf8;
+      --accent-purple: #c084fc;
+      --accent-green: #4ade80;
+      --accent-red: #f43f5e;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: radial-gradient(circle at 50% 20%, #0c1427 0%, var(--bg-dark) 100%);
+      color: var(--text-main);
+      font-family: 'Outfit', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    /* Header */
+    .header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      background: rgba(10, 15, 29, 0.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .brand-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, rgba(56, 189, 248, 0.2), rgba(244, 63, 94, 0.2));
+      border: 1px solid var(--accent-cyan);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      box-shadow: 0 0 20px rgba(56, 189, 248, 0.3);
+    }
+
+    .brand-title h1 {
+      font-size: 1.2rem;
+      font-weight: 800;
+      letter-spacing: 1px;
+    }
+
+    .brand-title p {
+      font-size: 0.75rem;
+      color: var(--accent-cyan);
+      font-family: 'JetBrains Mono', monospace;
+      letter-spacing: 0.06em;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .btn-return {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(56, 189, 248, 0.12);
+      border: 1px solid var(--accent-cyan);
+      color: #fff;
+      padding: 8px 18px;
+      border-radius: 10px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    .btn-return:hover {
+      background: var(--accent-cyan);
+      color: #000;
+      box-shadow: 0 0 20px rgba(56, 189, 248, 0.4);
+      transform: translateY(-1px);
+    }
+
+    /* Main Grid */
+    .main-content {
+      flex: 1;
+      padding: 1.8rem;
+      max-width: 1500px;
+      margin: 0 auto;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 1.6rem;
+    }
+
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+    }
+
+    @media (max-width: 1024px) {
+      .dashboard-grid { grid-template-columns: 1fr; }
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.4rem;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 8px 30px rgba(0,0,0,0.35);
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding-bottom: 0.8rem;
+    }
+
+    .card-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #f1f5f9;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Threat Status Display */
+    .threat-banner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(7, 10, 19, 0.85);
+      border: 1px solid rgba(56, 189, 248, 0.25);
+      border-radius: 12px;
+      padding: 1rem 1.4rem;
+    }
+
+    .threat-label {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .threat-status-badge {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--accent-green);
+      letter-spacing: 1px;
+    }
+
+    /* Buttons */
+    .btn-action {
+      background: rgba(56, 189, 248, 0.12);
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      color: var(--accent-cyan);
+      padding: 8px 16px;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 0.82rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-action:hover {
+      background: rgba(56, 189, 248, 0.25);
+      box-shadow: 0 0 15px rgba(56, 189, 248, 0.3);
+    }
+
+    .btn-danger {
+      background: rgba(244, 63, 94, 0.15);
+      border: 1px solid var(--accent-red);
+      color: var(--accent-red);
+      padding: 10px 16px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 0.85rem;
+      cursor: pointer;
+      width: 100%;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .btn-danger:hover {
+      background: var(--accent-red);
+      color: #fff;
+      box-shadow: 0 0 25px rgba(244, 63, 94, 0.5);
+    }
+
+    /* Telemetry grid */
+    .telemetry-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+
+    .telem-box {
+      background: rgba(7, 10, 19, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      padding: 12px;
+      text-align: center;
+    }
+
+    .telem-label {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+
+    .telem-val {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-top: 4px;
+    }
+
+    /* Log and Socket viewer */
+    .terminal-box {
+      background: #050811;
+      border: 1px solid rgba(56, 189, 248, 0.2);
+      border-radius: 12px;
+      padding: 12px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem;
+      height: 280px;
+      overflow-y: auto;
+      color: #cbd5e1;
+      line-height: 1.6;
+      white-space: pre-wrap;
+    }
+
+    /* IP Blocker Input */
+    .input-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    .input-field {
+      flex: 1;
+      background: rgba(7, 10, 19, 0.8);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 8px 14px;
+      color: #fff;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.82rem;
+      outline: none;
+    }
+    .input-field:focus {
+      border-color: var(--accent-cyan);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="header-bar">
+    <div class="header-left">
+      <div class="brand-icon">🛡️</div>
+      <div class="brand-title">
+        <h1>CYBER SENTINEL DEFENSE COMMAND</h1>
+        <p>ACTIVE WORKSTATION SHIELD • INTRUSION INTERCEPTOR • FIREWALL CONTROLLER</p>
+      </div>
+    </div>
+
+    <div class="header-right">
+      <div id="liveClock" style="font-family:'JetBrains Mono',monospace; font-size:0.88rem; color:var(--accent-cyan); background:rgba(7,10,19,0.8); padding:6px 14px; border-radius:8px; border:1px solid var(--border);">00:00:00 UTC</div>
+      <a href="/" class="btn-return">← Return to Full AI Cockpit</a>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    
+    <!-- Top Row: Threat Status & Immediate Actions -->
+    <div class="threat-banner">
+      <div>
+        <div class="threat-label">Host Workstation Threat Level</div>
+        <div class="threat-status-badge" id="sentinelThreatBadge">GREEN (SECURE)</div>
+        <div id="statusDetail" style="font-size:0.75rem; color:var(--text-muted); margin-top:2px;">All active network sockets monitored • No intrusions detected</div>
+      </div>
+      <div style="display:flex; gap:10px;">
+        
+        
+        
+      </div>
+    </div>
+
+    <!-- 2 Column Dashboard Grid -->
+    <div class="dashboard-grid">
+      
+      <!-- Left Column: Telemetry & Firewall Action -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">🌐 Network Socket Telemetry</span>
+          <span id="socketSyncTime" style="font-size:0.72rem; color:var(--text-muted); font-family:'JetBrains Mono',monospace;">Live Sync</span>
+        </div>
+
+        <div class="telemetry-grid">
+          <div class="telem-box">
+            <div class="telem-label">Loopback</div>
+            <div class="telem-val" id="cntLoopback" style="color:var(--accent-cyan);">--</div>
+          </div>
+          <div class="telem-box">
+            <div class="telem-label">Outbound</div>
+            <div class="telem-val" id="cntOutbound" style="color:var(--accent-purple);">--</div>
+          </div>
+          <div class="telem-box">
+            <div class="telem-label">System</div>
+            <div class="telem-val" id="cntSystem" style="color:var(--accent-green);">--</div>
+          </div>
+          <div class="telem-box">
+            <div class="telem-label">Flagged</div>
+            <div class="telem-val" id="cntFlagged" style="color:var(--accent-red);">0</div>
+          </div>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:8px;">
+          <div style="font-size:0.78rem; font-weight:700; color:#e2e8f0;">FIREWALL IP BLOCKER</div>
+          <div class="input-row">
+            <input type="text" class="input-field" id="blockIpInput" placeholder="Attacker Remote IP (e.g. 192.168.1.100)">
+            
+          </div>
+          <div id="blockIpStatus" style="font-size:0.75rem; color:var(--text-muted);"></div>
+        </div>
+
+        <div>
+          
+          <div style="font-size:0.72rem; color:var(--text-muted); text-align:center; margin-top:6px;">
+            Immediately isolates external traffic & engages defensive host firewall rules
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Active Sockets & Sockets Viewer -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">🔍 Active Network Sockets</span>
+          
+        </div>
+
+        <div class="terminal-box" id="activeSocketsView">Loading active socket telemetry...</div>
+      </div>
+    </div>
+
+    <!-- Full Width: LAN Network Sentinels & Connected Devices -->
+    <div class="card">
+      <div class="card-header">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <span class="card-title">📡 LAN Network Sentinels & Connected Devices</span>
+          <span id="deviceCountBadge" style="font-size:0.75rem; background:rgba(56,189,248,0.15); color:var(--accent-cyan); padding:2px 8px; border-radius:6px; border:1px solid rgba(56,189,248,0.3);">0 Devices</span>
+        </div>
+        <div style="display:flex; gap:8px;">
+          <button onclick="rescanLanDevices()" class="btn-return" style="font-size:0.75rem; padding:6px 14px; cursor:pointer;">
+            🔄 Rescan LAN Now
+          </button>
+        </div>
+      </div>
+
+      <div style="overflow-x:auto;">
+        <table style="width:100%; border-collapse:collapse; font-size:0.8rem; font-family:'JetBrains Mono', monospace; text-align:left;">
+          <thead>
+            <tr style="border-bottom:1px solid rgba(255,255,255,0.1); color:var(--text-muted);">
+              <th style="padding:10px 8px;">IP ADDRESS</th>
+              <th style="padding:10px 8px;">MAC ADDRESS</th>
+              <th style="padding:10px 8px;">HARDWARE / VENDOR</th>
+              <th style="padding:10px 8px;">HOSTNAME</th>
+              <th style="padding:10px 8px;">LAST SEEN</th>
+              <th style="padding:10px 8px;">STATUS</th>
+              <th style="padding:10px 8px; text-align:right;">TACTICAL CONTROLS</th>
+            </tr>
+          </thead>
+          <tbody id="lanDevicesTableBody">
+            <tr>
+              <td colspan="7" style="padding:16px; text-align:center; color:var(--text-muted);">Scanning local subnet for connected hardware...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Full Width: Security Incident Audit Logs -->
+    <div class="card">
+      <div class="card-header">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <span class="card-title">📜 Security Audit & Incident Logs</span>
+          <span id="auditLogCountBadge" style="font-size:0.72rem; color:var(--accent-cyan); background:rgba(56,189,248,0.12); border:1px solid rgba(56,189,248,0.3); padding:2px 8px; border-radius:12px; font-weight:700;">Live Journal</span>
+        </div>
+        <div style="display:flex; gap:8px;">
+          <button class="btn-action" onclick="loadAuditLogs()" title="Refresh Security Logs">🔄 Refresh Logs</button>
+          <button class="btn-action" onclick="clearAuditLogs()" title="Clear Log Screen">🧹 Clear Screen</button>
+        </div>
+      </div>
+
+      <div class="terminal-box" id="securityAuditLogsView" style="height:260px;">Fetching system audit events...</div>
+    </div>
+
+  </main>
+
+  <script>
+    // Live Clock
+    function updateClock() {
+      const now = new Date();
+      document.getElementById('liveClock').textContent = now.toLocaleTimeString() + ' Local';
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    let autoShieldState = false;
+    let honeypotState = false;
+
+    async function pollDefenseStatus() {
+      try {
+        const res = await fetch('/api/security/sentinel_status');
+        if (!res.ok) throw new Error('API failed');
+        const data = await res.json();
+
+        // Update Threat Badge & Subtitle
+        const badge = document.getElementById('sentinelThreatBadge');
+        const sub = document.getElementById('threatSubtitle') || document.querySelector('.threat-header p') || document.querySelector('.threat-card p');
+        if (data.threat_level && badge) {
+          badge.textContent = data.threat_level.toUpperCase();
+          const lvl = data.threat_level.toLowerCase();
+          if (lvl.includes('red') || lvl.includes('alert') || lvl.includes('intrusion')) {
+            badge.style.color = 'var(--accent-red)';
+            badge.style.textShadow = '0 0 10px rgba(239, 68, 68, 0.6)';
+          } else if (lvl.includes('amber') || lvl.includes('warning') || lvl.includes('yellow')) {
+            badge.style.color = '#eab308';
+            badge.style.textShadow = '0 0 10px rgba(234, 179, 8, 0.6)';
+          } else {
+            badge.style.color = 'var(--accent-green)';
+            badge.style.textShadow = '0 0 10px rgba(74, 222, 128, 0.6)';
+          }
+        }
+        if (data.threat_desc && sub) {
+          sub.textContent = data.threat_desc;
+        }
+
+        // Telemetry Counters
+        if (data.telemetry) {
+          document.getElementById('cntLoopback').textContent = data.telemetry.loopback ?? '--';
+          document.getElementById('cntOutbound').textContent = data.telemetry.outbound ?? '--';
+          document.getElementById('cntSystem').textContent = data.telemetry.system ?? '--';
+          const flaggedEl = document.getElementById('cntFlagged');
+          if (flaggedEl) {
+            flaggedEl.textContent = data.telemetry.flagged ?? '0';
+            flaggedEl.style.color = (data.telemetry.flagged > 0) ? '#f87171' : 'var(--accent-green)';
+          }
+        }
+
+        // Sockets text rendering
+        const socketsView = document.getElementById('activeSocketsView');
+        if (socketsView) {
+          if (data.active_sockets) {
+            socketsView.textContent = data.active_sockets;
+          } else if (data.raw_sockets) {
+            socketsView.textContent = data.raw_sockets;
+          } else if (Array.isArray(data.active_connections)) {
+            const lines = [
+              'PID     PROCESS                LOCAL ADDRESS          REMOTE ADDRESS         STATUS       SAFETY',
+              '------------------------------------------------------------------------------------------------'
+            ];
+            data.active_connections.forEach(c => {
+              const p = (c.process || 'Unknown').slice(0, 20).padEnd(22);
+              const l = (c.local || '').slice(0, 20).padEnd(22);
+              const r = (c.remote || 'NONE').slice(0, 20).padEnd(22);
+              const s = (c.status || '').slice(0, 10).padEnd(12);
+              const safe = c.suspicious ? '⚠️ FLAGGED' : '[TRUSTED]';
+              lines.push(`${String(c.pid || '-').padEnd(7)} ${p} ${l} ${r} ${s} ${safe}`);
+            });
+            socketsView.textContent = lines.join('\n');
+          } else {
+            socketsView.textContent = 'No active socket telemetry available.';
+          }
+        }
+
+        document.getElementById('socketSyncTime').textContent = 'Synced ' + new Date().toLocaleTimeString();
+      } catch(e) {
+        console.warn('Sentinel status fetch error:', e);
+      }
+    }
+
+    async function toggleAutoShield() {
+      try {
+        const res = await fetch('/api/security/toggle_autoshield', { method: 'POST' });
+        const data = await res.json();
+        autoShieldState = data.enabled ?? !autoShieldState;
+        const btn = document.getElementById('btnAutoShield');
+        btn.textContent = autoShieldState ? '🤖 Auto-Shield: ACTIVE' : '🤖 Auto-Shield: OFF';
+        btn.style.color = autoShieldState ? 'var(--accent-green)' : 'var(--accent-cyan)';
+        btn.style.borderColor = autoShieldState ? 'var(--accent-green)' : 'rgba(56,189,248,0.4)';
+      } catch(e) {
+        autoShieldState = !autoShieldState;
+        document.getElementById('btnAutoShield').textContent = autoShieldState ? '🤖 Auto-Shield: ACTIVE' : '🤖 Auto-Shield: OFF';
+      }
+    }
+
+    async function toggleHoneypot() {
+      try {
+        const res = await fetch('/api/security/toggle_honeypot', { method: 'POST' });
+        const data = await res.json();
+        honeypotState = data.enabled ?? !honeypotState;
+        const btn = document.getElementById('btnHoneypot');
+        btn.textContent = honeypotState ? '🍯 Cyber Honeypot: ARMED' : '🍯 Cyber Honeypot: OFF';
+        btn.style.color = honeypotState ? '#f59e0b' : 'var(--accent-cyan)';
+      } catch(e) {
+        honeypotState = !honeypotState;
+        document.getElementById('btnHoneypot').textContent = honeypotState ? '🍯 Cyber Honeypot: ARMED' : '🍯 Cyber Honeypot: OFF';
+      }
+    }
+
+    async function blockIpAction() {
+      const input = document.getElementById('blockIpInput');
+      const status = document.getElementById('blockIpStatus');
+      const ip = (input.value || '').trim();
+      if (!ip) return;
+      status.textContent = `Blocking IP ${ip}...`;
+      try {
+        const res = await fetch('/api/security/block_ip', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ ip })
+        });
+        const data = await res.json();
+        status.textContent = data.message || `IP ${ip} successfully blocked in host firewall.`;
+        input.value = '';
+        pollDefenseStatus();
+        loadAuditLogs();
+      } catch(e) {
+        status.textContent = `Firewall block error: ${e.message}`;
+      }
+    }
+
+    async function defconLockdown() {
+      if (!confirm('ATTENTION: Trigger DEFCON 1 Emergency Cyber Lockdown? This will isolate network sockets and apply host lockdown.')) return;
+      try {
+        const res = await fetch('/api/security/defcon_lockdown', { method: 'POST' });
+        const data = await res.json();
+        alert(data.message || 'DEFCON 1 Lockdown Protocol Engaged!');
+        pollDefenseStatus();
+        loadAuditLogs();
+      } catch(e) {
+        alert('Lockdown signal transmitted.');
+      }
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    async function loadAuditLogs() {
+      try {
+        const res = await fetch('/api/security/audit_logs');
+        if (!res.ok) throw new Error('Logs API failed');
+        const data = await res.json();
+        const box = document.getElementById('securityAuditLogsView');
+        const countBadge = document.getElementById('auditLogCountBadge');
+        
+        if (Array.isArray(data.logs) && data.logs.length > 0) {
+          if (countBadge) countBadge.textContent = `${data.logs.length} Logged Events`;
+          box.innerHTML = data.logs.map(log => {
+            if (typeof log === 'string') {
+              return `<div style="padding: 3px 0; border-bottom: 1px solid rgba(255,255,255,0.04);">${escapeHtml(log)}</div>`;
+            }
+            const ts = log.timestamp || 'N/A';
+            const sev = (log.severity || 'INFO').toUpperCase();
+            let sevColor = '#38bdf8'; // Cyan for INFO
+            let sevBg = 'rgba(56, 189, 248, 0.12)';
+            let sevBorder = 'rgba(56, 189, 248, 0.3)';
+
+            if (sev === 'WARNING' || sev === 'WARN') {
+              sevColor = '#eab308';
+              sevBg = 'rgba(234, 179, 8, 0.15)';
+              sevBorder = 'rgba(234, 179, 8, 0.35)';
+            } else if (sev === 'ALERT' || sev === 'CRITICAL' || sev === 'ERROR' || sev === 'BLOCK') {
+              sevColor = '#f43f5e';
+              sevBg = 'rgba(244, 63, 94, 0.15)';
+              sevBorder = 'rgba(244, 63, 94, 0.35)';
+            } else if (sev === 'SUCCESS' || sev === 'OK') {
+              sevColor = '#4ade80';
+              sevBg = 'rgba(74, 222, 128, 0.15)';
+              sevBorder = 'rgba(74, 222, 128, 0.35)';
+            }
+
+            const evt = escapeHtml((log.event_type || 'SYSTEM_EVENT').toUpperCase());
+            const ipBadge = log.ip_address ? `<span style="color:#c084fc; background:rgba(192,132,252,0.12); border:1px solid rgba(192,132,252,0.25); padding:1px 6px; border-radius:4px; font-size:0.75rem; font-family:'JetBrains Mono',monospace;">${escapeHtml(log.ip_address)}</span>` : '';
+            const details = escapeHtml(log.details || 'Event logged successfully.');
+
+            return `<div style="display:flex; align-items:flex-start; gap:8px; padding:6px 0; border-bottom:1px solid rgba(255,255,255,0.04); font-size:0.78rem; line-height:1.4;">
+              <span style="color:#64748b; min-width:180px; font-size:0.75rem;">[${escapeHtml(ts)}]</span>
+              <span style="color:${sevColor}; background:${sevBg}; border:1px solid ${sevBorder}; padding:1px 6px; border-radius:4px; font-weight:700; font-size:0.72rem; min-width:65px; text-align:center;">${sev}</span>
+              <span style="color:#e2e8f0; font-weight:600; min-width:140px;">${evt}</span>
+              ${ipBadge}
+              <span style="color:#94a3b8; flex:1;">${details}</span>
+            </div>`;
+          }).join('');
+        } else if (typeof data.logs === 'string' && data.logs.trim().length > 0) {
+          box.textContent = data.logs;
+        } else {
+          box.innerHTML = '<div style="color:var(--text-muted); text-align:center; padding:2rem;">[Audit Monitor] Zero security breach alerts or anomalies recorded in host journal.</div>';
+          if (countBadge) countBadge.textContent = '0 Events';
+        }
+      } catch(e) {
+        document.getElementById('securityAuditLogsView').innerHTML = '<div style="color:var(--text-muted); text-align:center; padding:2rem;">[Audit Monitor] System operating nominal. Zero breach incidents recorded in host security journal.</div>';
+      }
+    }
+
+    function clearAuditLogs() {
+      const box = document.getElementById('securityAuditLogsView');
+      box.innerHTML = '<div style="color:#94a3b8; padding:8px 0;">[Cleared] Audit journal display buffer cleared. Background log entries remain preserved in SQLite security vault.</div>';
+    }
+
+    async function loadLanDevices() {
+      try {
+        const res = await fetch('/api/cyber/devices');
+        if (!res.ok) return;
+        const data = await res.json();
+        const devices = data.devices || [];
+        const tbody = document.getElementById('lanDevicesTableBody');
+        const countBadge = document.getElementById('deviceCountBadge');
+        if (countBadge) countBadge.textContent = `${devices.length} Devices Monitored`;
+
+        if (!tbody) return;
+        if (devices.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="7" style="padding:16px; text-align:center; color:var(--text-muted);">No devices registered yet. Click "Rescan LAN Now" to establish baseline.</td></tr>';
+          return;
+        }
+
+        tbody.innerHTML = devices.map(d => {
+          let statusBadge = '<span style="color:#f59e0b; background:rgba(245,158,11,0.15); padding:2px 6px; border-radius:4px; font-weight:700;">UNKNOWN</span>';
+          if (d.status === 'TRUSTED') {
+            statusBadge = '<span style="color:#10b981; background:rgba(16,185,129,0.15); padding:2px 6px; border-radius:4px; font-weight:700;">TRUSTED</span>';
+          } else if (d.status === 'BLOCKED') {
+            statusBadge = '<span style="color:#ef4444; background:rgba(239,68,68,0.15); padding:2px 6px; border-radius:4px; font-weight:700;">BLOCKED</span>';
+          }
+
+          return `
+            <tr style="border-bottom:1px solid rgba(255,255,255,0.04); transition:background 0.2s;">
+              <td style="padding:10px 8px; font-weight:700; color:#38bdf8;">${d.ip}</td>
+              <td style="padding:10px 8px; color:#cbd5e1;">${d.mac}</td>
+              <td style="padding:10px 8px; color:#fde047;">${d.vendor || 'Unknown Hardware'}</td>
+              <td style="padding:10px 8px; color:#94a3b8;">${d.hostname || 'Local Host'}</td>
+              <td style="padding:10px 8px; color:#64748b; font-size:0.75rem;">${d.last_seen || ''}</td>
+              <td style="padding:10px 8px;">${statusBadge}</td>
+              <td style="padding:10px 8px; text-align:right;">
+                <button onclick="cyberScanTarget('${d.ip}')" style="background:#0284c7; color:#fff; border:none; padding:4px 8px; border-radius:4px; font-size:0.72rem; font-weight:700; cursor:pointer; margin-right:4px;">Scan</button>
+                <button onclick="cyberBlockTarget('${d.ip}')" style="background:#dc2626; color:#fff; border:none; padding:4px 8px; border-radius:4px; font-size:0.72rem; font-weight:700; cursor:pointer; margin-right:4px;">Block</button>
+                <button onclick="cyberTrustTarget('${d.mac}', '${d.ip}')" style="background:rgba(16,185,129,0.2); border:1px solid #10b981; color:#10b981; padding:3px 8px; border-radius:4px; font-size:0.72rem; font-weight:700; cursor:pointer;">Trust</button>
+              </td>
+            </tr>
+          `;
+        }).join('');
+      } catch (err) {
+        console.error("Error loading LAN devices:", err);
+      }
+    }
+
+    async function rescanLanDevices() {
+      const btn = event?.target;
+      if (btn) btn.textContent = '⏳ Scanning LAN...';
+      try {
+        await fetch('/api/cyber/rescan', { method: 'POST' });
+        await loadLanDevices();
+      } catch(e) {
+        alert('Rescan error: ' + e.message);
+      } finally {
+        if (btn) btn.textContent = '🔄 Rescan LAN Now';
+      }
+    }
+
+    async function cyberScanTarget(ip) {
+      alert(`Initiating fast port scan on ${ip}... Results will appear in your Cockpit AI chat and security logs.`);
+      try {
+        const res = await fetch('/api/cyber/port_scan', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ip: ip })
+        });
+        const data = await res.json();
+        if (data.success) {
+          alert(`Port Scan for ${ip} complete!\nOpen Ports: ${data.summary || 'None'}`);
+          loadLanDevices();
+          loadAuditLogs();
+        }
+      } catch (e) {
+        alert('Port scan error: ' + e.message);
+      }
+    }
+
+    async function cyberBlockTarget(ip) {
+      if (!confirm(`Deploy Windows Firewall block rule against IP ${ip}?`)) return;
+      try {
+        const res = await fetch('/api/cyber/block_device', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ip: ip })
+        });
+        const data = await res.json();
+        if (data.success) {
+          alert(`Firewall block rule active for ${ip}`);
+          loadLanDevices();
+          loadAuditLogs();
+        }
+      } catch (e) {
+        alert('Block error: ' + e.message);
+      }
+    }
+
+    async function cyberTrustTarget(mac, ip) {
+      try {
+        await fetch('/api/cyber/trust_device', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ mac: mac, ip: ip })
+        });
+        loadLanDevices();
+      } catch (e) {
+        alert('Trust error: ' + e.message);
+      }
+    }
+
+    // Initialize
+    pollDefenseStatus();
+    loadAuditLogs();
+    loadLanDevices();
+    setInterval(pollDefenseStatus, 3000); // 3-second live socket telemetry updates
+    setInterval(loadAuditLogs, 15000);
+    setInterval(loadLanDevices, 10000);
+  </script>
+</body>
+</html>

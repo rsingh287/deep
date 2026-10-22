@@ -1,0 +1,175 @@
+# ==============================================================================
+# D.E.E.P (Dynamic Executive Edge Platform) - Git Ignore Configuration
+# Zero-Trust Production & Open Source Standard
+# ==============================================================================
+
+# -----------------------------------------------------------------------------
+# 1. Credentials, Secrets & Environment Configurations (MANDATORY ZERO-TRUST)
+# -----------------------------------------------------------------------------
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.token
+*.pfx
+*.cert
+*.crt
+id_rsa*
+change_pg_pass.py
+
+# Personal Identity, Resumes & Documents
+*resume*
+*Resume*
+*.docx
+
+# -----------------------------------------------------------------------------
+# 2. Local Databases, Vectors & Epistemic Memory
+# -----------------------------------------------------------------------------
+*.db
+*.db-*
+*.sqlite
+*.sqlite3
+*.ldb
+database.db
+local_ai.db
+deep_knowledge_graph.db
+qdrant_db/
+chroma_db/
+pg_data/
+flash_knowledge/
+control_settings.json
+custom_circuits.json
+automix_meta_cache.json
+voice_state.json
+
+# -----------------------------------------------------------------------------
+# 3. Browser Profiles, Session Data & Caches (Prevents 400MB+ Bloat & Session Leaks)
+# -----------------------------------------------------------------------------
+pc_app_profile/
+component_crx_cache/
+extensions_crx_cache/
+DawnGraphiteCache/
+
+# -----------------------------------------------------------------------------
+# 4. Voice Biometrics, Audio Media & Clones
+# -----------------------------------------------------------------------------
+voices.bin
+custom_voices/
+recordings/
+music/
+scratch/lyrics_cache/
+*.mp3
+*.wav
+*.flac
+*.aac
+
+# -----------------------------------------------------------------------------
+# 4b. Machine Learning Models, Neural Weights & Tasks (>50MB Bloat)
+# -----------------------------------------------------------------------------
+*.pth
+*.pt
+*.onnx
+*.task
+*.bin
+*.weights
+*.tflite
+*.safetensors
+*.gguf
+
+# -----------------------------------------------------------------------------
+# 5. Screen Captures, Webcam Dumps & Binary Vision Artifacts
+# -----------------------------------------------------------------------------
+real_screen*.png
+screen_*.png
+webcam_hardware_capture.jpg
+desktop_vision_capture.png
+!static/*.png
+!static/img/*
+!blender_projects/previews/*.png
+!reports/*.png
+!docs/images/*
+
+# -----------------------------------------------------------------------------
+# 6. Embedded & Hardware Logs (PICkit / MPLAB)
+# -----------------------------------------------------------------------------
+MPLABXLog.xml*
+log.0
+*.hex
+*.cof
+*.mcs
+
+# -----------------------------------------------------------------------------
+# 7. Temporary, Scratch & Runtime Directories
+# -----------------------------------------------------------------------------
+scratch/
+.trash/
+disabled_startup_backup/
+startup_backup/
+invoices_inbox/
+uploads/
+.system_generated/
+generated_apps/*
+!generated_apps/.gitkeep
+globe-page/
+node_modules/
+DEEP_Voice_Sentinel.vbs
+
+# Scratch / One-off developer test scripts
+test.py
+test_api.py
+test_api2.py
+test_db.py
+scratch_test_ollama.py
+run_live_deep_test.py
+cleanup_startup.py
+record_feedback_fix.py
+test_train_deep.py
+train_deep_pic_hardware.py
+
+*.tmp
+*.bak
+*.bak_*
+*.log
+
+# -----------------------------------------------------------------------------
+# 8. Python, Virtual Environments & C-Extensions
+# -----------------------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.pyd
+.Python
+env/
+venv/
+.venv/
+ENV/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+.pytest_cache/
+
+# -----------------------------------------------------------------------------
+# 9. IDEs & Operating System Artifacts
+# -----------------------------------------------------------------------------
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini

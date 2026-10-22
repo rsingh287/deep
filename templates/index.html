@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Antigravity Local AI PC Cockpit - Sci-Fi Workstation</title>
+  <link rel="manifest" href="/static/manifest.json">
+  <meta name="theme-color" content="#070a12">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Rajdhani:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+  <script src="//unpkg.com/3d-force-graph"></script>
+  
+
+  
+  
+
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}?v=2.5">
+</head>
+<body>
+
+  <!-- Matrix Background Canvas -->
+  <canvas id="matrixCanvas"></canvas>
+
+  <video id="fallbackVideo" autoplay playsinline></video>
+  <input type="file" id="imageFileInput" accept="image/*">
+  <input type="file" id="globalZipFileInput" accept=".zip,.rar,.7z,.tar,.gz,.png,.jpg,.jpeg,.csv" style="display:none;" onchange="handleZipUpload(this.files[0])">
+
+  <!-- Command Palette Modal (Ctrl+K) -->
+  {% include 'modals/cmdPaletteModal.html' %}
+    <!-- COCKPIT SUBSYSTEM OVERLAY CONTAINER (Weather, Trading, Defense, Memory) -->
+
+  <!-- ========================================================================= -->
+  <!-- D.E.E.P SLIDE-OUT COMMAND DRAWER (CONSOLIDATED SUBSYSTEMS & TOOLS)          -->
+  <!-- ========================================================================= -->
+  {% include 'modals/deepCommandDrawerOverlay.html' %}
+  
+  <!-- ========================================================================= -->
+  <!-- D.E.E.P QUANTUM HOLOGRAPHIC COMMAND CENTER HUD (ENTERPRISE / JARVIS)       -->
+  <!-- ========================================================================= -->
+  
+
+  
+
+  {% include 'modals/knowledgeGraphModal.html' %}
+  {% include 'modals/deepQuantumHUDModal.html' %}
+
+  <!-- ========================================================================= -->
+  <!-- NEURAL VOICE CLONING STUDIO MODAL                                         -->
+  <!-- ========================================================================= -->
+  {% include 'modals/voiceCloningModal.html' %}
+
+{% include 'modals/subsystemOverlayContainer.html' %}
+
+<!-- 85% VOICE COMMANDS CHEAT SHEET MODAL -->
+  {% include 'modals/voiceCommandsModal.html' %}
+
+
+  <!-- ========================================================================= -->
+  <!-- ⚙️ WORKSTATION SETTINGS & SYSTEM CONFIGURATION MODAL -->
+  <!-- ========================================================================= -->
+  {% include 'modals/modalWorkstationSettings.html' %}
+  {% include 'modals/dockerControlModal.html' %}
+
+  <!-- ========================================================================= -->
+  <!-- 🧠 HUMAN FEEDBACK & LEARNED COGNITIVE RULES MODAL                          -->
+  <!-- ========================================================================= -->
+  {% include 'modals/modalHumanFeedback.html' %}
+
+  <!-- Standby Overlay -->
+  {% include 'modals/standbyOverlay.html' %}
+
+  <!-- Top Navigation Header Bar with Grouped Controls -->
+  {% include 'partials/top_bar.html' %}
+
+  <!-- Application Body Layout -->
+  <main class="app-body" id="appBody">
+
+    <!-- IDE ACTIVITY BAR (FAR-LEFT VERTICAL NAVIGATION DOCK) -->
+    {% include 'partials/activityBar.html' %}
+
+    <!-- LEFT SIDEBAR PANEL: CHATS, TOOLS & TELEMETRY -->
+    {% include 'partials/panelLeft.html' %}
+
+    <!-- CENTER CONTAINER: CHAT & WORKSPACE -->
+    {% include 'partials/centerContainer.html' %}
+
+    <!-- ARTIFACT CANVAS: DEDICATED LIVE CODE & UI VIEWER -->
+    {% include 'partials/panelCanvas.html' %}
+
+    <!-- RIGHT PANEL: 3D COMPANION ASSISTANT -->
+    {% include 'partials/panelRight.html' %}
+
+  </main>
+
+  
+  <script src="{{ url_for('static', filename='js/app.js') }}?v=2.5"></script>
+</body>
+</html>

@@ -1,0 +1,102 @@
+<div id="voiceCloningModal" class="hidden" style="position:fixed; inset:0; background:rgba(4, 8, 19, 0.85); backdrop-filter:blur(16px); z-index:99999; display:none; align-items:center; justify-content:center; padding:20px;">
+    <div style="width:100%; max-width:680px; background:linear-gradient(180deg, rgba(15, 23, 42, 0.98), rgba(10, 15, 29, 0.98)); border:1px solid rgba(168, 85, 247, 0.5); border-radius:16px; box-shadow:0 0 40px rgba(168, 85, 247, 0.3), 0 20px 50px rgba(0,0,0,0.8); overflow:hidden; display:flex; flex-direction:column; font-family:'Inter', sans-serif;">
+      
+      <!-- Studio Header -->
+      <div style="display:flex; align-items:center; justify-content:space-between; padding:18px 24px; background:rgba(30, 27, 75, 0.5); border-bottom:1px solid rgba(168, 85, 247, 0.3);">
+        <div style="display:flex; align-items:center; gap:12px;">
+          <div style="width:36px; height:36px; border-radius:10px; background:linear-gradient(135deg, #a855f7, #06b6d4); display:flex; align-items:center; justify-content:center; font-size:18px; box-shadow:0 0 15px rgba(168, 85, 247, 0.5);">
+            🎙️
+          </div>
+          <div>
+            <div style="font-family:'JetBrains Mono', monospace; font-size:14px; font-weight:700; color:#f3e8ff; letter-spacing:1.5px;">NEURAL VOICE CLONING STUDIO</div>
+            <div style="font-size:11px; color:#a855f7; letter-spacing:0.5px;">ACOUSTIC HARMONIC PROFILER & SYNTHESIZER</div>
+          </div>
+        </div>
+        <button onclick="window.DeepVoiceStudio.close()" style="background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12); color:#cbd5e1; border-radius:8px; padding:6px 12px; font-size:12px; font-family:'JetBrains Mono', monospace; cursor:pointer; transition:all 0.2s;">✕ Close</button>
+      </div>
+
+      <!-- Studio Content Body -->
+      <div style="padding:24px; display:flex; flex-direction:column; gap:20px;">
+        
+        <!-- Guided Script Box -->
+        <div style="background:rgba(168, 85, 247, 0.08); border:1px dashed rgba(168, 85, 247, 0.35); border-radius:12px; padding:14px 18px;">
+          <div style="font-size:11px; font-weight:600; text-transform:uppercase; color:#c084fc; margin-bottom:6px; letter-spacing:1px;">📖 Calibration Script (Read aloud while recording):</div>
+          <div style="font-size:13px; color:#f1f5f9; font-style:italic; line-height:1.5;">
+            "Hello, I am calibrating my voice profile for the Antigravity local workstation. This audio will be analyzed for pitch, cadence, and vocal tone."
+          </div>
+        </div>
+
+        <!-- Recording & Upload Split -->
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+          
+          <!-- Method 1: Live Mic Record -->
+          <div style="background:rgba(15, 23, 42, 0.7); border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:18px; display:flex; flex-direction:column; align-items:center; text-align:center; gap:12px;">
+            <div style="font-size:12px; font-weight:600; color:#e2e8f0; letter-spacing:0.5px;">METHOD 1: RECORD LIVE</div>
+            
+            <div id="voiceRecordVisualizer" style="display:flex; align-items:center; justify-content:center; gap:4px; height:32px; width:100%;">
+              <div class="v-bar" style="width:5px; height:8px; background:#a855f7; border-radius:3px; transition:height 0.1s;"></div>
+              <div class="v-bar" style="width:5px; height:12px; background:#c084fc; border-radius:3px; transition:height 0.1s;"></div>
+              <div class="v-bar" style="width:5px; height:18px; background:#06b6d4; border-radius:3px; transition:height 0.1s;"></div>
+              <div class="v-bar" style="width:5px; height:10px; background:#c084fc; border-radius:3px; transition:height 0.1s;"></div>
+              <div class="v-bar" style="width:5px; height:6px; background:#a855f7; border-radius:3px; transition:height 0.1s;"></div>
+            </div>
+
+            <div id="voiceCountdown" style="font-family:'JetBrains Mono', monospace; font-size:22px; font-weight:700; color:#a855f7;">00:05</div>
+
+            <button id="btnStartVoiceRecord" onclick="window.DeepVoiceStudio.startRecording()" style="width:100%; padding:10px 16px; background:linear-gradient(135deg, #a855f7, #7e22ce); border:none; border-radius:8px; color:#ffffff; font-family:'JetBrains Mono', monospace; font-size:12px; font-weight:600; cursor:pointer; box-shadow:0 0 15px rgba(168, 85, 247, 0.4); display:flex; align-items:center; justify-content:center; gap:8px; transition:all 0.2s;">
+              <span style="display:inline-block; width:10px; height:10px; border-radius:50%; background:#ef4444;"></span>
+              <span>Record 5 Seconds</span>
+            </button>
+          </div>
+
+          <!-- Method 2: Audio File Upload -->
+          <div style="background:rgba(15, 23, 42, 0.7); border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:18px; display:flex; flex-direction:column; align-items:center; text-align:center; gap:12px;">
+            <div style="font-size:12px; font-weight:600; color:#e2e8f0; letter-spacing:0.5px;">METHOD 2: UPLOAD CLIP</div>
+            <div style="font-size:28px;">📁</div>
+            <div style="font-size:11px; color:#94a3b8;">Accepts .wav, .mp3, .m4a clips (3-15 seconds)</div>
+            <input type="file" id="voiceUploadInput" accept="audio/*" style="display:none;" onchange="window.DeepVoiceStudio.handleFileUpload(event)">
+            <button onclick="document.getElementById('voiceUploadInput').click()" style="width:100%; padding:10px 16px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.15); border-radius:8px; color:#f1f5f9; font-family:'JetBrains Mono', monospace; font-size:12px; font-weight:600; cursor:pointer; transition:all 0.2s;">
+              Choose Audio File
+            </button>
+          </div>
+        </div>
+
+        <!-- Status & Diagnostic Card -->
+        <div id="voiceStudioStatusCard" style="background:rgba(10, 15, 29, 0.9); border:1px solid rgba(6, 182, 212, 0.3); border-radius:12px; padding:16px 20px;">
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;">
+            <div style="font-size:11px; font-family:'JetBrains Mono', monospace; font-weight:700; color:#06b6d4; letter-spacing:1px;">ACOUSTIC PROFILE READOUT:</div>
+            <div id="voiceStudioBadge" style="font-size:10px; font-family:'JetBrains Mono', monospace; padding:3px 8px; border-radius:12px; background:rgba(34, 197, 94, 0.15); border:1px solid rgba(34, 197, 94, 0.4); color:#4ade80;">● READY</div>
+          </div>
+          <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:12px; font-family:'JetBrains Mono', monospace;">
+            <div style="background:rgba(255,255,255,0.03); padding:10px; border-radius:8px; border:1px solid rgba(255,255,255,0.05);">
+              <div style="font-size:10px; color:#94a3b8;">PITCH (F0)</div>
+              <div id="diagPitchVal" style="font-size:14px; font-weight:700; color:#38bdf8; margin-top:2px;">-- Hz</div>
+            </div>
+            <div style="background:rgba(255,255,255,0.03); padding:10px; border-radius:8px; border:1px solid rgba(255,255,255,0.05);">
+              <div style="font-size:10px; color:#94a3b8;">VOCAL PROFILE</div>
+              <div id="diagRangeVal" style="font-size:12px; font-weight:700; color:#c084fc; margin-top:2px;">--</div>
+            </div>
+            <div style="background:rgba(255,255,255,0.03); padding:10px; border-radius:8px; border:1px solid rgba(255,255,255,0.05);">
+              <div style="font-size:10px; color:#94a3b8;">TONE OFFSET</div>
+              <div id="diagOffsetVal" style="font-size:14px; font-weight:700; color:#4ade80; margin-top:2px;">-- Hz</div>
+            </div>
+          </div>
+          <div id="voiceStudioStatusMsg" style="font-size:12px; color:#cbd5e1; margin-top:12px; line-height:1.4;">
+            Ready to record. Click "Record 5 Seconds" or select an audio file.
+          </div>
+        </div>
+
+        <!-- Action Footer -->
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:12px;">
+          <button id="btnTestClonedVoice" onclick="window.DeepVoiceStudio.testPlayback()" style="flex:1; padding:12px 18px; background:linear-gradient(135deg, rgba(6, 182, 212, 0.25), rgba(168, 85, 247, 0.25)); border:1px solid rgba(6, 182, 212, 0.6); border-radius:10px; color:#38bdf8; font-family:'JetBrains Mono', monospace; font-size:12px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; transition:all 0.2s;">
+            <span>🔊</span>
+            <span>Test My Cloned Voice</span>
+          </button>
+          <button onclick="window.DeepVoiceStudio.close()" style="padding:12px 20px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15); border-radius:10px; color:#f1f5f9; font-family:'JetBrains Mono', monospace; font-size:12px; font-weight:600; cursor:pointer; transition:all 0.2s;">
+            Done
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>

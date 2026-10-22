@@ -1,0 +1,139 @@
+<!-- ============================================================== -->
+<!-- 🐳 DOCKER & MCP TOOLKIT WORKSTATION MODAL -->
+<!-- ============================================================== -->
+<div class="modal-overlay" id="dockerControlModal" style="display:none; position:fixed; inset:0; background:rgba(3,7,18,0.85); backdrop-filter:blur(10px); z-index:9999; justify-content:center; align-items:center; padding:20px;">
+  <div class="modal-card" style="width:100%; max-width:960px; max-height:90vh; background:linear-gradient(145deg, rgba(15,23,42,0.95), rgba(8,14,26,0.98)); border:1px solid rgba(14,165,233,0.35); border-radius:18px; box-shadow:0 25px 60px rgba(0,0,0,0.7), 0 0 35px rgba(14,165,233,0.15); display:flex; flex-direction:column; overflow:hidden; animation:modalSlideUp 0.25s ease-out;">
+
+    <!-- Modal Header -->
+    <div style="padding:16px 24px; border-bottom:1px solid rgba(255,255,255,0.08); display:flex; justify-content:space-between; align-items:center; background:rgba(14,165,233,0.05);">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <span style="font-size:1.8rem; filter:drop-shadow(0 0 10px rgba(14,165,233,0.6));">🐳</span>
+        <div>
+          <div style="font-size:1.15rem; font-weight:800; color:#fff; letter-spacing:0.5px; display:flex; align-items:center; gap:8px;">
+            DOCKER & MCP TOOLKIT COCKPIT
+            <span id="dockerDaemonBadge" style="font-size:0.68rem; padding:2px 8px; border-radius:12px; background:rgba(34,197,94,0.15); border:1px solid rgba(34,197,94,0.3); color:#4ade80; font-weight:700;">DAEMON ACTIVE</span>
+          </div>
+          <div style="font-size:0.75rem; color:var(--text-muted);">Containerized MCP Tools • Ephemeral Sandbox Execution • Compose Microservices</div>
+        </div>
+      </div>
+      <button onclick="closeDockerControlModal()" style="background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); color:#94a3b8; border-radius:10px; width:34px; height:34px; font-size:1.1rem; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all 0.2s;" onmouseover="this.style.color='#fff'; this.style.borderColor='rgba(239,68,68,0.5)';" onmouseout="this.style.color='#94a3b8'; this.style.borderColor='rgba(255,255,255,0.1)';">✕</button>
+    </div>
+
+    <!-- Modal Body -->
+    <div style="flex:1; overflow-y:auto; padding:22px; display:flex; flex-direction:column; gap:20px;">
+      
+      <!-- Top Metrics Row -->
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:12px;">
+        <div style="background:rgba(15,23,42,0.7); border:1px solid rgba(14,165,233,0.25); border-radius:12px; padding:14px;">
+          <div style="font-size:0.72rem; color:var(--text-muted); text-transform:uppercase; font-weight:700;">Active MCP Profile</div>
+          <div id="dockerProfileVal" style="font-size:1.15rem; font-weight:800; color:#38bdf8; margin-top:4px;">pappiprait</div>
+          <div style="font-size:0.68rem; color:#94a3b8; margin-top:2px;">Docker MCP Gateway profile</div>
+        </div>
+
+        <div style="background:rgba(15,23,42,0.7); border:1px solid rgba(14,165,233,0.25); border-radius:12px; padding:14px;">
+          <div style="font-size:0.72rem; color:var(--text-muted); text-transform:uppercase; font-weight:700;">Containerized MCP Servers</div>
+          <div id="dockerServerCountVal" style="font-size:1.15rem; font-weight:800; color:#a855f7; margin-top:4px;">5 Servers</div>
+          <div style="font-size:0.68rem; color:#94a3b8; margin-top:2px;">duckduckgo, fetch, n8n, playwright...</div>
+        </div>
+
+        <div style="background:rgba(15,23,42,0.7); border:1px solid rgba(14,165,233,0.25); border-radius:12px; padding:14px;">
+          <div style="font-size:0.72rem; color:var(--text-muted); text-transform:uppercase; font-weight:700;">Live MCP Tools Available</div>
+          <div id="dockerToolCountVal" style="font-size:1.15rem; font-weight:800; color:#22c55e; margin-top:4px;">61 Tools</div>
+          <div style="font-size:0.68rem; color:#94a3b8; margin-top:2px;">Usable by D.E.E.P in real-time</div>
+        </div>
+
+        <div style="background:rgba(15,23,42,0.7); border:1px solid rgba(14,165,233,0.25); border-radius:12px; padding:14px;">
+          <div style="font-size:0.72rem; color:var(--text-muted); text-transform:uppercase; font-weight:700;">Sandbox Isolation</div>
+          <div style="font-size:1.15rem; font-weight:800; color:#f59e0b; margin-top:4px;">Air-Gapped</div>
+          <div style="font-size:0.68rem; color:#94a3b8; margin-top:2px;">--network none • 512MB quota</div>
+        </div>
+      </div>
+
+      <!-- Section: Docker MCP Servers & Tools -->
+      <div style="background:rgba(15,23,42,0.6); border:1px solid rgba(255,255,255,0.08); border-radius:14px; padding:16px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+          <div style="font-size:0.92rem; font-weight:800; color:#fff; display:flex; align-items:center; gap:8px;">
+            <span>⚡</span> Active Docker MCP Servers in 'pappiprait'
+          </div>
+          <button onclick="refreshDockerTelemetry()" style="background:rgba(14,165,233,0.15); border:1px solid rgba(14,165,233,0.3); color:#38bdf8; border-radius:8px; padding:4px 10px; font-size:0.75rem; font-weight:700; cursor:pointer;">↻ Refresh</button>
+        </div>
+        <div id="dockerServersPills" style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px;">
+          <!-- Dynamically populated -->
+        </div>
+
+        <!-- Quick MCP Tool Action Bar -->
+        <div style="background:rgba(8,14,26,0.7); border:1px solid rgba(56,189,248,0.2); border-radius:10px; padding:12px; display:flex; flex-direction:column; gap:8px;">
+          <div style="font-size:0.78rem; font-weight:700; color:#94a3b8;">Quick MCP Action Test</div>
+          <div style="display:flex; gap:8px;">
+            <input type="text" id="dockerQuickQuery" placeholder="Search web with DuckDuckGo or enter URL to fetch..." style="flex:1; background:rgba(30,41,59,0.8); border:1px solid rgba(255,255,255,0.1); border-radius:8px; padding:8px 12px; color:#fff; font-size:0.82rem; outline:none;">
+            <button onclick="testDockerSearch()" style="background:linear-gradient(135deg, #0284c7, #0369a1); border:none; border-radius:8px; padding:8px 14px; color:#fff; font-weight:700; font-size:0.8rem; cursor:pointer;">🔍 Search</button>
+            <button onclick="testDockerFetch()" style="background:linear-gradient(135deg, #7c3aed, #6d28d9); border:none; border-radius:8px; padding:8px 14px; color:#fff; font-weight:700; font-size:0.8rem; cursor:pointer;">📄 Fetch URL</button>
+          </div>
+          <pre id="dockerMcpOutput" style="display:none; max-height:160px; overflow-y:auto; background:rgba(3,7,18,0.9); border:1px solid rgba(255,255,255,0.06); border-radius:8px; padding:10px; font-size:0.75rem; color:#4ade80; margin:0; font-family:monospace;"></pre>
+        </div>
+      </div>
+
+      <!-- Section: Ephemeral Code Sandbox Runner -->
+      <div style="background:rgba(15,23,42,0.6); border:1px solid rgba(255,255,255,0.08); border-radius:14px; padding:16px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+          <div style="font-size:0.92rem; font-weight:800; color:#fff; display:flex; align-items:center; gap:8px;">
+            <span>🛡️</span> Ephemeral Docker Code Sandbox
+          </div>
+          <div style="display:flex; gap:8px; align-items:center;">
+            <select id="dockerSandboxLang" style="background:rgba(30,41,59,0.8); border:1px solid rgba(255,255,255,0.15); border-radius:6px; padding:4px 8px; color:#fff; font-size:0.75rem;">
+              <option value="python">Python 3.11</option>
+              <option value="javascript">Node.js 18</option>
+              <option value="bash">Ubuntu Bash</option>
+            </select>
+            <button onclick="runDockerSandboxSnippet()" style="background:linear-gradient(135deg, #059669, #047857); border:none; border-radius:6px; padding:5px 12px; color:#fff; font-weight:700; font-size:0.75rem; cursor:pointer;">▶ Execute in Sandbox</button>
+          </div>
+        </div>
+        <textarea id="dockerSandboxCode" rows="4" style="width:100%; background:rgba(3,7,18,0.85); border:1px solid rgba(255,255,255,0.1); border-radius:8px; padding:10px; color:#e2e8f0; font-family:Consolas, monospace; font-size:0.8rem; resize:vertical; outline:none;" placeholder="# Type safe code here to test ephemeral container execution...">import math
+print("Factorial of 6 is:", math.factorial(6))
+print("Container is air-gapped and safe from host!")</textarea>
+        <div id="dockerSandboxResult" style="display:none; margin-top:8px; padding:10px; background:rgba(3,7,18,0.9); border:1px solid rgba(34,197,94,0.3); border-radius:8px; font-family:monospace; font-size:0.75rem; color:#4ade80;"></div>
+      </div>
+
+      <!-- Section: Docker Compose Services (Redis, Qdrant, n8n) -->
+      <div style="background:rgba(15,23,42,0.6); border:1px solid rgba(255,255,255,0.08); border-radius:14px; padding:16px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+          <div style="font-size:0.92rem; font-weight:800; color:#fff; display:flex; align-items:center; gap:8px;">
+            <span>📦</span> Background Compose Microservices (Redis, Qdrant, n8n)
+          </div>
+          <div style="display:flex; gap:8px;">
+            <button onclick="manageDockerCompose('up')" style="background:rgba(34,197,94,0.15); border:1px solid rgba(34,197,94,0.3); color:#4ade80; border-radius:8px; padding:5px 12px; font-size:0.75rem; font-weight:700; cursor:pointer;">▲ Start Stack (up -d)</button>
+            <button onclick="manageDockerCompose('down')" style="background:rgba(239,68,68,0.15); border:1px solid rgba(239,68,68,0.3); color:#f87171; border-radius:8px; padding:5px 12px; font-size:0.75rem; font-weight:700; cursor:pointer;">▼ Stop Stack (down)</button>
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:10px;">
+          <div style="background:rgba(8,14,26,0.7); border:1px solid rgba(255,255,255,0.06); border-radius:10px; padding:10px;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span style="font-weight:700; color:#fff; font-size:0.82rem;">deep-redis</span>
+              <span style="font-size:0.68rem; color:#38bdf8; background:rgba(56,189,248,0.1); padding:2px 6px; border-radius:6px;">Port 6379</span>
+            </div>
+            <div style="font-size:0.7rem; color:var(--text-muted); margin-top:4px;">Ephemeral in-memory cache & worker queue</div>
+          </div>
+
+          <div style="background:rgba(8,14,26,0.7); border:1px solid rgba(255,255,255,0.06); border-radius:10px; padding:10px;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span style="font-weight:700; color:#fff; font-size:0.82rem;">deep-qdrant</span>
+              <span style="font-size:0.68rem; color:#a855f7; background:rgba(168,85,247,0.1); padding:2px 6px; border-radius:6px;">Port 6333</span>
+            </div>
+            <div style="font-size:0.7rem; color:var(--text-muted); margin-top:4px;">High-throughput vector search for RAG memory</div>
+          </div>
+
+          <div style="background:rgba(8,14,26,0.7); border:1px solid rgba(255,255,255,0.06); border-radius:10px; padding:10px;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span style="font-weight:700; color:#fff; font-size:0.82rem;">deep-n8n</span>
+              <span style="font-size:0.68rem; color:#22c55e; background:rgba(34,197,94,0.1); padding:2px 6px; border-radius:6px;">Port 5678</span>
+            </div>
+            <div style="font-size:0.7rem; color:var(--text-muted); margin-top:4px;">400+ autonomous app integrations & webhooks</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</div>

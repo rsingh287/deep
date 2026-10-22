@@ -1,0 +1,118 @@
+<aside class="panel-container left-panel" id="panelLeft">
+      <div class="panel-header-bar" style="display:flex; justify-content:space-between; align-items:center;">
+        <span class="panel-header-title" id="leftPanelHeaderTitle">💬 Chat Sessions</span>
+        <button class="btn-del-chat" onclick="toggleLeftPanel()" title="Hide Sidebar">✕</button>
+      </div>
+
+      <!-- Quick Sub-Tab Switcher -->
+      <div class="nav-tabs" style="display:flex; background:rgba(15,23,42,0.65); padding:4px 6px; gap:4px; border-bottom:1px solid var(--border);">
+        <button class="nav-tab-btn active" id="subtabBtnChats" onclick="activityBarClick('tabChats', document.getElementById('actBtnChats'))">💬 Chats</button>
+        <button class="nav-tab-btn" id="subtabBtnTools" onclick="activityBarClick('tabTools', document.getElementById('actBtnTools'))">⚡ 35 APIs</button>
+        <button class="nav-tab-btn" id="subtabBtnTelemetry" onclick="activityBarClick('tabTelemetry', document.getElementById('actBtnTelemetry'))">📊 Hardware</button>
+      </div>
+
+      <div class="panel-content">
+        <!-- SUB-TAB 1: CHATS & SESSION LIST -->
+        <div class="tab-pane active" id="tabChats">
+          <div class="card-box">
+            <div class="card-box-title"><span>Chat Sessions</span></div>
+            <button class="btn-new-chat" id="btnNewChat">➕ New Chat Session</button>
+            <div class="chat-history-list" id="chatHistoryList">
+              <div style="font-size:0.75rem; color:var(--text-muted);">Loading chats...</div>
+            </div>
+          </div>
+
+          <div class="card-box">
+            <div class="card-box-title"><span>📌 Focused Window</span></div>
+            <div style="font-size: 0.8rem; word-break: break-word;">
+              <span style="color: var(--accent-cyan); font-weight: 600;" id="activeWinTitle">Scanning...</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- SUB-TAB 2: 35 INSTITUTIONAL APIS & 19 MCP SERVERS -->
+        <div class="tab-pane" id="tabTools" style="display:none;">
+          <div class="card-box">
+            <div class="card-box-title"><span>⚡ 35 Institutional APIs</span></div>
+            <p style="font-size:0.72rem; color:var(--text-muted); margin-bottom:8px;">Zero-cost, verified public feeds connected to D.E.E.P core:</p>
+            <div style="display:flex; flex-direction:column; gap:6px; max-height:220px; overflow-y:auto; padding-right:4px;">
+              <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(15,23,42,0.6); padding:6px 8px; border-radius:6px; border:1px solid rgba(255,255,255,0.06);">
+                <span style="font-size:0.76rem; font-weight:600;">Bank of Canada (CAD/USD)</span>
+                <button onclick="testQuickApi('/api/public/cad_usd')" style="font-size:0.68rem; padding:2px 8px; background:rgba(56,189,248,0.15); border:1px solid rgba(56,189,248,0.35); color:#38bdf8; border-radius:4px; cursor:pointer;">Test ↗</button>
+              </div>
+              <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(15,23,42,0.6); padding:6px 8px; border-radius:6px; border:1px solid rgba(255,255,255,0.06);">
+                <span style="font-size:0.76rem; font-weight:600;">US CISA KEV (Zero-Days)</span>
+                <button onclick="testQuickApi('/api/public/cisa_kev')" style="font-size:0.68rem; padding:2px 8px; background:rgba(244,63,94,0.15); border:1px solid rgba(244,63,94,0.35); color:#f43f5e; border-radius:4px; cursor:pointer;">Test ↗</button>
+              </div>
+              <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(15,23,42,0.6); padding:6px 8px; border-radius:6px; border:1px solid rgba(255,255,255,0.06);">
+                <span style="font-size:0.76rem; font-weight:600;">World Bank (210+ Nations)</span>
+                <button onclick="testQuickApi('/api/public/world_bank')" style="font-size:0.68rem; padding:2px 8px; background:rgba(16,185,129,0.15); border:1px solid rgba(16,185,129,0.35); color:#10b981; border-radius:4px; cursor:pointer;">Test ↗</button>
+              </div>
+              <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(15,23,42,0.6); padding:6px 8px; border-radius:6px; border:1px solid rgba(255,255,255,0.06);">
+                <span style="font-size:0.76rem; font-weight:600;">NASA Asteroid Radar (JPL)</span>
+                <button onclick="testQuickApi('/api/public/nasa')" style="font-size:0.68rem; padding:2px 8px; background:rgba(234,179,8,0.15); border:1px solid rgba(234,179,8,0.35); color:#facc15; border-radius:4px; cursor:pointer;">Test ↗</button>
+              </div>
+              <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(15,23,42,0.6); padding:6px 8px; border-radius:6px; border:1px solid rgba(255,255,255,0.06);">
+                <span style="font-size:0.76rem; font-weight:600;">USGS Global Earthquakes</span>
+                <button onclick="testQuickApi('/api/public/earthquakes')" style="font-size:0.68rem; padding:2px 8px; background:rgba(168,85,247,0.15); border:1px solid rgba(168,85,247,0.35); color:#c084fc; border-radius:4px; cursor:pointer;">Test ↗</button>
+              </div>
+              <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(15,23,42,0.6); padding:6px 8px; border-radius:6px; border:1px solid rgba(255,255,255,0.06);">
+                <span style="font-size:0.76rem; font-weight:600;">GitHub Event Firehose</span>
+                <button onclick="testQuickApi('/api/public/github_events')" style="font-size:0.68rem; padding:2px 8px; background:rgba(56,189,248,0.15); border:1px solid rgba(56,189,248,0.35); color:#38bdf8; border-radius:4px; cursor:pointer;">Test ↗</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="card-box">
+            <div class="card-box-title"><span>🧩 19 MCP Protocol Servers</span></div>
+            <div style="display:flex; flex-wrap:wrap; gap:6px;">
+              <span style="font-size:0.7rem; padding:3px 8px; background:rgba(56,189,248,0.12); border:1px solid rgba(56,189,248,0.3); border-radius:6px; color:#38bdf8;">postgres</span>
+              <span style="font-size:0.7rem; padding:3px 8px; background:rgba(56,189,248,0.12); border:1px solid rgba(56,189,248,0.3); border-radius:6px; color:#38bdf8;">git</span>
+              <span style="font-size:0.7rem; padding:3px 8px; background:rgba(56,189,248,0.12); border:1px solid rgba(56,189,248,0.3); border-radius:6px; color:#38bdf8;">fetch</span>
+              <span style="font-size:0.7rem; padding:3px 8px; background:rgba(56,189,248,0.12); border:1px solid rgba(56,189,248,0.3); border-radius:6px; color:#38bdf8;">sequential-thinking</span>
+              <span style="font-size:0.7rem; padding:3px 8px; background:rgba(56,189,248,0.12); border:1px solid rgba(56,189,248,0.3); border-radius:6px; color:#38bdf8;">playwright</span>
+              <span style="font-size:0.7rem; padding:3px 8px; background:rgba(56,189,248,0.12); border:1px solid rgba(56,189,248,0.3); border-radius:6px; color:#38bdf8;">pgvector</span>
+              <span style="font-size:0.7rem; padding:3px 8px; background:rgba(56,189,248,0.12); border:1px solid rgba(56,189,248,0.3); border-radius:6px; color:#38bdf8;">semgrep</span>
+              <span style="font-size:0.7rem; padding:3px 8px; background:rgba(56,189,248,0.12); border:1px solid rgba(56,189,248,0.3); border-radius:6px; color:#38bdf8;">duckdb</span>
+            </div>
+            <button onclick="testQuickApi('/api/mcp/servers')" style="margin-top:8px; width:100%; font-size:0.75rem; padding:5px; background:rgba(168,85,247,0.15); border:1px solid rgba(168,85,247,0.4); color:#c084fc; border-radius:6px; cursor:pointer; font-weight:600;">Inspect All 19 MCP Servers ↗</button>
+          </div>
+        </div>
+
+        <!-- SUB-TAB 3: HARDWARE TELEMETRY & SPECS -->
+        <div class="tab-pane" id="tabTelemetry" style="display:none;">
+          <div class="card-box">
+            <div class="card-box-title"><span>📊 Real-Time Telemetry</span></div>
+            <div class="metric-header"><span>CPU Load (14 Cores)</span><span id="cpuPct">0%</span></div>
+            <div class="progress-bar-bg"><div class="progress-bar-fill" id="cpuBar"></div></div>
+
+            <div class="metric-header" style="margin-top: 6px;"><span>RAM Usage (32 GB)</span><span id="ramPct">0%</span></div>
+            <div class="progress-bar-bg"><div class="progress-bar-fill" id="ramBar" style="background:#38bdf8;"></div></div>
+
+            <div class="metric-header" style="margin-top: 6px;"><span>GPU Load (RTX A2000)</span><span id="gpuPct">0%</span></div>
+            <div class="progress-bar-bg"><div class="progress-bar-fill" id="gpuBar" style="background:var(--accent-purple);"></div></div>
+
+            <div class="metric-header" style="margin-top: 6px;"><span>VRAM Usage (8 GB GDDR6)</span><span id="vramPct">0%</span></div>
+            <div class="progress-bar-bg"><div class="progress-bar-fill" id="vramBar" style="background:var(--accent-green);"></div></div>
+
+            <canvas id="telemetryChart" style="margin-top:8px;"></canvas>
+
+            <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:var(--text-muted); margin-top:8px; padding-top:6px; border-top:1px solid rgba(255,255,255,0.06);">
+              <span>Disk: <strong id="diskFree" style="color:#fff;">-- GB</strong></span>
+              <span>Net: <strong id="netStat" style="color:var(--accent-cyan);">0 MB</strong></span>
+            </div>
+          </div>
+
+          <div class="card-box">
+            <div class="card-box-title"><span>💻 Host Configuration</span></div>
+            <div style="font-size:0.75rem; display:flex; flex-direction:column; gap:4px; color:#cbd5e1;">
+              <div>• CPU: <strong>Intel 14 Cores / 20 Threads</strong></div>
+              <div>• RAM: <strong>32 GB DDR5/DDR4</strong></div>
+              <div>• GPU: <strong>NVIDIA RTX A2000 8GB Laptop</strong></div>
+              <div>• CUDA: <strong>v13.2 (Active)</strong></div>
+              <div>• DB: <strong>PostgreSQL 18.4 (deep_db)</strong></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </aside>

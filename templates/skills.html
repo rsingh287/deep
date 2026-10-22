@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Master AI Skills Arsenal - Antigravity Local AI PC Cockpit</title>
+  <style>
+    :root {
+      --bg-dark: #07090e;
+      --panel-bg: rgba(15, 23, 42, 0.85);
+      --card-bg: rgba(20, 30, 50, 0.6);
+      --card-border: rgba(56, 189, 248, 0.2);
+      --accent-cyan: #00f0ff;
+      --accent-emerald: #10b981;
+      --accent-amber: #f59e0b;
+      --accent-purple: #a855f7;
+      --accent-rose: #f43f5e;
+      --text-main: #f1f5f9;
+      --text-muted: #94a3b8;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background-color: var(--bg-dark);
+      background-image: 
+        radial-gradient(circle at 10% 10%, rgba(0, 240, 255, 0.04) 0%, transparent 40%),
+        radial-gradient(circle at 90% 90%, rgba(168, 85, 247, 0.04) 0%, transparent 40%);
+      color: var(--text-main);
+      font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100vh;
+      padding: 24px;
+    }
+
+    /* Header Bar */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 24px;
+      background: var(--panel-bg);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      margin-bottom: 24px;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .title-area h1 {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--accent-cyan);
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .title-area p {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .badge-status {
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--accent-emerald);
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--accent-emerald);
+      border-radius: 50%;
+      box-shadow: 0 0 10px var(--accent-emerald);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .nav-btn {
+      text-decoration: none;
+      padding: 8px 14px;
+      border-radius: 10px;
+      font-size: 0.84rem;
+      font-weight: 600;
+      color: var(--text-main);
+      background: rgba(30, 41, 59, 0.8);
+      border: 1px solid rgba(255,255,255,0.1);
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .nav-btn:hover {
+      background: rgba(56, 189, 248, 0.2);
+      border-color: var(--accent-cyan);
+      color: var(--accent-cyan);
+      transform: translateY(-1px);
+    }
+
+    .nav-btn-cockpit {
+      background: linear-gradient(135deg, rgba(0, 240, 255, 0.2), rgba(168, 85, 247, 0.2));
+      border-color: var(--accent-cyan);
+      color: var(--accent-cyan);
+    }
+
+    /* Controls: Search & Category Pills */
+    .controls-panel {
+      background: var(--panel-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 20px 24px;
+      margin-bottom: 24px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+    }
+
+    .search-row {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    .search-input-wrapper {
+      flex: 1;
+      position: relative;
+    }
+
+    .search-input-wrapper span {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1.1rem;
+      color: var(--text-muted);
+    }
+
+    .search-input {
+      width: 100%;
+      background: rgba(10, 15, 26, 0.85);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      border-radius: 12px;
+      padding: 12px 16px 12px 46px;
+      color: #fff;
+      font-size: 0.95rem;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+
+    .search-input:focus {
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 15px rgba(0, 240, 255, 0.25);
+    }
+
+    .stats-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0 18px;
+      background: rgba(10, 15, 26, 0.85);
+      border: 1px solid rgba(56, 189, 248, 0.2);
+      border-radius: 12px;
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: var(--accent-cyan);
+      white-space: nowrap;
+    }
+
+    /* Categories Pills */
+    .categories-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .cat-pill {
+      background: rgba(30, 41, 59, 0.7);
+      border: 1px solid rgba(255,255,255,0.08);
+      color: var(--text-muted);
+      padding: 7px 14px;
+      border-radius: 20px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .cat-pill:hover {
+      background: rgba(56, 189, 248, 0.15);
+      color: #fff;
+      border-color: rgba(56, 189, 248, 0.4);
+    }
+
+    .cat-pill.active {
+      background: var(--accent-cyan);
+      color: #000;
+      border-color: var(--accent-cyan);
+      font-weight: 700;
+      box-shadow: 0 0 12px rgba(0, 240, 255, 0.4);
+    }
+
+    /* Skills Grid */
+    .skills-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+      gap: 18px;
+    }
+
+    .skill-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      backdrop-filter: blur(8px);
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .skill-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple));
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    .skill-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--accent-cyan);
+      box-shadow: 0 12px 30px rgba(0, 240, 255, 0.15);
+    }
+
+    .skill-card:hover::before {
+      opacity: 1;
+    }
+
+    .card-top {
+      margin-bottom: 14px;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 8px;
+    }
+
+    .skill-name {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #fff;
+      line-height: 1.3;
+    }
+
+    .category-tag {
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 6px;
+      background: rgba(56, 189, 248, 0.12);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      color: var(--accent-cyan);
+      white-space: nowrap;
+    }
+
+    .skill-id {
+      font-family: 'Courier New', monospace;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .plugin-pill {
+      background: rgba(168, 85, 247, 0.15);
+      border: 1px solid rgba(168, 85, 247, 0.3);
+      color: #c084fc;
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-size: 0.68rem;
+    }
+
+    .skill-desc {
+      font-size: 0.85rem;
+      line-height: 1.5;
+      color: #cbd5e1;
+      display: -webkit-box;
+      -webkit-line-clamp: 4;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .card-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 16px;
+      padding-top: 14px;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .btn-use {
+      flex: 1;
+      background: linear-gradient(135deg, rgba(0, 240, 255, 0.15), rgba(16, 185, 129, 0.15));
+      border: 1px solid var(--accent-cyan);
+      color: var(--accent-cyan);
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .btn-use:hover {
+      background: var(--accent-cyan);
+      color: #000;
+      box-shadow: 0 0 15px rgba(0, 240, 255, 0.4);
+    }
+
+    .btn-copy {
+      background: rgba(30, 41, 59, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: var(--text-muted);
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-copy:hover {
+      color: #fff;
+      border-color: rgba(255,255,255,0.3);
+    }
+
+    /* Toast Notification */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: rgba(16, 185, 129, 0.95);
+      color: #000;
+      font-weight: 700;
+      padding: 12px 20px;
+      border-radius: 10px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+      display: none;
+      align-items: center;
+      gap: 8px;
+      z-index: 1000;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Header Navigation -->
+  <div class="header">
+    <div class="header-left">
+      <div class="title-area">
+        <h1>⚡ MASTER AI SKILLS ARSENAL</h1>
+        <p>422 Specialized Engineering Skills & Custom Agents • Antigravity AI Cockpit</p>
+      </div>
+      <div class="badge-status">
+        <span class="status-dot"></span> 422 ACTIVE IN MEMORY
+      </div>
+    </div>
+    <div class="nav-links">
+      <a href="/" class="nav-btn nav-btn-cockpit">💬 AI Cockpit</a>
+      <a href="/camera_vision" class="nav-btn">👁️ Face & Gestures</a>
+      <a href="/weather" class="nav-btn">🌦️ Weather</a>
+      <a href="/trading" class="nav-btn">📈 Sharemarket</a>
+      <a href="/news" class="nav-btn">📰 News</a>
+      <a href="/jobs" class="nav-btn">💼 Jobs</a>
+    </div>
+  </div>
+
+  <!-- Search & Category Filters -->
+  <div class="controls-panel">
+    <div class="search-row">
+      <div class="search-input-wrapper">
+        <span>🔍</span>
+        <input type="text" id="searchInput" class="search-input" placeholder="Search 422 skills (e.g., flutter, security, react, bigquery, reverse, prompt, k8s)..." oninput="applyFilters()">
+      </div>
+      <div class="stats-badge" id="statsBadge">
+        Showing 422 / 422 Skills
+      </div>
+    </div>
+    <div class="categories-bar" id="categoryBar">
+      
+    </div>
+  </div>
+
+  <!-- Skills Grid -->
+  <div class="skills-grid" id="skillsGrid">
+    <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: var(--text-muted);">
+      ⚡ Loading Master Skills Arsenal from memory.db...
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="toast">✅ Skill Protocol Copied!</div>
+
+  <script>
+    let allSkills = [];
+    let activeCategory = 'All';
+
+    async function loadSkills() {
+      try {
+        const res = await fetch('/api/skills');
+        const data = await res.json();
+        if (data.success) {
+          allSkills = data.skills;
+          renderCategoryPills(data.categories, data.total);
+          renderSkills(allSkills);
+        }
+      } catch (err) {
+        console.error("Failed to load skills:", err);
+      }
+    }
+
+    function renderCategoryPills(categories, total) {
+      const bar = document.getElementById('categoryBar');
+      let html = `<button class="cat-pill ${activeCategory === 'All' ? 'active' : ''}" onclick="selectCategory('All')">All (${total || allSkills.length})</button>`;
+      if (Array.isArray(categories)) {
+        categories.forEach(c => {
+          const catName = c.category || 'General';
+          const isAct = activeCategory === catName ? 'active' : '';
+          html += `<button class="cat-pill ${isAct}" onclick="selectCategory('${escapeAttr(catName)}')">${catName} (${c.count})</button>`;
+        });
+      }
+      bar.innerHTML = html;
+    }
+
+    function selectCategory(cat) {
+      activeCategory = cat;
+      const pills = document.querySelectorAll('.cat-pill');
+      pills.forEach(p => {
+        if ((cat === 'All' && p.textContent.startsWith('All')) || p.textContent.startsWith(cat + ' ')) {
+          p.classList.add('active');
+        } else {
+          p.classList.remove('active');
+        }
+      });
+      applyFilters();
+    }
+
+    function applyFilters() {
+      const query = document.getElementById('searchInput').value.toLowerCase().trim();
+      let filtered = allSkills;
+
+      if (activeCategory !== 'All') {
+        filtered = filtered.filter(s => s.category && s.category.includes(activeCategory));
+      }
+
+      if (query) {
+        filtered = filtered.filter(s => 
+          (s.id && s.id.toLowerCase().includes(query)) ||
+          (s.name && s.name.toLowerCase().includes(query)) ||
+          (s.description && s.description.toLowerCase().includes(query)) ||
+          (s.plugin && s.plugin.toLowerCase().includes(query))
+        );
+      }
+
+      document.getElementById('statsBadge').textContent = `Showing ${filtered.length} / ${allSkills.length} Skills`;
+      renderSkills(filtered);
+    }
+
+    function renderSkills(skills) {
+      const grid = document.getElementById('skillsGrid');
+      if (skills.length === 0) {
+        grid.innerHTML = `
+          <div style="grid-column: 1 / -1; text-align: center; padding: 60px; color: var(--text-muted);">
+            🔍 No skills found matching your search. Try another keyword or select "All".
+          </div>
+        `;
+        return;
+      }
+
+      grid.innerHTML = skills.map(s => `
+        <div class="skill-card">
+          <div class="card-top">
+            <div class="card-header">
+              <span class="skill-name">${s.name}</span>
+              <span class="category-tag">${s.category || 'Core Automation'}</span>
+            </div>
+            <div class="skill-id">
+              <span># ${s.id}</span>
+              ${s.plugin ? `<span class="plugin-pill">${s.plugin}</span>` : ''}
+            </div>
+            <p class="skill-desc">${s.description || 'Specialized autonomous engineering skill.'}</p>
+          </div>
+          <div class="card-actions">
+            <button class="btn-use" onclick="useSkillInCockpit('${escapeAttr(s.id)}', '${escapeAttr(s.name)}')">
+              <span>⚡ Engage in Cockpit</span>
+            </button>
+            <button class="btn-copy" onclick="copyProtocol('${escapeAttr(s.id)}', '${escapeAttr(s.description)}')" title="Copy Skill Identifier & Directive">
+              <span>📋 Copy</span>
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function escapeAttr(str) {
+      return (str || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+    }
+
+    async function useSkillInCockpit(id, name) {
+      showToast(`Engaging [${name}] into neural memory...`);
+      try {
+        await fetch('/api/skills/active', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ skill_id: id, name: name })
+        });
+      } catch(e) {
+        console.warn('Skill activation error:', e);
+      }
+      const prompt = `Use skill ${id} (${name})`;
+      sessionStorage.setItem('pending_cockpit_prompt', prompt);
+      setTimeout(() => {
+        window.location.href = `/?prompt=${encodeURIComponent(prompt)}`;
+      }, 350);
+    }
+
+    function copyProtocol(id, desc) {
+      navigator.clipboard.writeText(`Skill [${id}]:\n${desc}`).then(() => {
+        showToast(`Copied ${id} protocol to clipboard!`);
+      });
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = `✅ ${msg}`;
+      t.style.display = 'flex';
+      setTimeout(() => { t.style.display = 'none'; }, 2400);
+    }
+
+    // Initialize on load
+    window.addEventListener('DOMContentLoaded', loadSkills);
+  </script>
+</body>
+</html>

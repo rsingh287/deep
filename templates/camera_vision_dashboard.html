@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Antigravity AI - Live Camera Vision & Gesture Dashboard</title>
+    <style>
+        :root {
+            --bg-dark: #0a0c10;
+            --panel-bg: #12161f;
+            --accent-cyan: #00f0ff;
+            --accent-magenta: #ff007f;
+            --accent-green: #00ff88;
+            --text-main: #e2e8f0;
+            --text-muted: #94a3b8;
+        }
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--accent-cyan);
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+            color: var(--accent-cyan);
+            letter-spacing: 1px;
+        }
+        .badge {
+            background: rgba(0, 240, 255, 0.15);
+            color: var(--accent-cyan);
+            border: 1px solid var(--accent-cyan);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: bold;
+        }
+        .grid-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .card {
+            background: var(--panel-bg);
+            border: 1px solid #1e293b;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+        }
+        .card h2 {
+            margin-top: 0;
+            font-size: 18px;
+            color: var(--accent-cyan);
+            border-bottom: 1px solid #334155;
+            padding-bottom: 10px;
+        }
+        .video-container {
+            width: 100%;
+            height: 340px;
+            background: #000;
+            border-radius: 8px;
+            border: 2px solid var(--accent-cyan);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+        }
+        .video-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .controls-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 15px;
+        }
+        .btn {
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+            color: #fff;
+            border: 1px solid var(--accent-cyan);
+            padding: 12px 18px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .btn:hover {
+            background: var(--accent-cyan);
+            color: #000;
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.4);
+            transform: translateY(-2px);
+        }
+        .btn-magenta {
+            border-color: var(--accent-magenta);
+        }
+        .btn-magenta:hover {
+            background: var(--accent-magenta);
+            color: #fff;
+            box-shadow: 0 0 15px rgba(255, 0, 127, 0.4);
+        }
+        .btn-green {
+            border-color: var(--accent-green);
+        }
+        .btn-green:hover {
+            background: var(--accent-green);
+            color: #000;
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.4);
+        }
+        .telemetry-box {
+            background: #090d16;
+            border: 1px solid #334155;
+            border-radius: 6px;
+            padding: 15px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 13px;
+            height: 290px;
+            overflow-y: auto;
+            color: #38bdf8;
+        }
+        .status-pill {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            background: var(--accent-green);
+            border-radius: 50%;
+            margin-right: 6px;
+            box-shadow: 0 0 8px var(--accent-green);
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div style="display:flex; align-items:center; gap:14px;">
+            <h1>📷 ANTIGRAVITY AI - CAMERA VISION & GESTURE COCKPIT</h1>
+            <div class="badge"><span class="status-pill"></span> SYSTEM ONLINE (PORT 5000)</div>
+        </div>
+        <div style="display:flex; gap:10px; align-items:center;">
+            <a href="/" class="btn" style="text-decoration:none; padding:8px 16px; font-size:13px;">💬 Back to AI Cockpit</a>
+        </div>
+    </div>
+
+    <div class="grid-container">
+        <!-- LEFT PANEL: LIVE CAMERA VIEWPORT & BUTTONS -->
+        <div class="card">
+            <h2>🎥 Live Camera Feed & Interactive Triggers</h2>
+            <div class="video-container" id="videoContainer">
+                <img id="dashboardStreamImg" src="" alt="Live 30 FPS Stream">
+            </div>
+
+            <div class="controls-grid">
+                
+                
+                
+                
+                
+                
+                
+            </div>
+        </div>
+
+        <!-- RIGHT PANEL: REAL-TIME AI TELEMETRY -->
+        <div class="card">
+            <h2>📊 Real-Time AI Visual Telemetry & Analysis</h2>
+            <div class="telemetry-box" id="telemetryOutput">
+                // Continuous 30 FPS Live Stream Active.<br>
+                // Click any button on the left to request instant AI telemetry analysis.
+            </div>
+            <div style="margin-top: 15px;">
+                
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function startDashboardStream() {
+            const img = document.getElementById('dashboardStreamImg');
+            if (img) img.src = '/video_feed';
+        }
+
+        function stopDashboardStream() {
+            const img = document.getElementById('dashboardStreamImg');
+            if (img) img.src = '';
+        }
+
+        function logTelemetry(title, data) {
+            const el = document.getElementById('telemetryOutput');
+            const timestamp = new Date().toLocaleTimeString();
+            el.innerHTML = `[${timestamp}] <b>=== ${title} ===</b><br>` +
+                           `<pre style="white-space: pre-wrap; color: #38bdf8;">${JSON.stringify(data, null, 2)}</pre>` +
+                           `<hr style="border-color: #334155;">` + el.innerHTML;
+        }
+
+        async function triggerCameraVision() {
+            try {
+                const res = await fetch('/api/vision/live_stream_frame');
+                const data = await res.json();
+                logTelemetry("LIVE CAMERA VISION", data);
+            } catch (err) {
+                logTelemetry("ERROR", err.toString());
+            }
+        }
+
+        async function triggerSignLanguage() {
+            try {
+                const res = await fetch('/api/vision/sign_language');
+                const data = await res.json();
+                logTelemetry("SIGN LANGUAGE RECOGNITION", data);
+            } catch (err) {
+                logTelemetry("ERROR", err.toString());
+            }
+        }
+
+        async function triggerFacialEmotion() {
+            try {
+                const res = await fetch('/api/vision/facial_expression');
+                const data = await res.json();
+                logTelemetry("FACIAL EMOTION ANALYSIS", data);
+            } catch (err) {
+                logTelemetry("ERROR", err.toString());
+            }
+        }
+
+        async function triggerHardwareInspection() {
+            try {
+                const res = await fetch('/api/vision/inspect_hardware', { method: 'POST' });
+                const data = await res.json();
+                logTelemetry("PIC HARDWARE OPTICAL INSPECTION", data);
+            } catch (err) {
+                logTelemetry("ERROR", err.toString());
+            }
+        }
+
+        async function triggerMediaPipeKinematics() {
+            try {
+                const res = await fetch('/api/vision/mediapipe_kinematics');
+                const data = await res.json();
+                logTelemetry("✋ MEDIAPIPE HAND & FACE KINEMATICS (21 JOINTS + 468 FACE MESH)", data);
+                if (data.report_text) {
+                    const el = document.getElementById('telemetryOutput');
+                    el.innerHTML = `<div style="background:rgba(56,189,248,0.1); border-left:4px solid #38bdf8; padding:10px; margin:10px 0; white-space:pre-wrap; font-family:monospace; color:#e2e8f0;">${data.report_text}</div>` + el.innerHTML;
+                }
+            } catch (err) {
+                logTelemetry("ERROR", err.toString());
+            }
+        }
+
+        async function triggerVoiceAction(cmd) {
+            try {
+                const res = await fetch('/api/speech/execute_voice_action', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ command: cmd })
+                });
+                const data = await res.json();
+                logTelemetry("PUNJABI VOICE ACTION EXECUTION", data);
+            } catch (err) {
+                logTelemetry("ERROR", err.toString());
+            }
+        }
+    </script>
+</body>
+</html>

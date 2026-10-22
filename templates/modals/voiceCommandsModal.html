@@ -1,0 +1,287 @@
+<div class="voice-modal-overlay" id="voiceCommandsModal" onclick="closeVoiceCommandsModal(event)">
+    <div class="voice-modal-box" onclick="event.stopPropagation()">
+      <div class="voice-modal-header">
+        <div class="voice-modal-title">
+          <span>🎙️</span> Deep Voice Command Center (52 Verified Commands)
+        </div>
+        <div style="display:flex; align-items:center; gap:10px;">
+          <span style="font-size:0.75rem; color:#94a3b8;">Wake Word: <strong>"Deep"</strong></span>
+          
+        </div>
+      </div>
+      <div class="voice-modal-body">
+        
+        <!-- Category 1: Subsystems & Navigation (5 Commands) -->
+        <div class="voice-category-card">
+          <div class="voice-category-title"><span style="color:#38bdf8;">🚀</span> Subsystems & Navigation (5)</div>
+          <div class="voice-cmd-grid">
+            <div class="voice-cmd-chip" onclick="DeepVoice.execute('open weather')">
+              <span class="voice-cmd-phrase">"Open weather"</span>
+              <span class="voice-cmd-desc">Navigate to Live Weather Radar</span>
+            </div>
+            <div class="voice-cmd-chip" onclick="DeepVoice.execute('open cyber defense')">
+              <span class="voice-cmd-phrase">"Open cyber defense"</span>
+              <span class="voice-cmd-desc">Navigate to Security Defense Command</span>
+            </div>
+            <div class="voice-cmd-chip" onclick="DeepVoice.execute('open memory')">
+              <span class="voice-cmd-phrase">"Open memory"</span>
+              <span class="voice-cmd-desc">Navigate to Knowledge Store & Facts</span>
+            </div>
+            <div class="voice-cmd-chip" onclick="DeepVoice.execute('open trading')">
+              <span class="voice-cmd-phrase">"Open trading"</span>
+              <span class="voice-cmd-desc">Launch TradingView Stock Charts</span>
+            </div>
+            <div class="voice-cmd-chip" onclick="DeepVoice.execute('go home')">
+              <span class="voice-cmd-phrase">"Go home" / "Back to cockpit"</span>
+              <span class="voice-cmd-desc">Return to Cockpit Dashboard</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Category 2: Deep 3D Avatar Controls (5 Commands) -->
+        <div class="voice-category-card">
+          <div class="voice-category-title"><span style="color:#c084fc;">🤖</span> Deep 3D Controls (5)</div>
+          <div class="voice-cmd-grid">
+            <div class="voice-cmd-chip" onclick="DeepVoice.execute('open 3d view')">
+              <span class="voice-cmd-phrase">"Open 3D view" / "Show Deep"</span>
+              <span class="voice-cmd-desc">Expand 3D stage</span>
+            </div>
+            <div class="voice-cmd-chip" onclick="DeepVoice.execute('close 3d view')">
+              <span class="voice-cmd-phrase">"Close 3D view" / "Hide Deep"</span>
+              <span class="voice-cmd-desc">Minimize 3D stage (0% GPU)</span>
+            </div>
+            <div class="voice-cmd-chip" onclick="DeepVoice.execute('reset camera')">
+              <span class="voice-cmd-phrase">"Reset camera" / "Center Deep"</span>
+              <span class="voice-cmd-desc">Center 3D viewpoint</span>
+            </div>
+            <div class="voice-cmd-chip" onclick="DeepVoice.execute('tell me a joke')">
+              <span class="voice-cmd-phrase">"Tell me a joke"</span>
+              <span class="voice-cmd-desc">Deep tells a tech joke</span>
+            </div>
+            <div class="voice-cmd-chip" onclick="DeepVoice.execute('motivate me')">
+              <span class="voice-cmd-phrase">"Motivate me"</span>
+              <span class="voice-cmd-desc">Inspirational quote</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Category 3: Windows Apps & System Launchers (10 Commands) -->
+        <div class="voice-category-card">
+          <div class="voice-category-title"><span style="color:#4ade80;">💻</span> Windows Applications (10)</div>
+          <div class="voice-cmd-grid">
+            <div class="voice-cmd-chip" onclick="DeepVoice.execute('open notepad')">
+              <span class="voice-cmd-phrase">"Open Notepad"</span>
+              <span class="voice-cmd-desc">Launch Windows Notepad app</span>
+            </div>
+            <div class="voice-cmd-chip" onclick="DeepVoice.execute('open calculator')">
+              <span class="voice-cmd-phrase">"Open Calculator"</span>
+              <span class="voice-cmd-desc">Launch Windows Calculator</span>
+            </div>
+            <div class="voice-cmd-chip" onclick="DeepVoice.execute('open task manager')">
+              <span class="voice-cmd-phrase">"Open Task Manager"</span>
+              <span class="voice-cmd-desc">Launch Windows Task Manager</span>
+            </div>
+            <div class="voice-cmd-chip" onclick="DeepVoice.execute('open file explorer')">
+              <span class="voice-cmd-phrase">"Open File Explorer"</span>
+              <span class="voice-cmd-desc">Open Windows Explorer</span>
+            </div>
+            <div class="voice-cmd-chip" onclick="DeepVoice.execute('open terminal')">
+              <span class="voice-cmd-phrase">"Open Terminal"</span>
+              <span class="voice-cmd-desc">Launch PowerShell Console</span>
+            </div>
+            <div class="voice-cmd-chip" onclick="DeepVoice.execute('open settings')">
+              <span class="voice-cmd-phrase">"Open Settings"</span>
+              <span class="voice-cmd-desc">Launch Windows Settings</span>
+            </div>
+            <div class="voice-cmd-chip" onclick="DeepVoice.execute('open control panel')">
+              <span class="voice-cmd-phrase">"Open Control Panel"</span>
+              <span class="voice-cmd-desc">Launch Windows Control Panel</span>
+            </div>
+            <div class="voice-cmd-chip" onclick="DeepVoice.execute('open paint')">
+              <span class="voice-cmd-phrase">"Open Paint"</span>
+              <span class="voice-cmd-desc">Launch Windows Paint</span>
+            </div>
+            <div class="voice-cmd-chip" onclick="DeepVoice.execute('open downloads')">
+              <span class="voice-cmd-phrase">"Open Downloads"</span>
+              <span class="voice-cmd-desc">Open Downloads folder</span>
+            </div>
+            <div class="voice-cmd-chip" onclick="DeepVoice.execute('open documents')">
+              <span class="voice-cmd-phrase">"Open Documents"</span>
+              <span class="voice-cmd-desc">Open Documents folder</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Category 4: PC Productivity & Quick Actions (6 Commands) -->
+        <div class="voice-category-card">
+          <div class="voice-category-title"><span style="color:#2dd4bf;">⚡</span> Host Actions & Shortcuts (6)</div>
+          <div class="voice-cmd-grid">
+            <div class="voice-cmd-chip" onclick="DeepVoice.execute('take screenshot')">
+              <span class="voice-cmd-phrase">"Take screenshot"</span>
+              <span class="voice-cmd-desc">Capture & analyze active screen</span>
+            </div>
+            <div class="voice-cmd-chip" onclick="DeepVoice.execute('clean temp files')">
+              <span class="voice-cmd-phrase">"Clean temp files"</span>
+              <span class="voice-cmd-desc">Purge temporary system cache</span>
+            </div>
+            <div class="voice-cmd-chip" onclick="DeepVoice.execute('lock pc')">
+              <span class="voice-cmd-phrase">"Lock PC"</span>
+              <span class="voice-cmd-desc">Instantly lock Windows PC</span>
+            </div>
+            <div class="voice-cmd-chip" onclick="DeepVoice.execute('show desktop')">
+              <span class="voice-cmd-phrase">"Show desktop"</span>
+              <span class="voice-cmd-desc">Minimize all windows (Win+D)</span>
+            </div>
+            <div class="voice-cmd-chip" onclick="DeepVoice.execute('open chrome')">
+              <span class="voice-cmd-phrase">"Open Chrome"</span>
+              <span class="voice-cmd-desc">Launch Google Chrome</span>
+            </div>
+            <div class="voice-cmd-chip" onclick="DeepVoice.execute('open vscode')">
+              <span class="voice-cmd-phrase">"Open VS Code"</span>
+              <span class="voice-cmd-desc">Launch Visual Studio Code</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Category 5: AI Model Switching (6 Commands) -->
+        <div class="voice-category-card">
+          <div class="voice-category-title"><span style="color:#f59e0b;">🧠</span> AI Model Switches (6)</div>
+          <div class="voice-cmd-grid">
+            <div class="voice-cmd-chip" onclick="DeepVoice.execute('switch to 3b')">
+              <span class="voice-cmd-phrase">"Switch to 3B"</span>
+              <span class="voice-cmd-desc">⚡ qwen2.5:3b (Ultra Fast)</span>
+            </div>
+            <div class="voice-cmd-chip" onclick="DeepVoice.execute('switch to 7b')">
+              <span class="voice-cmd-phrase">"Switch to 7B"</span>
+              <span class="voice-cmd-desc">🚀 qwen2.5:7b (Balanced)</span>
+            </div>
+            <div class="voice-cmd-chip" onclick="DeepVoice.execute('switch to coder')">
+              <span class="voice-cmd-phrase">"Switch to Coder"</span>
+              <span class="voice-cmd-desc">💻 qwen2.5-coder:7b</span>
+            </div>
+            <div class="voice-cmd-chip" onclick="DeepVoice.execute('switch to deepseek')">
+              <span class="voice-cmd-phrase">"Switch to DeepSeek"</span>
+              <span class="voice-cmd-desc">🧠 deepseek-r1:8b (Reasoning)</span>
+            </div>
+            <div class="voice-cmd-chip" onclick="DeepVoice.execute('switch to auto')">
+              <span class="voice-cmd-phrase">"Switch to Auto"</span>
+              <span class="voice-cmd-desc">⚡ Auto Workload Router</span>
+            </div>
+            <div class="voice-cmd-chip" onclick="DeepVoice.execute('switch to vision')">
+              <span class="voice-cmd-phrase">"Switch to Vision"</span>
+              <span class="voice-cmd-desc">👁️ qwen2.5vl:7b (Vision OCR)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Category 6: Audio, Speech & Dictation (6 Commands) -->
+        <div class="voice-category-card">
+          <div class="voice-category-title"><span style="color:#ec4899;">🔊</span> Audio & Speech Controls (6)</div>
+          <div class="voice-cmd-grid">
+            <div class="voice-cmd-chip" onclick="DeepVoice.execute('volume up')">
+              <span class="voice-cmd-phrase">"Volume up"</span>
+              <span class="voice-cmd-desc">Increase PC master volume</span>
+            </div>
+            <div class="voice-cmd-chip" onclick="DeepVoice.execute('volume down')">
+              <span class="voice-cmd-phrase">"Volume down"</span>
+              <span class="voice-cmd-desc">Decrease PC master volume</span>
+            </div>
+            <div class="voice-cmd-chip" onclick="DeepVoice.execute('mute pc')">
+              <span class="voice-cmd-phrase">"Mute audio" / "Mute PC"</span>
+              <span class="voice-cmd-desc">Toggle master audio mute</span>
+            </div>
+            <div class="voice-cmd-chip" onclick="DeepVoice.execute('stop talking')">
+              <span class="voice-cmd-phrase">"Stop talking" / "Silence"</span>
+              <span class="voice-cmd-desc">Instantly stop Deep speech</span>
+            </div>
+            <div class="voice-cmd-chip" onclick="DeepVoice.execute('mute voice')">
+              <span class="voice-cmd-phrase">"Mute voice" / "Unmute voice"</span>
+              <span class="voice-cmd-desc">Toggle speech feedback</span>
+            </div>
+            <div class="voice-cmd-chip" onclick="DeepVoice.execute('mute mic')">
+              <span class="voice-cmd-phrase">"Mute mic" / "Unmute mic"</span>
+              <span class="voice-cmd-desc">Toggle continuous listening</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Category 7: Web Search & Browsing (6 Commands) -->
+        <div class="voice-category-card">
+          <div class="voice-category-title"><span style="color:#3b82f6;">🌐</span> Web Search & Browsing (6)</div>
+          <div class="voice-cmd-grid">
+            <div class="voice-cmd-chip" onclick="DeepVoice.execute('search google for AI news')">
+              <span class="voice-cmd-phrase">"Search Google for [query]"</span>
+              <span class="voice-cmd-desc">Google search query in browser</span>
+            </div>
+            <div class="voice-cmd-chip" onclick="DeepVoice.execute('search youtube for music')">
+              <span class="voice-cmd-phrase">"Search YouTube for [query]"</span>
+              <span class="voice-cmd-desc">Search and play on YouTube</span>
+            </div>
+            <div class="voice-cmd-chip" onclick="DeepVoice.execute('search wikipedia for Artificial intelligence')">
+              <span class="voice-cmd-phrase">"Search Wikipedia for [topic]"</span>
+              <span class="voice-cmd-desc">Look up article on Wikipedia</span>
+            </div>
+            <div class="voice-cmd-chip" onclick="DeepVoice.execute('open github')">
+              <span class="voice-cmd-phrase">"Open GitHub"</span>
+              <span class="voice-cmd-desc">Open GitHub in browser</span>
+            </div>
+            <div class="voice-cmd-chip" onclick="DeepVoice.execute('open reddit')">
+              <span class="voice-cmd-phrase">"Open Reddit"</span>
+              <span class="voice-cmd-desc">Open Reddit in browser</span>
+            </div>
+            <div class="voice-cmd-chip" onclick="DeepVoice.execute('open chatgpt')">
+              <span class="voice-cmd-phrase">"Open ChatGPT"</span>
+              <span class="voice-cmd-desc">Open ChatGPT in browser</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Category 8: Telemetry, Window & Layout (4 Commands) -->
+        <div class="voice-category-card">
+          <div class="voice-category-title"><span style="color:#06b6d4;">📊</span> Telemetry & Workspace (4)</div>
+          <div class="voice-cmd-grid">
+            <div class="voice-cmd-chip" onclick="DeepVoice.execute('what window is focused')">
+              <span class="voice-cmd-phrase">"Active window"</span>
+              <span class="voice-cmd-desc">Vocalize active application</span>
+            </div>
+            <div class="voice-cmd-chip" onclick="DeepVoice.execute('check cpu')">
+              <span class="voice-cmd-phrase">"Check CPU" / "Hardware stats"</span>
+              <span class="voice-cmd-desc">Vocalize CPU, GPU & RAM stats</span>
+            </div>
+            <div class="voice-cmd-chip" onclick="DeepVoice.execute('toggle sidebar')">
+              <span class="voice-cmd-phrase">"Toggle sidebar"</span>
+              <span class="voice-cmd-desc">Show/hide chat session list</span>
+            </div>
+            <div class="voice-cmd-chip" onclick="DeepVoice.execute('toggle terminal')">
+              <span class="voice-cmd-phrase">"Toggle terminal"</span>
+              <span class="voice-cmd-desc">Show/hide bottom console</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Category 9: Chat & Cockpit Operations (4 Commands) -->
+        <div class="voice-category-card">
+          <div class="voice-category-title"><span style="color:#10b981;">💬</span> Chat & Core Controls (4)</div>
+          <div class="voice-cmd-grid">
+            <div class="voice-cmd-chip" onclick="DeepVoice.execute('new chat')">
+              <span class="voice-cmd-phrase">"New chat"</span>
+              <span class="voice-cmd-desc">Start fresh conversation</span>
+            </div>
+            <div class="voice-cmd-chip" onclick="DeepVoice.execute('clear chat')">
+              <span class="voice-cmd-phrase">"Clear chat"</span>
+              <span class="voice-cmd-desc">Wipe message history</span>
+            </div>
+            <div class="voice-cmd-chip" onclick="DeepVoice.execute('emergency stop')">
+              <span class="voice-cmd-phrase">"Emergency stop"</span>
+              <span class="voice-cmd-desc">Abort active generation</span>
+            </div>
+            <div class="voice-cmd-chip" onclick="DeepVoice.execute('Deep, explain quantum computing')">
+              <span class="voice-cmd-phrase">"Deep, [any question]"</span>
+              <span class="voice-cmd-desc">Ask anything to local AI</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>

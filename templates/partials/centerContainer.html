@@ -1,0 +1,103 @@
+<div class="center-container" id="centerContainer">
+      <section class="panel-container center-panel" id="panelCenter">
+        <div class="panel-header-bar" style="display:flex; justify-content:space-between; align-items:center;">
+          <span class="panel-header-title" id="centerPanelTitle">⚡ AI Agent PC Cockpit - Direct Host Execution</span>
+          <div style="display:flex; gap:6px;">
+            <button class="btn-del-chat" onclick="clearActiveChat()" title="Clear Current Chat">🧹 Clear</button>
+          </div>
+        </div>
+
+        <!-- Chat Stream Scrollport -->
+        <div class="chat-scroll" id="chatScroll">
+          <!-- Flagship Command Center Hero Dashboard -->
+          <div class="cockpit-hero-dashboard" id="cockpitHeroDashboard">
+            <div class="hero-core-badge">
+              <span class="hero-core-pulse"></span>
+              <span>D.E.E.P Sovereign Cockpit • v2.4</span>
+            </div>
+            
+            <h1 class="hero-title">PRIMARY INTELLIGENCE COMMAND</h1>
+            <p class="hero-subtitle">
+              Sovereign Local AI Workstation with Direct PC Host Execution, Neural Swarm Routing, Multimodal Vision, and Autonomous Tool Coordination.
+            </p>
+
+            <!-- Living Center-Stage Voice Reactor -->
+            <div class="voice-reactor-container">
+              <div class="voice-reactor-orb-wrap" onclick="toggleMainVoiceMic()" title="Click to speak with D.E.E.P (or use Spacebar)">
+                <div class="voice-reactor-glow" id="voiceCoreGlow"></div>
+                <canvas class="voice-reactor-canvas" id="voiceReactorCanvas" width="140" height="140"></canvas>
+                <div class="voice-reactor-mic-btn" id="voiceReactorMicBtn">
+                  <span id="voiceReactorMicIcon" style="font-size:1.6rem;">🎙️</span>
+                </div>
+              </div>
+              <div class="voice-status-label" id="voiceStatusLabel">
+                <span class="hero-core-pulse" id="voiceStatusPulse"></span>
+                <span id="voiceStatusText">Speak naturally to D.E.E.P or click the core to listen</span>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <!-- Input Footer & Controls -->
+        <footer class="input-footer">
+          <div class="input-toolbar-row">
+            <div class="input-toolbar-left">
+              <button class="btn-input-tool btn-icon-only" id="btnAttach" title="Attach Image for Multimodal Vision (OCR / VLM)">
+                📎
+              </button>
+              <input type="file" id="imageFileInput" accept="image/*" style="display:none;">
+              <span id="attachedBadge" style="display:none; font-size:0.75rem; color:var(--accent-cyan); background:rgba(56,189,248,0.15); padding:2px 8px; border-radius:6px; border:1px solid rgba(56,189,248,0.3);">
+                Image Attached ✕
+              </span>
+              <button class="btn-input-tool btn-icon-only" id="btnMic" title="Toggle Dictation / Voice Input">
+                🎙️
+              </button>
+              <div id="typingTimer" style="font-size:0.72rem; color:var(--text-muted); margin-left:6px;"></div>
+              <div id="inputStats" style="display:none; font-size:0.72rem; color:var(--accent-cyan); background:rgba(56,189,248,0.1); border:1px solid rgba(56,189,248,0.25); border-radius:6px; padding:2px 8px; margin-left:6px; font-weight:600;"></div>
+            </div>
+
+            <div class="input-toolbar-right">
+              <div id="autoProtectionBadge" style="display:inline-flex; align-items:center; gap:6px; font-size:0.75rem; font-weight:600; color:#94a3b8; background:rgba(30,41,59,0.6); border:1px solid rgba(255,255,255,0.08); padding:4px 10px; border-radius:8px;" title="Autonomous execution risk mitigation & consensus active">
+                <span style="width:6px; height:6px; border-radius:50%; background:#10b981; box-shadow:0 0 6px #10b981;"></span>
+                <span id="autoProtectionText">Auto-Guard: Active</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="input-box-wrapper">
+            <textarea id="promptInput" placeholder="Tell me what to do on your PC or ask a question..." rows="1"></textarea>
+            <button id="sendBtn" class="btn-action" style="background:linear-gradient(135deg, #0284c7, #9333ea); border:none; color:#fff; font-weight:700; padding:8px 18px; border-radius:10px; cursor:pointer;">
+              ➤
+            </button>
+          </div>
+        </footer>
+      </section>
+
+      <!-- BOTTOM PANEL: TERMINAL & SYSTEM LOGS -->
+      <section class="panel-container bottom-panel hidden" id="panelBottom">
+        <div class="panel-header-bar" style="display:flex; justify-content:space-between; align-items:center; padding: 6px 12px;">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:#10b981; box-shadow:0 0 8px #10b981;"></span>
+            <span class="panel-header-title" style="font-size:0.78rem; font-weight:700; color:#38bdf8; letter-spacing:1px;">💻 SYSTEM TERMINAL & DIRECT HOST CONSOLE</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:6px;">
+            <button class="btn-del-chat" onclick="executeBottomTerminal('git status --short')" title="Run git status" style="padding:2px 8px; font-size:0.68rem; border-radius:5px; background:rgba(56,189,248,0.15); border:1px solid rgba(56,189,248,0.3); color:#38bdf8; cursor:pointer;">git status</button>
+            <button class="btn-del-chat" onclick="executeBottomTerminal('ollama ps')" title="Run ollama ps" style="padding:2px 8px; font-size:0.68rem; border-radius:5px; background:rgba(168,85,247,0.15); border:1px solid rgba(168,85,247,0.3); color:#c084fc; cursor:pointer;">ollama ps</button>
+            <button class="btn-del-chat" onclick="executeBottomTerminal('dir')" title="List Directory" style="padding:2px 8px; font-size:0.68rem; border-radius:5px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.15); color:#cbd5e1; cursor:pointer;">dir</button>
+            <button class="btn-del-chat" onclick="clearBottomTerminal()" title="Clear Terminal Output" style="padding:2px 8px; font-size:0.68rem; border-radius:5px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.15); color:#94a3b8; cursor:pointer;">🧹 Clear</button>
+            <button class="btn-del-chat" onclick="toggleBottomPanel()" title="Hide Bottom Console" style="padding:2px 8px; font-size:0.75rem; border-radius:5px; cursor:pointer;">✖</button>
+          </div>
+        </div>
+        <div class="panel-content" style="padding:8px 10px; display:flex; flex-direction:column; gap:6px; flex: 1; min-height:0; overflow:hidden;">
+          <div id="bottomTerminalLogs" style="flex:1; width:100%; min-height:85px; overflow-y:auto; background:#040812; border-radius:8px; padding:8px 12px; border:1px solid rgba(56,189,248,0.25); font-family:'JetBrains Mono', monospace; font-size:0.76rem; line-height:1.45; color:#a5f3fc; white-space:pre-wrap; word-break:break-all;">[HOST POWERSHELL READY] Direct Host Execution Bridge Connected.
+Working Directory: C:\Users\User\.gemini\antigravity\scratch\local_ai_gui
+Type any PowerShell command or click a quick action above to execute directly on the PC:</div>
+          <div style="display:flex; gap:6px; align-items:center; background:rgba(15,23,42,0.9); border:1px solid rgba(56,189,248,0.3); border-radius:8px; padding:4px 8px;">
+            <span style="font-family:'JetBrains Mono', monospace; font-size:0.78rem; font-weight:700; color:#38bdf8;">PS &gt;</span>
+            <input type="text" id="terminalInBottom" placeholder="Type PowerShell command (e.g. dir, git status, ollama ps, python app.py)..." style="flex:1; background:transparent; border:none; outline:none; font-family:'JetBrains Mono', monospace; font-size:0.78rem; color:#f8fafc;" onkeydown="if(event.key==='Enter') executeBottomTerminal()">
+            <button onclick="executeBottomTerminal()" style="background:linear-gradient(135deg, #0284c7, #38bdf8); border:none; color:#000; font-weight:700; border-radius:6px; padding:4px 12px; font-size:0.74rem; cursor:pointer;">Run ↵</button>
+          </div>
+        </div>
+      </section>
+    </div>

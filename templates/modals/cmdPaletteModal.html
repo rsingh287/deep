@@ -1,0 +1,24 @@
+<div class="cmd-palette-modal" id="cmdPaletteModal" onclick="closeCmdPalette(event)">
+    <div class="cmd-palette-box" onclick="event.stopPropagation()">
+      <div class="cmd-palette-header">
+        <span style="font-size:1.1rem; color:var(--accent-cyan);">🔍</span>
+        <input type="text" class="cmd-palette-input" id="cmdInput" placeholder="Type a command or search action (e.g. Audit, Notepad, Memory, Clean)..." oninput="filterCmds()">
+        <span class="kbd-badge">ESC</span>
+      </div>
+      <div class="cmd-palette-results" id="cmdResults">
+        <div class="cmd-item" onclick="toggleDeepQuantumHUD()"><span>⚡ Launch D.E.E.P Agent War Room & Code Monitor</span><span class="kbd-badge">War Room</span></div>
+        <div class="cmd-item" onclick="runCmdPaletteAction('ocr')"><span>👁️ Scan Screen with Live Vision OCR</span><span class="kbd-badge">Vision</span></div>
+        <div class="cmd-item" onclick="runCmdPaletteAction('turbo')"><span>🚀 Execute Turbo Boost RAM Purge</span><span class="kbd-badge">Boost</span></div>
+        <div class="cmd-item" onclick="runCmdPaletteAction('security')"><span>🛡️ Cyber Security Audit Scan</span><span class="kbd-badge">Security</span></div>
+        <div class="cmd-item" onclick="runCmdPaletteAction('audit')"><span>🤖 Run Autonomous System Audit Agent</span><span class="kbd-badge">Agent</span></div>
+        <div class="cmd-item" onclick="runCmdPaletteAction('clean')"><span>🧹 Run Disk Purge Agent</span><span class="kbd-badge">Cleanup</span></div>
+        <div class="cmd-item" onclick="runCmdPaletteAction('notepad')"><span>📝 Launch Notepad</span><span class="kbd-badge">Macro</span></div>
+        <div class="cmd-item" onclick="runCmdPaletteAction('taskmgr')"><span>📊 Launch Task Manager</span><span class="kbd-badge">Macro</span></div>
+        <div class="cmd-item" onclick="runCmdPaletteAction('shot')"><span>📸 Take Screenshot Analysis</span><span class="kbd-badge">Vision</span></div>
+        <div class="cmd-item" onclick="runCmdPaletteAction('toggle_left')"><span>📂 Toggle Left Sidebar</span><span class="kbd-badge">Ctrl+B</span></div>
+        <div class="cmd-item" onclick="runCmdPaletteAction('toggle_bottom')"><span>💻 Toggle Bottom Terminal</span><span class="kbd-badge">Ctrl+J</span></div>
+        <div class="cmd-item" onclick="runCmdPaletteAction('toggle_right')"><span>🌦️ Toggle Weather Panel</span><span class="kbd-badge">Ctrl+W</span></div>
+        <div class="cmd-item" onclick="runCmdPaletteAction('toggle_matrix')"><span>🟩 Toggle Ambient Matrix Canvas</span><span class="kbd-badge">Effect</span></div>
+      </div>
+    </div>
+  </div>

@@ -1,0 +1,188 @@
+<div class="voice-modal-overlay hidden" id="modalWorkstationSettings" onclick="closeWorkstationSettingsModal(event)" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(3,7,18,0.88); backdrop-filter:blur(16px); z-index:9999; align-items:center; justify-content:center; padding:1rem;">
+    <div class="voice-modal-box" onclick="event.stopPropagation()" style="background:#0b1120; border:1px solid rgba(56,189,248,0.4); border-radius:18px; width:95%; max-width:850px; max-height:88vh; display:flex; flex-direction:column; box-shadow:0 20px 60px rgba(0,0,0,0.8), 0 0 35px rgba(56,189,248,0.25); overflow:hidden;">
+      
+      <!-- Modal Header -->
+      <div style="display:flex; align-items:center; justify-content:space-between; padding:14px 20px; border-bottom:1px solid rgba(56,189,248,0.25); background:rgba(15,23,42,0.85);">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <span style="font-size:1.3rem;">⚙️</span>
+          <div>
+            <h3 style="margin:0; font-size:1.05rem; font-weight:700; color:#f1f5f9; letter-spacing:0.5px;">Workstation Settings & System Configuration</h3>
+            <span style="font-size:0.75rem; color:#38bdf8;">Commander Mr. Ramadeep Singh • Security Policies & Active Subsystems</span>
+          </div>
+        </div>
+        <button onclick="closeWorkstationSettingsModal()" style="background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12); color:#cbd5e1; border-radius:8px; padding:6px 12px; font-size:12px; cursor:pointer; font-weight:700; transition:all 0.2s;">✕ Close</button>
+      </div>
+
+      <!-- Settings Navigation Tabs -->
+      <div style="display:flex; gap:8px; padding:10px 18px; background:rgba(10,15,28,0.9); border-bottom:1px solid rgba(255,255,255,0.08); overflow-x:auto;">
+        <button class="set-tab-btn active" onclick="switchSettingsTab('profile', this)" style="padding:6px 14px; background:rgba(56,189,248,0.15); border:1px solid rgba(56,189,248,0.6); color:#38bdf8; border-radius:8px; font-size:0.78rem; font-weight:600; cursor:pointer; white-space:nowrap; transition:all 0.2s;">👤 Profile & Identity</button>
+        <button class="set-tab-btn" onclick="switchSettingsTab('permissions', this)" style="padding:6px 14px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); color:#94a3b8; border-radius:8px; font-size:0.78rem; font-weight:600; cursor:pointer; white-space:nowrap; transition:all 0.2s;">🛡️ Permissions & Security</button>
+        <button class="set-tab-btn" onclick="switchSettingsTab('vision', this)" style="padding:6px 14px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); color:#94a3b8; border-radius:8px; font-size:0.78rem; font-weight:600; cursor:pointer; white-space:nowrap; transition:all 0.2s;">👁️ Multimodal Vision</button>
+        <button class="set-tab-btn" onclick="switchSettingsTab('subsystems', this)" style="padding:6px 14px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); color:#94a3b8; border-radius:8px; font-size:0.78rem; font-weight:600; cursor:pointer; white-space:nowrap; transition:all 0.2s;">⚡ Subsystems & APIs</button>
+        <button class="set-tab-btn" onclick="switchSettingsTab('controls', this)" style="padding:6px 14px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); color:#94a3b8; border-radius:8px; font-size:0.78rem; font-weight:600; cursor:pointer; white-space:nowrap; transition:all 0.2s;">🎛️ Hardware & Controls</button>
+      </div>
+
+      <!-- Settings Body Panels -->
+      <div style="padding:18px 22px; overflow-y:auto; flex:1; display:flex; flex-direction:column; gap:14px;">
+        
+        <!-- PANEL 1: PROFILE & IDENTITY -->
+        <div id="setTab-profile" class="settings-panel-view">
+          <div style="background:rgba(15,23,42,0.6); border:1px solid rgba(56,189,248,0.25); border-radius:12px; padding:16px; margin-bottom:12px;">
+            <div style="font-size:0.75rem; font-weight:700; color:#38bdf8; text-transform:uppercase; letter-spacing:1px; margin-bottom:10px;">Authorized Workstation Commander Profile</div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+              <div>
+                <label for="settingsCommanderName" style="font-size:0.75rem; color:#94a3b8; display:block; margin-bottom:4px;">Commander Name</label>
+                <input id="settingsCommanderName" name="commander_name" type="text" value="Workstation Commander" style="width:100%; background:rgba(30,41,59,0.7); border:1px solid rgba(56,189,248,0.3); border-radius:8px; padding:7px 10px; color:#fff; font-weight:600; font-size:0.85rem;" readonly>
+              </div>
+              <div>
+                <label for="settingsStationRole" style="font-size:0.75rem; color:#94a3b8; display:block; margin-bottom:4px;">Station Role</label>
+                <input id="settingsStationRole" name="station_role" type="text" value="Commander & IT / AI Systems Architect" style="width:100%; background:rgba(30,41,59,0.7); border:1px solid rgba(255,255,255,0.1); border-radius:8px; padding:7px 10px; color:#cbd5e1; font-size:0.85rem;" readonly>
+              </div>
+              <div>
+                <label for="settingsLocation" style="font-size:0.75rem; color:#94a3b8; display:block; margin-bottom:4px;">Location</label>
+                <input id="settingsLocation" name="location" type="text" value="Edge Station / Local Node" style="width:100%; background:rgba(30,41,59,0.7); border:1px solid rgba(255,255,255,0.1); border-radius:8px; padding:7px 10px; color:#cbd5e1; font-size:0.85rem;" readonly>
+              </div>
+              <div>
+                <label for="settingsAIIdentity" style="font-size:0.75rem; color:#94a3b8; display:block; margin-bottom:4px;">AI Companion Identity</label>
+                <input id="settingsAIIdentity" name="ai_identity" type="text" value="DEEP (3D Agentic Workstation Core)" style="width:100%; background:rgba(30,41,59,0.7); border:1px solid rgba(255,255,255,0.1); border-radius:8px; padding:7px 10px; color:#38bdf8; font-weight:600; font-size:0.85rem;" readonly>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PANEL 2: PERMISSIONS & SECURITY -->
+        <div id="setTab-permissions" class="settings-panel-view" style="display:none;">
+          <div style="background:rgba(15,23,42,0.6); border:1px solid rgba(74,222,128,0.3); border-radius:12px; padding:16px; margin-bottom:12px;">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;">
+              <span style="font-size:0.8rem; font-weight:700; color:#4ade80; text-transform:uppercase; letter-spacing:1px;">🛡️ Policy: Sovereign Commander Guardrails</span>
+              <span style="background:rgba(74,222,128,0.15); border:1px solid rgba(74,222,128,0.4); color:#4ade80; font-size:0.7rem; padding:2px 8px; border-radius:12px; font-weight:700;">ACTIVE & ENFORCED</span>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:10px; font-size:0.82rem;">
+              <div style="display:flex; align-items:flex-start; gap:10px; background:rgba(15,23,42,0.4); padding:8px 12px; border-radius:8px; border:1px solid rgba(255,255,255,0.05);">
+                <span style="color:#4ade80; font-size:1.1rem;">✅</span>
+                <div>
+                  <strong style="color:#f1f5f9;">Full PC Execution Privileges:</strong>
+                  <div style="color:#94a3b8; font-size:0.75rem;">Autonomous creation, execution, and debugging across Python, PowerShell, command prompt, file explorer, hardware audio & display controls.</div>
+                </div>
+              </div>
+              <div style="display:flex; align-items:flex-start; gap:10px; background:rgba(239,68,68,0.08); padding:8px 12px; border-radius:8px; border:1px solid rgba(239,68,68,0.25);">
+                <span style="color:#f87171; font-size:1.1rem;">🛡️</span>
+                <div>
+                  <strong style="color:#f87171;">Windows Registry Protection (Strictly Blocked):</strong>
+                  <div style="color:#cbd5e1; font-size:0.75rem;">Zero alterations allowed. Commands targeting `reg`, `regedit`, `Set-ItemProperty`, `HKLM`, or `HKCU` are blocked at the engine gatekeeper.</div>
+                </div>
+              </div>
+              <div style="display:flex; align-items:flex-start; gap:10px; background:rgba(239,68,68,0.08); padding:8px 12px; border-radius:8px; border:1px solid rgba(239,68,68,0.25);">
+                <span style="color:#f87171; font-size:1.1rem;">🛡️</span>
+                <div>
+                  <strong style="color:#f87171;">Data Exfiltration Protection (Strictly Blocked):</strong>
+                  <div style="color:#cbd5e1; font-size:0.75rem;">Zero external data transmission allowed. Outbound file uploads, remote curls, and telemetry egress are permanently denied.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PANEL 3: MEDIAPIPE KINEMATICS -->
+        <div id="setTab-vision" class="settings-panel-view" style="display:none;">
+          <div style="background:rgba(15,23,42,0.6); border:1px solid rgba(0,240,255,0.3); border-radius:12px; padding:16px;">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;">
+              <span style="font-size:0.8rem; font-weight:700; color:#00f0ff; text-transform:uppercase; letter-spacing:1px;">✋ MediaPipe Hand & Face Kinematics Suite</span>
+              <a href="/camera_vision" style="background:rgba(0,240,255,0.15); border:1px solid rgba(0,240,255,0.4); color:#00f0ff; text-decoration:none; font-size:0.75rem; padding:4px 12px; border-radius:8px; font-weight:700;">Open Live Vision Portal ↗</a>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; font-size:0.8rem;">
+              <div style="background:rgba(22,30,49,0.7); border:1px solid rgba(56,189,248,0.2); border-radius:8px; padding:10px;">
+                <div style="color:#38bdf8; font-weight:700; margin-bottom:4px;">✋ Active Model 1: MediaPipe Hands</div>
+                <div style="color:#94a3b8; font-size:0.75rem;">Tracks 21 3D Joint Landmarks, palm direction, and finger kinematics vectors in real time.</div>
+              </div>
+              <div style="background:rgba(22,30,49,0.7); border:1px solid rgba(168,85,247,0.2); border-radius:8px; padding:10px;">
+                <div style="color:#c084fc; font-weight:700; margin-bottom:4px;">👤 Active Model 2: Face Mesh</div>
+                <div style="color:#94a3b8; font-size:0.75rem;">Resolves 468 3D facial mesh points, head pose pitch/yaw/roll, and real-time emotion reading.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PANEL 4: SUBSYSTEMS & PORTALS -->
+        <div id="setTab-subsystems" class="settings-panel-view" style="display:none;">
+          <div style="font-size:0.75rem; font-weight:700; color:#38bdf8; text-transform:uppercase; letter-spacing:1px; margin-bottom:8px;">Standalone Subsystem Portals (Separate Pages)</div>
+          <div style="display:grid; grid-template-columns:repeat(2, 1fr); gap:8px;">
+            <a href="/camera_vision" class="subsystem-portal-card" style="text-decoration:none; background:rgba(15,23,42,0.6); border:1px solid rgba(0,240,255,0.3); border-radius:10px; padding:10px; display:flex; align-items:center; gap:10px;">
+              <span style="font-size:1.3rem;">👁️</span>
+              <div>
+                <div style="font-weight:700; color:#00f0ff; font-size:0.82rem;">Face Emotion & Hand Gestures</div>
+                <div style="color:#94a3b8; font-size:0.72rem;">MediaPipe 3D Kinematics (/camera_vision)</div>
+              </div>
+            </a>
+            <a href="/weather" class="subsystem-portal-card" style="text-decoration:none; background:rgba(15,23,42,0.6); border:1px solid rgba(56,189,248,0.3); border-radius:10px; padding:10px; display:flex; align-items:center; gap:10px;">
+              <span style="font-size:1.3rem;">🌦️</span>
+              <div>
+                <div style="font-weight:700; color:#38bdf8; font-size:0.82rem;">Weather Radar & Forecast</div>
+                <div style="color:#94a3b8; font-size:0.72rem;">Live Doppler Radar (/weather)</div>
+              </div>
+            </a>
+            <a href="/trading" class="subsystem-portal-card" style="text-decoration:none; background:rgba(15,23,42,0.6); border:1px solid rgba(245,158,11,0.3); border-radius:10px; padding:10px; display:flex; align-items:center; gap:10px;">
+              <span style="font-size:1.3rem;">📈</span>
+              <div>
+                <div style="font-weight:700; color:#fbbf24; font-size:0.82rem;">Sharemarket & Quant Trading</div>
+                <div style="color:#94a3b8; font-size:0.72rem;">Live Stocks & Algorithms (/trading)</div>
+              </div>
+            </a>
+            <a href="/news" class="subsystem-portal-card" style="text-decoration:none; background:rgba(15,23,42,0.6); border:1px solid rgba(244,63,94,0.3); border-radius:10px; padding:10px; display:flex; align-items:center; gap:10px;">
+              <span style="font-size:1.3rem;">📰</span>
+              <div>
+                <div style="font-weight:700; color:#f43f5e; font-size:0.82rem;">Latest Global News Wire</div>
+                <div style="color:#94a3b8; font-size:0.72rem;">Real-time headlines (/news)</div>
+              </div>
+            </a>
+            <a href="/jobs" class="subsystem-portal-card" style="text-decoration:none; background:rgba(15,23,42,0.6); border:1px solid rgba(16,185,129,0.3); border-radius:10px; padding:10px; display:flex; align-items:center; gap:10px;">
+              <span style="font-size:1.3rem;">💼</span>
+              <div>
+                <div style="font-weight:700; color:#10b981; font-size:0.82rem;">Jobs by Location</div>
+                <div style="color:#94a3b8; font-size:0.72rem;">Location-aware careers (/jobs)</div>
+              </div>
+            </a>
+            <a href="/skills" class="subsystem-portal-card" style="text-decoration:none; background:rgba(15,23,42,0.6); border:1px solid rgba(234,179,8,0.4); border-radius:10px; padding:10px; display:flex; align-items:center; gap:10px;">
+              <span style="font-size:1.3rem;">⚡</span>
+              <div>
+                <div style="font-weight:700; color:#facc15; font-size:0.82rem;">Skills Arsenal (422)</div>
+                <div style="color:#94a3b8; font-size:0.72rem;">Specialized AI Developer Agents (/skills)</div>
+              </div>
+            </a>
+            <a href="/cyber_defense" class="subsystem-portal-card" style="text-decoration:none; background:rgba(15,23,42,0.6); border:1px solid rgba(244,63,94,0.3); border-radius:10px; padding:10px; display:flex; align-items:center; gap:10px;">
+              <span style="font-size:1.3rem;">🛡️</span>
+              <div>
+                <div style="font-weight:700; color:#f43f5e; font-size:0.82rem;">Cyber Sentinel Defense</div>
+                <div style="color:#94a3b8; font-size:0.72rem;">Host Security & Auditing (/cyber_defense)</div>
+              </div>
+            </a>
+            <a href="/memory" class="subsystem-portal-card" style="text-decoration:none; background:rgba(15,23,42,0.6); border:1px solid rgba(168,85,247,0.3); border-radius:10px; padding:10px; display:flex; align-items:center; gap:10px;">
+              <span style="font-size:1.3rem;">🧠</span>
+              <div>
+                <div style="font-weight:700; color:#c084fc; font-size:0.82rem;">Memory Database</div>
+                <div style="color:#94a3b8; font-size:0.72rem;">Persistent Facts & Preferences (/memory)</div>
+              </div>
+            </a>
+          </div>
+        </div>
+
+        <!-- PANEL 5: EVERYDAY PC CONTROLS -->
+        <div id="setTab-controls" class="settings-panel-view" style="display:none;">
+          <div style="background:rgba(15,23,42,0.6); border:1px solid rgba(56,189,248,0.25); border-radius:12px; padding:16px;">
+            <div style="font-size:0.75rem; font-weight:700; color:#38bdf8; text-transform:uppercase; letter-spacing:1px; margin-bottom:10px;">Quick Hardware & Action Triggers</div>
+            <div style="display:flex; flex-wrap:wrap; gap:8px;">
+              <button onclick="DeepVoice.speak('D.E.E.P audio channel operational. Workstation nominal.')" style="padding:7px 12px; background:rgba(56,189,248,0.15); border:1px solid rgba(56,189,248,0.4); color:#38bdf8; border-radius:8px; font-size:0.75rem; font-weight:600; cursor:pointer;">🔊 Audio Synthesis Test</button>
+              <button onclick="toggleMainVoiceMic()" style="padding:7px 12px; background:rgba(74,222,128,0.15); border:1px solid rgba(74,222,128,0.4); color:#4ade80; border-radius:8px; font-size:0.75rem; font-weight:600; cursor:pointer;">🎙️ Mic Listening Toggle</button>
+              <button onclick="triggerScreenVisionScan('Analyze what is on my screen right now'); closeWorkstationSettingsModal();" style="padding:7px 12px; background:rgba(168,85,247,0.15); border:1px solid rgba(168,85,247,0.4); color:#c084fc; border-radius:8px; font-size:0.75rem; font-weight:600; cursor:pointer;">📸 Screen Vision OCR</button>
+              <button onclick="toggleDeepQuantumHUD(); closeWorkstationSettingsModal();" style="padding:7px 12px; background:rgba(2,132,199,0.15); border:1px solid rgba(2,132,199,0.4); color:#38bdf8; border-radius:8px; font-size:0.75rem; font-weight:600; cursor:pointer;">⚡ Agent War Room</button>
+              <button onclick="toggleRightPanel(); closeWorkstationSettingsModal();" style="padding:7px 12px; background:rgba(234,179,8,0.15); border:1px solid rgba(234,179,8,0.4); color:#facc15; border-radius:8px; font-size:0.75rem; font-weight:600; cursor:pointer;">🤖 3D AI Buddy</button>
+              <button onclick="toggleArtifactCanvas(); closeWorkstationSettingsModal();" style="padding:7px 12px; background:rgba(168,85,247,0.15); border:1px solid rgba(168,85,247,0.4); color:#c084fc; border-radius:8px; font-size:0.75rem; font-weight:600; cursor:pointer;">🎨 Artifact Canvas</button>
+              <button onclick="DeepSubsystems.open('/cyber_defense', 'Cyber Defense Sentinel', '🛡️'); closeWorkstationSettingsModal();" style="padding:7px 12px; background:rgba(244,63,94,0.15); border:1px solid rgba(244,63,94,0.4); color:#f43f5e; border-radius:8px; font-size:0.75rem; font-weight:600; cursor:pointer;">🛡️ Cyber Sentinel</button>
+              <button onclick="promptPinLock()" style="padding:7px 12px; background:rgba(239,68,68,0.15); border:1px solid rgba(239,68,68,0.4); color:#f87171; border-radius:8px; font-size:0.75rem; font-weight:600; cursor:pointer;">🔒 Lock Workstation (PIN)</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>

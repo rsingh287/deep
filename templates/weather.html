@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>D.E.E.P Atmospheric & Weather Radar Station</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Rajdhani:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #070a12;
+      --card-bg: rgba(15, 23, 42, 0.75);
+      --border: rgba(56, 189, 248, 0.2);
+      --accent-cyan: #38bdf8;
+      --accent-purple: #c084fc;
+      --accent-green: #4ade80;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --glass-blur: blur(16px);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Outfit', sans-serif;
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      background-image:
+        radial-gradient(circle at 15% 15%, rgba(56, 189, 248, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 85% 85%, rgba(192, 132, 252, 0.08) 0%, transparent 40%);
+    }
+
+    /* Top Navigation Header */
+    .weather-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.85rem 1.8rem;
+      background: rgba(10, 15, 26, 0.92);
+      backdrop-filter: var(--glass-blur);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .brand-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      box-shadow: 0 0 15px rgba(56, 189, 248, 0.4);
+    }
+
+    .brand-title h1 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+    .brand-title p {
+      font-size: 0.76rem;
+      color: var(--accent-cyan);
+      font-family: 'JetBrains Mono', monospace;
+      letter-spacing: 0.05em;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .clock-display {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.95rem;
+      color: var(--accent-cyan);
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid var(--border);
+      padding: 6px 14px;
+      border-radius: 8px;
+    }
+
+    .btn-cockpit-return {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(56, 189, 248, 0.15);
+      border: 1px solid var(--accent-cyan);
+      color: var(--text-main);
+      padding: 8px 18px;
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: 0.88rem;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.25s ease;
+    }
+    .btn-cockpit-return:hover {
+      background: var(--accent-cyan);
+      color: #000;
+      box-shadow: 0 0 20px rgba(56, 189, 248, 0.5);
+      transform: translateY(-1px);
+    }
+
+    /* Main Container Grid */
+    .weather-main {
+      flex: 1;
+      padding: 1.1rem 1.6rem;
+      max-width: 1600px;
+      margin: 0 auto;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    /* City Cards Grid */
+    .cities-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1.1rem;
+    }
+
+    .city-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1rem 1.25rem;
+      backdrop-filter: var(--glass-blur);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .city-card:hover {
+      border-color: var(--accent-cyan);
+      box-shadow: 0 8px 30px rgba(56, 189, 248, 0.2);
+      transform: translateY(-2px);
+    }
+    .city-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple));
+    }
+
+    .city-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 8px;
+    }
+
+    .city-name {
+      font-size: 1.2rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    .city-temp-c {
+      font-size: 1.95rem;
+      font-weight: 800;
+      color: var(--accent-cyan);
+      line-height: 1;
+      font-family: 'Rajdhani', sans-serif;
+    }
+
+    .city-temp-f {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      text-align: right;
+      margin-top: 3px;
+    }
+
+    .city-condition-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 8px 0;
+      font-size: 0.95rem;
+      font-weight: 500;
+    }
+
+    .weather-icon-badge {
+      font-size: 1.6rem;
+    }
+
+    .metrics-row {
+      display: flex;
+      justify-content: space-between;
+      background: rgba(0, 0, 0, 0.35);
+      padding: 8px 12px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      margin-top: 10px;
+      font-size: 0.82rem;
+    }
+
+    .metric-item {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+    .metric-label {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .metric-val {
+      font-weight: 600;
+      color: #e2e8f0;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .alert-pill {
+      display: inline-block;
+      margin-top: 12px;
+      padding: 4px 12px;
+      border-radius: 6px;
+      font-size: 0.76rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      background: rgba(74, 222, 128, 0.15);
+      color: var(--accent-green);
+      border: 1px solid rgba(74, 222, 128, 0.35);
+    }
+    .alert-pill.warning {
+      background: rgba(239, 68, 68, 0.15);
+      color: #f87171;
+      border-color: rgba(239, 68, 68, 0.4);
+    }
+
+    /* Radar Map Section */
+    .radar-section {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 1.5rem;
+      backdrop-filter: var(--glass-blur);
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .radar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .radar-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .radar-controls {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 10px 14px;
+      background: rgba(15, 23, 42, 0.7);
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .radar-btn-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .radar-btn {
+      background: rgba(30, 41, 59, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #94a3b8;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .radar-btn:hover {
+      background: rgba(56, 189, 248, 0.15);
+      border-color: rgba(56, 189, 248, 0.4);
+      color: #38bdf8;
+    }
+
+    .radar-btn.active {
+      background: rgba(56, 189, 248, 0.22);
+      border-color: var(--accent-cyan);
+      color: var(--accent-cyan);
+      font-weight: 700;
+      box-shadow: 0 0 12px rgba(56, 189, 248, 0.25);
+    }
+
+    .radar-legend {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      font-family: 'JetBrains Mono', monospace;
+      flex-wrap: wrap;
+    }
+
+    .legend-bar {
+      height: 6px;
+      width: 140px;
+      border-radius: 3px;
+      background: linear-gradient(90deg, #38bdf8, #10b981, #facc15, #f97316, #ef4444, #a855f7);
+    }
+
+    .radar-frame {
+      width: 100%;
+      height: 440px;
+      border-radius: 14px;
+      border: 1px solid rgba(56, 189, 248, 0.25);
+      overflow: hidden;
+      background: #000;
+      position: relative;
+    }
+
+    .radar-frame iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    /* Split Radar & Extended Forecast Container */
+    .radar-forecast-split {
+      display: grid;
+      gap: 1.4rem;
+      align-items: stretch;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* Right Side Layout (Recommended Default) */
+    .radar-forecast-split.layout-right {
+      grid-template-columns: 1fr 370px;
+    }
+    .radar-forecast-split.layout-right .radar-section {
+      order: 1;
+    }
+    .radar-forecast-split.layout-right .forecast-section {
+      order: 2;
+    }
+
+    /* Left Side Layout */
+    .radar-forecast-split.layout-left {
+      grid-template-columns: 370px 1fr;
+    }
+    .radar-forecast-split.layout-left .radar-section {
+      order: 2;
+    }
+    .radar-forecast-split.layout-left .forecast-section {
+      order: 1;
+    }
+
+    /* Bottom Layout (Stacked Full-Width) */
+    .radar-forecast-split.layout-bottom {
+      grid-template-columns: 1fr;
+    }
+    .radar-forecast-split.layout-bottom .radar-section {
+      order: 1;
+    }
+    .radar-forecast-split.layout-bottom .forecast-section {
+      order: 2;
+    }
+
+    @media (max-width: 1180px) {
+      .radar-forecast-split,
+      .radar-forecast-split.layout-right,
+      .radar-forecast-split.layout-left {
+        grid-template-columns: 1fr !important;
+      }
+      .radar-forecast-split .radar-section { order: 1 !important; }
+      .radar-forecast-split .forecast-section { order: 2 !important; }
+    }
+
+    /* Forecast Section */
+    .forecast-section {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 1.15rem 1.25rem;
+      backdrop-filter: var(--glass-blur);
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+      transition: all 0.3s ease;
+    }
+
+    .forecast-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .forecast-title {
+      font-size: 0.98rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .forecast-badge {
+      font-size: 0.68rem;
+      color: var(--accent-cyan);
+      background: rgba(56, 189, 248, 0.12);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      padding: 2px 7px;
+      border-radius: 6px;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 600;
+    }
+
+    .forecast-layout-controls {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      background: rgba(15, 23, 42, 0.8);
+      padding: 3px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .layout-btn {
+      background: transparent;
+      border: 1px solid transparent;
+      color: #94a3b8;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .layout-btn:hover {
+      color: #f8fafc;
+      background: rgba(255, 255, 255, 0.06);
+    }
+    .layout-btn.active {
+      background: rgba(56, 189, 248, 0.22);
+      border-color: var(--accent-cyan);
+      color: var(--accent-cyan);
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.2);
+    }
+
+    /* Days Container */
+    .forecast-days-container {
+      display: flex;
+      gap: 6px;
+      flex: 1;
+    }
+
+    /* Vertical modes: layout-right and layout-left */
+    .radar-forecast-split.layout-right .forecast-days-container,
+    .radar-forecast-split.layout-left .forecast-days-container {
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    /* Bottom mode: horizontal cards */
+    .radar-forecast-split.layout-bottom .forecast-days-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 1rem;
+    }
+
+    /* Forecast Item Row/Card */
+    .forecast-item {
+      background: rgba(10, 15, 26, 0.65);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      padding: 0.44rem 0.8rem;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .forecast-item:hover {
+      border-color: var(--accent-cyan);
+      background: rgba(56, 189, 248, 0.09);
+      transform: translateX(2px);
+    }
+    .radar-forecast-split.layout-left .forecast-item:hover {
+      transform: translateX(-2px);
+    }
+
+    /* In bottom layout, forecast-item becomes a centered card */
+    .radar-forecast-split.layout-bottom .forecast-item {
+      flex-direction: column;
+      text-align: center;
+      padding: 1rem 0.8rem;
+      gap: 8px;
+      justify-content: center;
+    }
+    .radar-forecast-split.layout-bottom .forecast-item:hover {
+      transform: translateY(-2px);
+    }
+
+    .forecast-col-day {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: #f1f5f9;
+      text-transform: uppercase;
+      min-width: 50px;
+      letter-spacing: 0.05em;
+    }
+
+    .forecast-col-condition {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      flex: 1;
+      font-size: 0.8rem;
+      color: #cbd5e1;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    .forecast-icon-sm {
+      font-size: 1.25rem;
+      line-height: 1;
+    }
+
+    .forecast-condition-label {
+      font-size: 0.76rem;
+      color: #94a3b8;
+    }
+
+    .forecast-col-temps {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+    }
+
+    .temp-low {
+      color: #94a3b8;
+      min-width: 26px;
+      text-align: right;
+    }
+
+    .temp-high {
+      color: var(--accent-cyan);
+      font-weight: 700;
+      min-width: 26px;
+    }
+
+    /* Temperature Visual Slider Bar */
+    .temp-bar-track {
+      width: 52px;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.12);
+      border-radius: 2px;
+      position: relative;
+      overflow: hidden;
+    }
+    .temp-bar-fill {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      background: linear-gradient(90deg, #38bdf8, #10b981, #facc15, #f97316);
+      border-radius: 2px;
+    }
+
+    /* Bottom mode adjustments */
+    .radar-forecast-split.layout-bottom .temp-bar-track {
+      display: none;
+    }
+    .radar-forecast-split.layout-bottom .forecast-condition-label {
+      display: none;
+    }
+    .radar-forecast-split.layout-bottom .forecast-icon-sm {
+      font-size: 2rem;
+    }
+    .radar-forecast-split.layout-bottom .forecast-col-condition {
+      justify-content: center;
+    }
+
+    footer {
+      text-align: center;
+      padding: 1.5rem;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      font-family: 'JetBrains Mono', monospace;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Header -->
+  <header class="weather-header">
+    <div class="header-left">
+      <div class="brand-icon">🌦️</div>
+      <div class="brand-title">
+        <h1>D.E.E.P ATMOSPHERIC OBSERVATORY</h1>
+        <p>ORBITAL RADAR • MULTI-ZONE TELEMETRY • EXTENDED FORECASTS</p>
+      </div>
+    </div>
+
+    <div class="header-right">
+      <div class="clock-display" id="liveClock">00:00:00 UTC</div>
+      <a href="/" class="btn-cockpit-return">← Return to Full AI Cockpit</a>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="weather-main">
+    
+    <!-- Live Multi-City Telemetry Cards -->
+    <section class="cities-grid" id="citiesContainer">
+      <div class="city-card">
+        <div style="color: var(--accent-cyan); font-size: 0.9rem;">Connecting to atmospheric satellite network...</div>
+      </div>
+    </section>
+
+    <!-- Split Radar & Extended Forecast Container (Default Right Side) -->
+    <div class="radar-forecast-split layout-right" id="radarForecastSplit">
+      
+      <!-- Live Interactive Doppler Radar Embed -->
+      <section class="radar-section">
+        <div class="radar-header">
+          <div class="radar-title">
+            <span>📡 LIVE DOPPLER WEATHER & PRECIPITATION RADAR</span>
+            <span style="font-size: 0.72rem; color: #10b981; background: rgba(16,185,129,0.15); border: 1px solid rgba(16,185,129,0.35); padding: 3px 8px; border-radius: 12px; font-weight: 700;">LIVE SUDBURY DOPPLER ACTIVE</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <button class="radar-btn" onclick="refreshRadarFrame()" title="Reload Radar Stream">🔄 Refresh Stream</button>
+            <button class="radar-btn" onclick="toggleRadarFullscreen()" title="Toggle Fullscreen Radar View">⛶ Expand Radar</button>
+          </div>
+        </div>
+
+        <!-- Radar Layer Presets & Legend -->
+        <div class="radar-controls">
+          <div class="radar-btn-group">
+            <button class="radar-btn active" id="btnRadSudbury" onclick="setRadarPreset('sudbury_local')">🎯 Sudbury Metro (High-Res)</button>
+            <button class="radar-btn" id="btnRadOntario" onclick="setRadarPreset('ontario_regional')">🍁 Ontario Regional</button>
+            <button class="radar-btn" id="btnRadLoop" onclick="setRadarPreset('storm_loop')">⛈️ Storm Tracker & Loop</button>
+            <button class="radar-btn" id="btnRadSat" onclick="setRadarPreset('satellite_ir')">☁️ Infrared Satellite</button>
+            <button class="radar-btn" id="btnRadWind" onclick="setRadarPreset('wind_live')">💨 Live Wind & Particle Stream</button>
+          </div>
+          <div class="radar-legend">
+            <span>Precipitation:</span>
+            <div class="legend-bar"></div>
+            <span>Light ➔ Severe Storm / Hail</span>
+          </div>
+        </div>
+
+        <div class="radar-frame" id="radarFrameContainer">
+          <!-- Interactive Doppler Radar centered directly on Greater Sudbury, ON (46.4900, -80.9900) -->
+          <iframe 
+            id="liveRadarIframe"
+            src="https://www.rainviewer.com/map.html?loc=46.4900,-80.9900,8&oFa=0&oC=1&oU=0&oCl=1&c=1&o=85&lm=1&layer=radar&sm=1&sn=1" 
+            title="Interactive Doppler Radar"
+            loading="lazy"
+            allowfullscreen>
+          </iframe>
+        </div>
+      </section>
+
+      <!-- 7-Day Extended Forecast Section (Vertical Right / Left / Bottom) -->
+      <section class="forecast-section" id="forecastSection">
+        <div class="forecast-header">
+          <div class="forecast-title">
+            <span>📅 7-DAY EXTENDED FORECAST</span>
+            <span class="forecast-badge">SUDBURY ZONE</span>
+          </div>
+          <div class="forecast-layout-controls" title="Change Forecast Dock Position">
+            <button class="layout-btn" id="btnLayoutLeft" onclick="setForecastLayout('left')" title="Dock 7-Day Forecast on Left Side">◧ Left</button>
+            <button class="layout-btn active" id="btnLayoutRight" onclick="setForecastLayout('right')" title="Dock 7-Day Forecast on Right Side (Recommended)">◨ Right</button>
+            <button class="layout-btn" id="btnLayoutBottom" onclick="setForecastLayout('bottom')" title="Dock 7-Day Forecast at Bottom">⬒ Bottom</button>
+          </div>
+        </div>
+        <div class="forecast-days-container" id="forecastGrid">
+          <div style="color: var(--text-muted); font-size: 0.85rem; padding: 1.5rem; text-align: center;">Calculating meteorological models...</div>
+        </div>
+      </section>
+
+    </div>
+
+  </main>
+
+  <footer>
+    D.E.E.P ATMOSPHERIC ENGINE v2.5 • REAL-TIME ENVIRONMENT CANADA & OPEN-METEO TELEMETRY
+  </footer>
+
+  <script>
+    // Live Clock
+    function updateClock() {
+      const now = new Date();
+      document.getElementById('liveClock').textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }) + ' LOCAL';
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+    // Radar Presets Engine
+    const RADAR_PRESETS = {
+      'sudbury_local': 'https://www.rainviewer.com/map.html?loc=46.4900,-80.9900,9&oFa=0&oC=1&oU=0&oCl=1&c=1&o=85&lm=1&layer=radar&sm=1&sn=1',
+      'ontario_regional': 'https://www.rainviewer.com/map.html?loc=46.0000,-80.5000,7&oFa=0&oC=1&oU=0&oCl=1&c=1&o=85&lm=1&layer=radar&sm=1&sn=1',
+      'storm_loop': 'https://www.rainviewer.com/map.html?loc=46.4900,-80.9900,8&oFa=1&oC=1&oU=0&oCl=1&c=1&o=90&lm=1&layer=radar&sm=1&sn=1',
+      'satellite_ir': 'https://www.rainviewer.com/map.html?loc=46.4900,-80.9900,7&oFa=0&oC=1&oU=0&oCl=1&c=1&o=85&lm=0&layer=sat-ir&sm=0&sn=1',
+      'wind_live': 'https://embed.windy.com/embed.html?type=map&location=coordinates&metricRain=default&metricTemp=default&metricWind=default&zoom=8&overlay=wind&product=ecmwf&level=surface&lat=46.4900&lon=-80.9900'
+    };
+
+    function setRadarPreset(key) {
+      document.querySelectorAll('.radar-btn-group .radar-btn').forEach(b => b.classList.remove('active'));
+      const activeBtnMap = {
+        'sudbury_local': 'btnRadSudbury',
+        'ontario_regional': 'btnRadOntario',
+        'storm_loop': 'btnRadLoop',
+        'satellite_ir': 'btnRadSat',
+        'wind_live': 'btnRadWind'
+      };
+      const btnId = activeBtnMap[key];
+      if (btnId) {
+        const el = document.getElementById(btnId);
+        if (el) el.classList.add('active');
+      }
+      const iframe = document.getElementById('liveRadarIframe');
+      if (iframe && RADAR_PRESETS[key]) {
+        iframe.src = RADAR_PRESETS[key];
+      }
+    }
+
+    function refreshRadarFrame() {
+      const iframe = document.getElementById('liveRadarIframe');
+      if (iframe) {
+        const cur = iframe.src.split('&_t=')[0];
+        iframe.src = cur + '&_t=' + Date.now();
+      }
+    }
+
+    function toggleRadarFullscreen() {
+      const frameContainer = document.getElementById('radarFrameContainer');
+      if (!frameContainer) return;
+      if (!document.fullscreenElement) {
+        if (frameContainer.requestFullscreen) {
+          frameContainer.requestFullscreen();
+        } else if (frameContainer.webkitRequestFullscreen) {
+          frameContainer.webkitRequestFullscreen();
+        }
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        } else if (document.webkitExitFullscreen) {
+          document.webkitExitFullscreen();
+        }
+      }
+    }
+
+    function getWeatherEmoji(condition) {
+      const c = (condition || '').toLowerCase();
+      if (c.includes('clear') || c.includes('sun')) return '☀️';
+      if (c.includes('cloud') || c.includes('overcast')) return '☁️';
+      if (c.includes('rain') || c.includes('drizzle')) return '🌧️';
+      if (c.includes('thunder') || c.includes('storm')) return '⛈️';
+      if (c.includes('snow') || c.includes('flurr')) return '❄️';
+      if (c.includes('fog') || c.includes('mist')) return '🌫️';
+      return '🌤️';
+    }
+
+    // Fetch Live Cities from /api/system/weather
+    async function fetchLiveWeather() {
+      try {
+        const resp = await fetch('/api/system/weather');
+        const data = await resp.json();
+        const container = document.getElementById('citiesContainer');
+
+        if (data.locations && data.locations.length > 0) {
+          container.innerHTML = '';
+          data.locations.forEach(loc => {
+            const card = document.createElement('div');
+            card.className = 'city-card';
+            const isWarning = loc.alert_level === 'warning';
+
+            card.innerHTML = `
+              <div class="city-card-header">
+                <div>
+                  <div class="city-name">${loc.name}</div>
+                  <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 2px;">Zone Monitoring Station</div>
+                </div>
+                <div>
+                  <div class="city-temp-c">${loc.temp_c}°C</div>
+                  <div class="city-temp-f">${loc.temp_f}°F</div>
+                </div>
+              </div>
+
+              <div class="city-condition-row">
+                <span class="weather-icon-badge">${getWeatherEmoji(loc.condition)}</span>
+                <span>${loc.condition}</span>
+              </div>
+
+              <div class="metrics-row">
+                <div class="metric-item">
+                  <span class="metric-label">Wind Velocity</span>
+                  <span class="metric-val">${loc.windspeed_kmh || loc.wind_kph || 0} km/h</span>
+                </div>
+                <div class="metric-item">
+                  <span class="metric-label">Atmosphere</span>
+                  <span class="metric-val">1013 hPa</span>
+                </div>
+                <div class="metric-item">
+                  <span class="metric-label">Station Status</span>
+                  <span class="metric-val" style="color: var(--accent-green);">SYNCED</span>
+                </div>
+              </div>
+
+              <div class="alert-pill ${isWarning ? 'warning' : ''}">
+                ${loc.alert || 'GREEN — Normal'}
+              </div>
+            `;
+            container.appendChild(card);
+          });
+        }
+      } catch (err) {
+        console.warn('Weather fetch error:', err);
+      }
+    }
+
+    function setForecastLayout(mode) {
+      const splitContainer = document.getElementById('radarForecastSplit');
+      if (!splitContainer) return;
+
+      splitContainer.classList.remove('layout-left', 'layout-right', 'layout-bottom');
+      splitContainer.classList.add('layout-' + mode);
+
+      document.querySelectorAll('.forecast-layout-controls .layout-btn').forEach(b => b.classList.remove('active'));
+      const activeBtn = document.getElementById('btnLayout' + mode.charAt(0).toUpperCase() + mode.slice(1));
+      if (activeBtn) activeBtn.classList.add('active');
+
+      localStorage.setItem('deep_weather_forecast_dock', mode);
+    }
+
+    // Initialize layout from localStorage (default to 'right' as recommended)
+    const initialDock = localStorage.getItem('deep_weather_forecast_dock') || 'right';
+    setForecastLayout(initialDock);
+
+    function getWeatherDetails(code) {
+      if (code === 0) return { icon: '☀️', text: 'Clear Sky' };
+      if (code === 1) return { icon: '🌤️', text: 'Mainly Clear' };
+      if (code === 2) return { icon: '⛅', text: 'Partly Cloudy' };
+      if (code === 3) return { icon: '☁️', text: 'Overcast' };
+      if ([45, 48].includes(code)) return { icon: '🌫️', text: 'Fog / Mist' };
+      if ([51, 53, 55].includes(code)) return { icon: '🌦️', text: 'Light Drizzle' };
+      if ([61, 63, 65].includes(code)) return { icon: '🌧️', text: 'Rain' };
+      if ([80, 81, 82].includes(code)) return { icon: '🌧️', text: 'Heavy Showers' };
+      if ([71, 73, 75, 77, 85, 86].includes(code)) return { icon: '❄️', text: 'Snow Flurries' };
+      if ([95, 96, 99].includes(code)) return { icon: '⛈️', text: 'Thunderstorm' };
+      return { icon: '🌤️', text: 'Partly Cloudy' };
+    }
+
+    // 7-Day Forecast via Open-Meteo for Greater Sudbury
+    async function fetchForecast() {
+      try {
+        const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=46.49&longitude=-80.99&daily=weathercode,temperature_2m_max,temperature_2m_min&timezone=auto');
+        const data = await res.json();
+        const grid = document.getElementById('forecastGrid');
+        if (!data.daily) return;
+
+        grid.innerHTML = '';
+        const days = data.daily.time;
+        const allMins = data.daily.temperature_2m_min || [0];
+        const allMaxs = data.daily.temperature_2m_max || [20];
+        const globalMin = Math.min(...allMins);
+        const globalMax = Math.max(...allMaxs);
+        const tempRange = Math.max(1, globalMax - globalMin);
+
+        for (let i = 0; i < Math.min(7, days.length); i++) {
+          const date = new Date(days[i] + 'T00:00:00');
+          const dayName = i === 0 ? 'Today' : date.toLocaleDateString('en-US', { weekday: 'short' });
+          const maxT = Math.round(data.daily.temperature_2m_max[i]);
+          const minT = Math.round(data.daily.temperature_2m_min[i]);
+          const code = data.daily.weathercode[i];
+          const info = getWeatherDetails(code);
+
+          const leftPct = Math.max(0, Math.min(80, Math.round(((minT - globalMin) / tempRange) * 100)));
+          const widthPct = Math.max(18, Math.min(100 - leftPct, Math.round(((maxT - minT) / tempRange) * 100)));
+
+          const item = document.createElement('div');
+          item.className = 'forecast-item';
+          item.innerHTML = `
+            <div class="forecast-col-day">${dayName}</div>
+            <div class="forecast-col-condition" title="${info.text}">
+              <span class="forecast-icon-sm">${info.icon}</span>
+              <span class="forecast-condition-label">${info.text}</span>
+            </div>
+            <div class="forecast-col-temps">
+              <span class="temp-low">${minT}°</span>
+              <div class="temp-bar-track" title="Temp Range: ${minT}°C - ${maxT}°C">
+                <div class="temp-bar-fill" style="left: ${leftPct}%; width: ${widthPct}%;"></div>
+              </div>
+              <span class="temp-high">${maxT}°</span>
+            </div>
+          `;
+          grid.appendChild(item);
+        }
+      } catch (e) {
+        console.warn('Forecast error:', e);
+      }
+    }
+
+    fetchLiveWeather();
+    fetchForecast();
+    setInterval(fetchLiveWeather, 25000);
+    setInterval(fetchForecast, 300000);
+  </script>
+</body>
+</html>

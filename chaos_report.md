@@ -1,0 +1,1 @@
+# Chaos Benchmark Report\n\nFailures detected: 1\n- Malformed test !@#$%^&*()_+\n

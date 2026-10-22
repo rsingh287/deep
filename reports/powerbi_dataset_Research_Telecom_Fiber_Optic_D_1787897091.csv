@@ -1,0 +1,121 @@
+Timestamp,Category,Region,Efficiency_Score,Tickets_Resolved,Revenue_Impact_CAD
+2026-01-01,Cloud Systems,Peel Region,75.41,86,7234
+2026-01-02,IT Support Tickets,Greater Sudbury,72.95,89,9822
+2026-01-03,Network Security,Niagara Region,91.3,44,8449
+2026-01-04,IT Support Tickets,Toronto Metro,99.27,47,6055
+2026-01-05,IT Support Tickets,Niagara Region,70.21,103,10166
+2026-01-06,Data Analytics,Greater Sudbury,74.12,106,4247
+2026-01-07,Data Analytics,Toronto Metro,85.17,78,3028
+2026-01-08,Data Analytics,Peel Region,87.92,35,6893
+2026-01-09,Cloud Systems,Peel Region,98.49,23,9013
+2026-01-10,Network Security,Niagara Region,90.18,74,11170
+2026-01-11,Cloud Systems,Peel Region,94.58,49,4652
+2026-01-12,Cloud Systems,Niagara Region,89.54,16,2521
+2026-01-13,IT Support Tickets,Toronto Metro,75.45,77,8373
+2026-01-14,Cloud Systems,Niagara Region,81.66,114,9129
+2026-01-15,Cloud Systems,Peel Region,98.35,99,8363
+2026-01-16,Network Security,Niagara Region,85.92,38,6359
+2026-01-17,Cloud Systems,Toronto Metro,78.14,43,3562
+2026-01-18,Network Security,Peel Region,70.46,23,6963
+2026-01-19,Telecom Infrastructure,Toronto Metro,78.66,77,6758
+2026-01-20,Data Analytics,Peel Region,90.98,49,7392
+2026-01-21,IT Support Tickets,Greater Sudbury,89.21,42,7778
+2026-01-22,Telecom Infrastructure,Toronto Metro,83.26,47,8715
+2026-01-23,Network Security,Greater Sudbury,87.44,100,9654
+2026-01-24,Data Analytics,Peel Region,81.3,61,5340
+2026-01-25,Network Security,Niagara Region,76.96,28,10562
+2026-01-26,Data Analytics,Peel Region,90.96,104,9221
+2026-01-27,Cloud Systems,Peel Region,75.95,110,4290
+2026-01-28,Telecom Infrastructure,Toronto Metro,86.62,18,3257
+2026-01-29,Network Security,Greater Sudbury,87.83,29,4742
+2026-01-30,Network Security,Toronto Metro,97.81,85,11414
+2026-01-31,Data Analytics,Niagara Region,95.97,56,11289
+2026-02-01,Telecom Infrastructure,Peel Region,95.71,42,5127
+2026-02-02,Cloud Systems,Niagara Region,96.06,106,7092
+2026-02-03,Telecom Infrastructure,Peel Region,76.72,76,8276
+2026-02-04,Cloud Systems,Peel Region,95.39,117,10401
+2026-02-05,Data Analytics,Peel Region,84.3,111,2163
+2026-02-06,Data Analytics,Niagara Region,76.45,102,4804
+2026-02-07,Cloud Systems,Peel Region,71.91,72,2791
+2026-02-08,IT Support Tickets,Greater Sudbury,78.88,70,2198
+2026-02-09,Telecom Infrastructure,Niagara Region,84.83,68,2354
+2026-02-10,Network Security,Toronto Metro,96.79,33,6749
+2026-02-11,Network Security,Toronto Metro,83.21,84,7035
+2026-02-12,Cloud Systems,Greater Sudbury,92.47,31,10458
+2026-02-13,Network Security,Toronto Metro,99.01,100,3430
+2026-02-14,Telecom Infrastructure,Peel Region,79.46,84,4011
+2026-02-15,Network Security,Greater Sudbury,87.43,73,8046
+2026-02-16,IT Support Tickets,Greater Sudbury,93.88,34,4411
+2026-02-17,Cloud Systems,Peel Region,90.38,53,3885
+2026-02-18,Telecom Infrastructure,Greater Sudbury,80.06,103,7034
+2026-02-19,IT Support Tickets,Greater Sudbury,76.74,30,10315
+2026-02-20,Telecom Infrastructure,Toronto Metro,85.62,16,6923
+2026-02-21,Cloud Systems,Peel Region,96.56,23,8900
+2026-02-22,Data Analytics,Greater Sudbury,91.42,17,5999
+2026-02-23,Telecom Infrastructure,Toronto Metro,95.1,86,7039
+2026-02-24,Cloud Systems,Niagara Region,70.27,103,1598
+2026-02-25,Telecom Infrastructure,Peel Region,78.38,96,4369
+2026-02-26,Data Analytics,Toronto Metro,99.34,114,9852
+2026-02-27,Cloud Systems,Peel Region,84.57,62,5487
+2026-02-28,Data Analytics,Peel Region,79.09,62,6055
+2026-03-01,Data Analytics,Greater Sudbury,88.77,36,8393
+2026-03-02,Network Security,Greater Sudbury,96.32,41,1725
+2026-03-03,Network Security,Niagara Region,89.03,78,7100
+2026-03-04,Network Security,Toronto Metro,91.31,33,9183
+2026-03-05,Data Analytics,Toronto Metro,89.04,31,8839
+2026-03-06,Cloud Systems,Niagara Region,98.14,20,2560
+2026-03-07,Network Security,Peel Region,86.31,109,4670
+2026-03-08,Cloud Systems,Peel Region,72.22,99,4475
+2026-03-09,Telecom Infrastructure,Toronto Metro,84.32,32,3316
+2026-03-10,IT Support Tickets,Greater Sudbury,94.9,81,3395
+2026-03-11,IT Support Tickets,Toronto Metro,89.8,37,4509
+2026-03-12,Data Analytics,Niagara Region,95.88,31,9596
+2026-03-13,Telecom Infrastructure,Greater Sudbury,90.91,53,7096
+2026-03-14,IT Support Tickets,Greater Sudbury,82.38,64,10216
+2026-03-15,Cloud Systems,Niagara Region,70.15,50,6280
+2026-03-16,Cloud Systems,Peel Region,72.09,30,10663
+2026-03-17,Data Analytics,Greater Sudbury,70.81,112,7419
+2026-03-18,Data Analytics,Peel Region,74.57,76,2648
+2026-03-19,IT Support Tickets,Niagara Region,70.9,66,6277
+2026-03-20,Data Analytics,Toronto Metro,79.64,22,4624
+2026-03-21,Cloud Systems,Toronto Metro,98.47,117,6815
+2026-03-22,Network Security,Toronto Metro,85.67,61,8466
+2026-03-23,Cloud Systems,Toronto Metro,98.79,44,11374
+2026-03-24,Telecom Infrastructure,Toronto Metro,77.99,106,6677
+2026-03-25,IT Support Tickets,Peel Region,75.44,76,4338
+2026-03-26,Telecom Infrastructure,Toronto Metro,82.06,72,2012
+2026-03-27,IT Support Tickets,Toronto Metro,86.2,62,5172
+2026-03-28,Network Security,Peel Region,88.83,75,5570
+2026-03-29,Network Security,Niagara Region,91.54,81,4647
+2026-03-30,IT Support Tickets,Toronto Metro,74.68,100,4244
+2026-03-31,Network Security,Niagara Region,72.71,61,3641
+2026-04-01,Cloud Systems,Peel Region,83.99,104,8117
+2026-04-02,Network Security,Greater Sudbury,80.22,108,5952
+2026-04-03,IT Support Tickets,Niagara Region,98.0,114,4349
+2026-04-04,Cloud Systems,Greater Sudbury,70.45,33,3989
+2026-04-05,Telecom Infrastructure,Toronto Metro,89.43,18,4339
+2026-04-06,IT Support Tickets,Peel Region,95.58,46,2351
+2026-04-07,Cloud Systems,Niagara Region,86.91,47,5500
+2026-04-08,Network Security,Greater Sudbury,94.21,26,9502
+2026-04-09,Telecom Infrastructure,Peel Region,89.22,57,9223
+2026-04-10,Network Security,Peel Region,76.33,60,10445
+2026-04-11,Data Analytics,Greater Sudbury,72.1,22,8248
+2026-04-12,IT Support Tickets,Niagara Region,70.69,48,9806
+2026-04-13,Telecom Infrastructure,Greater Sudbury,73.49,89,1912
+2026-04-14,Cloud Systems,Peel Region,93.7,50,7488
+2026-04-15,Telecom Infrastructure,Toronto Metro,93.8,63,2622
+2026-04-16,Cloud Systems,Niagara Region,77.38,110,11379
+2026-04-17,Network Security,Toronto Metro,82.66,27,4414
+2026-04-18,Telecom Infrastructure,Niagara Region,96.63,76,10287
+2026-04-19,Telecom Infrastructure,Niagara Region,78.78,33,1895
+2026-04-20,Network Security,Peel Region,94.99,23,4002
+2026-04-21,Cloud Systems,Niagara Region,89.96,66,6446
+2026-04-22,IT Support Tickets,Greater Sudbury,72.46,83,8766
+2026-04-23,Cloud Systems,Peel Region,86.33,99,9151
+2026-04-24,Network Security,Greater Sudbury,93.05,53,3656
+2026-04-25,Network Security,Niagara Region,98.74,28,6229
+2026-04-26,Network Security,Greater Sudbury,96.19,89,8301
+2026-04-27,Cloud Systems,Peel Region,92.46,31,3042
+2026-04-28,Network Security,Toronto Metro,72.15,64,8438
+2026-04-29,IT Support Tickets,Niagara Region,72.4,51,7041
+2026-04-30,Data Analytics,Toronto Metro,81.04,79,2865

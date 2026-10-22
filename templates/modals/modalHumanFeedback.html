@@ -1,0 +1,48 @@
+<div class="voice-modal-overlay hidden" id="modalHumanFeedback" onclick="closeFeedbackModal(event)" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(3,7,18,0.88); backdrop-filter:blur(16px); z-index:9999; align-items:center; justify-content:center; padding:1rem;">
+    <div class="voice-modal-box" onclick="event.stopPropagation()" style="background:#0b1120; border:1px solid rgba(16,185,129,0.4); border-radius:18px; width:95%; max-width:880px; max-height:88vh; display:flex; flex-direction:column; box-shadow:0 20px 60px rgba(0,0,0,0.8), 0 0 35px rgba(16,185,129,0.25); overflow:hidden;">
+      
+      <!-- Modal Header -->
+      <div style="display:flex; align-items:center; justify-content:space-between; padding:14px 20px; border-bottom:1px solid rgba(16,185,129,0.25); background:rgba(15,23,42,0.85);">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <span style="font-size:1.3rem;">🧠</span>
+          <div>
+            <h3 style="margin:0; font-size:1.05rem; font-weight:700; color:#f1f5f9; letter-spacing:0.5px;">Human Feedback & Reinforcement Learning (RLHF Core)</h3>
+            <span style="font-size:0.75rem; color:#34d399;">Active Directives • What D.E.E.P Does Right & Mistakes to Avoid</span>
+          </div>
+        </div>
+        <button onclick="closeFeedbackModal()" style="background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12); color:#cbd5e1; border-radius:8px; padding:6px 12px; font-size:12px; cursor:pointer; font-weight:700; transition:all 0.2s;">✕ Close</button>
+      </div>
+
+      <!-- KPI Metrics Strip -->
+      <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:12px; padding:16px 20px; background:rgba(10,15,28,0.9); border-bottom:1px solid rgba(255,255,255,0.08);">
+        <div style="background:rgba(15,23,42,0.6); border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:10px; text-align:center;">
+          <div style="font-size:0.72rem; color:#94a3b8; text-transform:uppercase; font-weight:600;">Total Feedback</div>
+          <div id="fbStatTotal" style="font-size:1.4rem; font-weight:800; color:#f8fafc; margin-top:4px;">0</div>
+        </div>
+        <div style="background:rgba(16,185,129,0.08); border:1px solid rgba(16,185,129,0.25); border-radius:10px; padding:10px; text-align:center;">
+          <div style="font-size:0.72rem; color:#34d399; text-transform:uppercase; font-weight:600;">Approval Rate</div>
+          <div id="fbStatRate" style="font-size:1.4rem; font-weight:800; color:#34d399; margin-top:4px;">100%</div>
+        </div>
+        <div style="background:rgba(56,189,248,0.08); border:1px solid rgba(56,189,248,0.25); border-radius:10px; padding:10px; text-align:center;">
+          <div style="font-size:0.72rem; color:#38bdf8; text-transform:uppercase; font-weight:600;">Verified Right</div>
+          <div id="fbStatPositive" style="font-size:1.4rem; font-weight:800; color:#38bdf8; margin-top:4px;">0</div>
+        </div>
+        <div style="background:rgba(245,158,11,0.08); border:1px solid rgba(245,158,11,0.25); border-radius:10px; padding:10px; text-align:center;">
+          <div style="font-size:0.72rem; color:#fbbf24; text-transform:uppercase; font-weight:600;">Corrections Learned</div>
+          <div id="fbStatNegative" style="font-size:1.4rem; font-weight:800; color:#fbbf24; margin-top:4px;">0</div>
+        </div>
+      </div>
+
+      <!-- Feedback List / Rules Container -->
+      <div id="fbListContainer" style="padding:16px 20px; overflow-y:auto; flex:1; display:flex; flex-direction:column; gap:10px;">
+        <div style="text-align:center; padding:30px; color:#94a3b8; font-size:0.85rem;">Loading feedback rules...</div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div style="display:flex; justify-content:space-between; align-items:center; padding:12px 20px; border-top:1px solid rgba(255,255,255,0.08); background:rgba(10,15,28,0.9); font-size:0.75rem; color:#94a3b8;">
+        <span>💡 Tip: Click <b>👍</b> or <b>👎</b> on any AI message or tell D.E.E.P <i>"Do this instead"</i> in chat to teach it.</span>
+        <button onclick="refreshFeedbackList()" style="background:rgba(56,189,248,0.15); border:1px solid rgba(56,189,248,0.4); color:#38bdf8; border-radius:6px; padding:4px 10px; font-size:0.75rem; cursor:pointer; font-weight:600;">🔄 Refresh Rules</button>
+      </div>
+
+    </div>
+  </div>

@@ -1,0 +1,63 @@
+from .base_intent import BaseIntent
+import os
+import json
+
+class CodeScannerIntent(BaseIntent):
+    SCAN_TRIGGERS = [
+        "scan my code", "find dead code", "find bugs",
+        "go through all coding and find bugs", "code audit", "scan code",
+    ]
+
+    @classmethod
+    def can_handle(cls, norm_prompt: str) -> bool:
+        return any(t in norm_prompt for t in cls.SCAN_TRIGGERS)
+
+    @classmethod
+    def execute(cls, user_prompt: str, norm_prompt: str):
+        try:
+            import code_scanner_engine
+
+            scan_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+            results_json = code_scanner_engine.run_code_scan(scan_dir)
+            results = json.loads(results_json)
+
+            report = "🛡️ **Code Scan Complete**\n\n"
+
+            if results.get("bugs"):
+                report += f"**Bugs/Logic Issues Found ({len(results['bugs'])}):**\n"
+                for bug in results["bugs"][:10]:
+                    report += f"- `{bug}`\n"
+                if len(results["bugs"]) > 10:
+                    report += f"- *...and {len(results['bugs'])-10} more.*\n"
+            else:
+                report += "**Bugs:** None detected!\n"
+
+            report += "\n"
+
+            if results.get("dead_code"):
+                report += f"**Dead Code Found ({len(results['dead_code'])}):**\n"
+                for dc in results["dead_code"][:10]:
+                    report += f"- `{dc}`\n"
+                if len(results["dead_code"]) > 10:
+                    report += f"- *...and {len(results['dead_code'])-10} more.*\n"
+            else:
+                report += "**Dead Code:** None detected!\n"
+
+            if results.get("errors"):
+                report += "\n**Scan Errors:**\n"
+                for err in results["errors"]:
+                    report += f"- {err}\n"
+
+            return (
+                report,
+                "code_scanner_engine",
+                [
+                    {
+                        "language": "python",
+                        "code": "code_scanner_engine.run_code_scan()",
+                        "output": "Code scanned successfully.",
+                    }
+                ],
+            )
+        except Exception as e:
+            return (f"❌ **Code Scanner Error:** {e}", "code_scanner_engine", [])
