@@ -1,21 +1,29 @@
-MIT License
+PolyForm Noncommercial License 1.0.0
 
-Copyright (c) 2026 DEEP Sovereign Cockpit Team
+https://polyformproject.org/licenses/noncommercial/1.0.0/
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+Copyright (c) 2026 Ramandeep Singh (rsingh287)
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+1. Purpose
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+The licensor grants you the rights in Section 2 (Grant) to use the software strictly for Noncommercial Purposes. "Noncommercial Purpose" means any use that is not primarily intended for or directed toward commercial advantage or private monetary compensation.
+
+2. Grant
+
+Subject to the terms and conditions of this license, the licensor grants you a worldwide, royalty-free, non-exclusive license to:
+- Use, study, test, copy, and modify the software for Noncommercial Purposes (including personal education, academic research, and non-monetized hobbyist projects).
+- Distribute copies of the software or modified versions of the software for Noncommercial Purposes, provided that you include this full license and copyright notice with every copy.
+
+3. Commercial Use Prohibited
+
+You may NOT exercise any of the rights granted to you in Section 2 in any manner that is primarily intended for or directed toward commercial advantage, commercial product deployment, SaaS integration, paid consulting, or monetary compensation.
+
+If you or your organization wish to use, integrate, or deploy this software for commercial purposes, you must obtain a separate written commercial agreement and license from the author (contact: deep@local.ai).
+
+4. Notices & Attribution
+
+You must ensure that anyone who gets a copy of any part of this software from you also receives a copy of this license and the copyright notice above.
+
+5. Disclaimer of Warranty
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT, OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.

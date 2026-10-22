@@ -2,7 +2,7 @@
 
 > **Sovereign Local AI Cockpit, Autonomous Voice Sentinel & Physical Hardware Controller**
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![License: PolyForm Noncommercial 1.0.0](https://img.shields.io/badge/License-PolyForm%20Noncommercial-red.svg)](LICENSE)
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-brightgreen.svg)](https://www.python.org/)
 [![Security: Zero--Trust](https://img.shields.io/badge/Security-Zero--Trust%20AST-orange.svg)](SECURITY.md)
 [![Architecture: Event--Driven](https://img.shields.io/badge/Architecture-Event--Driven-purple.svg)](#system-architecture)
@@ -162,7 +162,7 @@ deep/
 ├── tests/                         # Comprehensive system and security test suites
 ├── CONTRIBUTING.md                # Contribution guidelines and coding conventions
 ├── SECURITY.md                    # Zero-trust security policy & vulnerability reporting
-└── LICENSE                        # MIT Open Source License
+└── LICENSE                        # PolyForm Noncommercial 1.0.0 License
 ```
 
 ---
@@ -180,4 +180,9 @@ See [SECURITY.md](SECURITY.md) for full details on our zero-trust architecture.
 
 ## 📜 License
 
-This project is licensed under the **MIT License**. See the [LICENSE](LICENSE) file for complete details.
+This project is licensed under the **PolyForm Noncommercial License 1.0.0**. 
+
+- ✅ **Free & Permitted**: Personal use, academic study, research, hobbyist tinkering, and noncommercial evaluation.
+- 🚫 **Prohibited**: Any commercial deployment, SaaS monetization, paid distribution, or commercial integration without a separate commercial license from the author.
+
+See the [LICENSE](LICENSE) file for complete legal terms. For commercial licensing inquiries, contact [deep@local.ai](mailto:deep@local.ai).
