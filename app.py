@@ -669,51 +669,6 @@ def execute_code(code_str, language, script_name=None):
                     None,
                 )
             elif lang in ["c", "cpp", "c++"]:
-                # Autonomous PIC18F embedded firmware detection & compilation
-                # STRICT REQUIREMENT: Only attempt XC8 compilation if this is a complete, standalone firmware source file
-                # containing the required PIC headers, config pragmas, oscillator definition, and a main function.
-                has_pic_header = ("<xc.h>" in code_str or "<htc.h>" in code_str)
-                has_pragma = ("#pragma config" in code_str)
-                has_xtal = ("_XTAL_FREQ" in code_str)
-                has_main = ("main(" in code_str or "main (" in code_str)
-                is_standalone_pic = has_pic_header and has_pragma and has_xtal and has_main
-
-                if is_standalone_pic:
-                    try:
-                        import pic_embedded_engine
-                        # Extract project name from filename, comment, or timestamp
-                        first_line = code_str.split("\n")[0].strip()
-                        m_proj = re.search(r"Project:\s*([a-zA-Z0-9_\-]+)", code_str, re.I)
-                        if m_proj:
-                            proj_name = m_proj.group(1).strip().replace(" ", "_").lower()
-                        else:
-                            clean_base = re.sub(r"[^a-zA-Z0-9_]", "_", script_name.replace(".c", "").replace(".cpp", ""))
-                            if not clean_base or clean_base.startswith("autonomous_app_") or clean_base.lower() in ["include", "main", "test"]:
-                                proj_name = f"pic_proj_{int(time.time())}"
-                            else:
-                                proj_name = clean_base
-
-                        proj_name = re.sub(r'[^a-zA-Z0-9_]', '_', proj_name).strip('_')
-                        res = pic_embedded_engine.scaffold_and_compile_project(proj_name, code_str)
-                        b_res = res.get("build", {})
-                        if b_res.get("success"):
-                            hex_p = b_res.get("hex_path", "")
-                            return (
-                                f"Autonomous PIC18F85K22 Build Successful!\n"
-                                f"Project: {res.get('project_dir')}\n"
-                                f"HEX Binary: {hex_p}\n"
-                                f"Status: Ready to flash with PICkit 3 (Press F6 in MPLAB X or flash via Deep).",
-                                None,
-                            )
-                        else:
-                            err_msg = b_res.get("stderr") or b_res.get("stdout") or "Compilation failed"
-                            return (
-                                f"Scaffolded PIC project at {res.get('project_dir')}.\nXC8 Build Notice: {err_msg[:300]}",
-                                None,
-                            )
-                    except Exception as pe:
-                        print(f"[PIC AutoBuild Execution Error]: {pe}")
-
                 return (
                     f"C/C++ source code generated and saved to: {file_path}\nReady for compilation.",
                     None,
@@ -4148,76 +4103,7 @@ def api_agent_pilot():
         return jsonify({"status": "error", "message": str(e)}), 500
 
 
-# ============================================================
-# BLENDER AI COPILOT API ROUTES
-# ============================================================
 
-
-@app.route("/api/blender/status", methods=["GET"])
-def api_blender_status():
-    try:
-        import blender_copilot_engine as bce
-
-        info = bce.get_blender_info()
-        return jsonify(info)
-    except Exception as e:
-        return jsonify({"installed": False, "error": str(e)}), 500
-
-
-@app.route("/api/blender/create", methods=["POST"])
-def api_blender_create():
-    try:
-        import threading
-
-        import blender_copilot_engine as bce
-
-        data = request.get_json() or {}
-        prompt = data.get("prompt", "make a 3D sphere")
-        project_name = data.get("project_name", None)
-        auto_open = data.get("auto_open", True)
-
-        def run_creation():
-            res = bce.create_3d_thing(
-                prompt, project_name=project_name, auto_open=auto_open
-            )
-            print(f"[BlenderCopilot] Done: {res}")
-
-        thread = threading.Thread(target=run_creation, daemon=True)
-        thread.start()
-
-        return jsonify(
-            {
-                "status": "started",
-                "message": f"Deep is modeling '{prompt}' in Blender. Blender will open with your 3D scene when ready.",
-                "prompt": prompt,
-            }
-        )
-    except Exception as e:
-        return jsonify({"status": "error", "message": str(e)}), 500
-
-
-@app.route("/api/blender/open", methods=["POST"])
-def api_blender_open():
-    try:
-        import blender_copilot_engine as bce
-
-        data = request.get_json() or {}
-        blend_file = data.get("blend_file", None)
-        result = bce.launch_blender(blend_file=blend_file)
-        return jsonify(result)
-    except Exception as e:
-        return jsonify({"success": False, "error": str(e)}), 500
-
-
-@app.route("/api/blender/preview/<filename>")
-def api_blender_preview(filename):
-    previews_dir = os.path.join(
-        os.path.dirname(__file__), "blender_projects", "previews"
-    )
-    return send_from_directory(previews_dir, filename)
-
-
-# ============================================================
 
 # --- FLOATING 3D ASSISTANT APP ROUTING ---
 FLOATING_APP_DIR = (
@@ -4525,7 +4411,6 @@ from routes.hardware import hardware_bp
 from routes.ingestion import ingestion_bp
 from routes.cyber import cyber_bp
 from routes.gurbani import gurbani_bp
-from routes.pcb import pcb_bp
 from routes.enhanced_tools_bp import enhanced_bp
 from routes.public_apis_bp import public_bp
 from routes.docker_bp import docker_bp
@@ -4539,7 +4424,6 @@ app.register_blueprint(hardware_bp)
 app.register_blueprint(ingestion_bp)
 app.register_blueprint(cyber_bp)
 app.register_blueprint(gurbani_bp)
-app.register_blueprint(pcb_bp)
 app.register_blueprint(enhanced_bp)
 app.register_blueprint(public_bp)
 app.register_blueprint(docker_bp)

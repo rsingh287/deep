@@ -86,7 +86,6 @@ webcam_hardware_capture.jpg
 desktop_vision_capture.png
 !static/*.png
 !static/img/*
-!blender_projects/previews/*.png
 !reports/*.png
 !docs/images/*
 
@@ -186,17 +185,9 @@ Desktop.ini
 *.rlf
 *.o
 *.s
-pic_firmware/*.cmf
-pic_firmware/*.elf
-pic_firmware/*.hxl
-pic_firmware/*.sdb
-pic_firmware/*.sym
-pic_firmware/*.p1
-pic_firmware/*.d
-pic_firmware/*.lst
-pic_firmware/*.rlf
-pic_firmware/*.o
-pic_firmware/*.s
+blender_projects/
+pcb_projects/
+pic_firmware/
 
 # Report export outputs
 reports/*.csv
@@ -204,13 +195,3 @@ reports/*.png
 reports/*.md
 !reports/.gitkeep
 
-# Raw unpacked Gerber layers (Fab ZIP package, BOM, and CPL are tracked instead)
-pcb_projects/*/*.gtl
-pcb_projects/*/*.gbl
-pcb_projects/*/*.gts
-pcb_projects/*/*.gbs
-pcb_projects/*/*.gto
-pcb_projects/*/*.gbo
-pcb_projects/*/*.gml
-pcb_projects/*/*.drl
-pcb_projects/*/*.cir

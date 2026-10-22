@@ -1,5 +1,4 @@
 from .sikh_heritage_intent import SikhHeritageIntent
-from .pcb_designer_intent import PCBDesignerIntent
 from .os_automator import OSAutomatorIntent
 from .server_launcher import ServerLauncherIntent
 from .git_intent import GitAutopilotIntent
@@ -16,7 +15,6 @@ from .code_scanner_intent import CodeScannerIntent
 # In the future, this can auto-discover intents in this folder.
 REGISTERED_INTENTS = [
     SikhHeritageIntent,
-    PCBDesignerIntent,
     GitAutopilotIntent,
     BrowserPilotIntent,
     OSAutomatorIntent,

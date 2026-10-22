@@ -1880,72 +1880,7 @@ I have generated the Python Tkinter script and launched the live desktop animati
         except Exception as e:
             print(f"[ResearchPowerBIEngine] Error: {e}")
 
-    # ---------------------------------------------------------
-    # 0A-BLENDER. BLENDER 3D COPILOT ENGINE ROUTER
-    # ---------------------------------------------------------
-    if any(
-        k in prompt_low
-        for k in [
-            "blender",
-            "3d model",
-            "3d scene",
-            "render in blender",
-            "model in blender",
-            "create in blender",
-        ]
-    ):
-        try:
-            import blender_copilot_engine as bce
 
-            info = bce.get_blender_info()
-            if not info.get("installed"):
-                return (
-                    "⚠️ **Blender Not Detected:** Blender was not found in Program Files. Please ensure Blender is installed.",
-                    "blender_error",
-                    [],
-                )
-
-            # Strip trigger words to get pure 3D prompt
-            clean_prompt = re.sub(
-                r"\b(blender|3d model|3d scene|render in blender|model in blender|create in blender|make|model|create)\b",
-                "",
-                user_prompt,
-                flags=re.IGNORECASE,
-            ).strip()
-            if not clean_prompt:
-                clean_prompt = "a futuristic neon cyber crystal"
-
-            res = bce.create_3d_thing(clean_prompt, auto_open=True)
-            if res.get("success"):
-                blend_path = res.get("blend_file")
-                preview_path = res.get("preview_image")
-                summary_str = (
-                    f"🎨 **Blender 3D Copilot Complete!**\n\n"
-                    f"**Prompt:** `{clean_prompt}`\n"
-                    f"**Blender Version:** `{info.get('version')}`\n"
-                    f"**3D Scene File:** `{blend_path}`\n"
-                    f"**Render Preview:** `{preview_path}`\n\n"
-                    f"🚀 *Blender has been launched on your desktop with the generated 3D scene!*"
-                )
-                return (
-                    summary_str,
-                    "blender_copilot",
-                    [
-                        {
-                            "language": "python",
-                            "code": f"bce.create_3d_thing('{clean_prompt}', auto_open=True)",
-                            "output": "3D Scene Created and Opened in Blender",
-                        }
-                    ],
-                )
-            else:
-                return (
-                    f"❌ **Blender Generation Failed:** {res.get('error')}",
-                    "blender_error",
-                    [],
-                )
-        except Exception as e:
-            print(f"[BlenderCopilotRouter] Error: {e}")
     if any(
         k in prompt_low
         for k in [

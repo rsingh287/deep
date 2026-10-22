@@ -11,9 +11,9 @@
 
 ## 📖 Overview
 
-**D.E.E.P (Dynamic Executive Edge Platform)** is an enterprise-grade, offline-capable local artificial intelligence workstation and hardware cockpit. Designed for zero-cloud reliance, D.E.E.P unifies state-of-the-art local Large Language Models (LLMs), multi-modal computer vision, voice wake-word sentinels, smart home IoT, and direct embedded microcontroller programming (Microchip PIC18F & PICkit 3) into a single cohesive control center.
+**D.E.E.P (Dynamic Executive Edge Platform)** is an enterprise-grade, offline-capable local artificial intelligence workstation and autonomous executive cockpit. Designed for zero-cloud reliance, D.E.E.P unifies state-of-the-art local Large Language Models (LLMs), multi-modal computer vision, voice wake-word sentinels, smart home IoT, and autonomous OS desktop automation into a single cohesive control center.
 
-Whether managing low-latency audio playback, executing AST-guarded database queries, monitoring network threats with a cyber honeypot, or flashing physical MCU firmware over USB, D.E.E.P delivers executive-level sovereign computing on local hardware.
+Whether managing low-latency audio playback, executing AST-guarded database queries, monitoring network threats with a cyber honeypot, or orchestrating local agentic workflows, D.E.E.P delivers executive-level sovereign computing on local hardware.
 
 ---
 
@@ -28,10 +28,10 @@ Whether managing low-latency audio playback, executing AST-guarded database quer
                  ┌─────────────────────────┼─────────────────────────┐
                  │                         │                         │
      ┌───────────▼───────────┐ ┌───────────▼───────────┐ ┌───────────▼───────────┐
-     │ 🎙️ Voice & Co-Pilot   │ │ 👁️ Computer Vision   │ │ ⚡ Embedded Hardware  │
-     │ • Wake-word Sentinel  │ │ • MediaPipe Gestures  │ │ • PIC18F85K22 Target  │
-     │ • Dual AI Co-Pilots   │ │ • Desktop Screen OCR  │ │ • PICkit 3 USB Flasher│
-     │ • Executive TTS Engine│ │ • Camera Inspection   │ │ • 16x2 LCD Line 2 Bus │
+     │ 🎙️ Voice & Co-Pilot   │ │ 👁️ Computer Vision   │ │ ⚙️ OS & Agent Pilot   │
+     │ • Wake-word Sentinel  │ │ • MediaPipe Gestures  │ │ • Autonomous Workflow │
+     │ • Dual AI Co-Pilots   │ │ • Desktop Screen OCR  │ │ • Native Shell / PTY  │
+     │ • Executive TTS Engine│ │ • Camera Inspection   │ │ • Everyday PC Actions │
      └───────────────────────┘ └───────────────────────┘ └───────────────────────┘
                  │                         │                         │
      ┌───────────▼───────────┐ ┌───────────▼───────────┐ ┌───────────▼───────────┐
@@ -52,13 +52,10 @@ Whether managing low-latency audio playback, executing AST-guarded database quer
 - **MediaPipe Hand & Face Tracking**: Zero-latency physical gesture recognition for contactless system navigation.
 - **Hardware Inspection Stream**: MJPEG video feed for real-time circuit board, wire, and component diagnostics.
 
-### ⚡ 3. Physical Hardware & Embedded MCU Controller
-- **PIC18F Trainer 2 Architecture**: Native toolchain for the Microchip **PIC18F85K22** (80-pin TQFP, 4.9152 MHz external crystal).
-- **USB PICkit 3 Flashing Engine**: Deterministic USB mutex locking to compile and flash XC8 firmware via `ipecmd.exe` with zero bus contention.
-- **Hardware Pinout Drivers**:
-  - **16x2 Character LCD**: 8-bit bus wired to `PORTH` (`RE0` RS, `RE1` EN, `RA4` Backlight). Strict Line 2 rendering protocol (`0xC0..0xCF`).
-  - **Sensors**: Microchip **MCP9701-E/TO** linear active thermistor ($19.5\text{ mV}/^\circ\text{C}$ transfer function on `AN0`/`RA0`) with 16-sample ADC smoothing.
-  - **Peripherals**: 8-bit Red LED bar on `PORTD`, piezo buzzer on `LATF`, and matrix keypad on `PORTJ`/`PORTC`.
+### ⚙️ 3. OS Automation & Autonomous Agent Pilot
+- **Everyday PC Operations**: Deep desktop automation supporting application launching, window management, audio controls, and workflow execution.
+- **PTY Terminal Bridge**: Interactive WebSocket-based terminal session with ANSI color rendering and zero-latency shell communication.
+- **Hardware Telemetry Sentinel**: Real-time monitoring of CPU, RAM, GPU metrics, disk health, and thermal levels.
 
 ### 🧠 4. Epistemic Vector Memory & RAG
 - **Qdrant Vector Engine**: Ultra-fast vector database storage for semantic memory and contextual document retrieval.
@@ -149,14 +146,12 @@ deep/
 ├── .env.example                   # Sanitized environment configuration template
 ├── routes/                        # Modular Flask Blueprints
 │   ├── chat.py                    # Multi-turn dual co-pilot conversational routes
-│   ├── hardware.py                # PIC18F MCU flashing & telemetry endpoints
+│   ├── hardware.py                # System hardware telemetry & battery diagnostics
 │   ├── vision.py                  # Computer vision and screen inspection APIs
 │   ├── cyber.py                   # Cyber defense, honeypot & RBAC routes
 │   ├── system.py                  # Process monitoring, health & diagnostics
 │   └── ingestion.py               # Document parsing & knowledge base intake
 ├── intents/                       # Autonomous intent engines
-├── pic_firmware/                  # Microchip PIC18F C source templates & hex binaries
-├── pcb_projects/                  # PCB designs & Gerber generation templates
 ├── static/                        # CSS, Vanilla JS, and Cockpit UI assets
 ├── templates/                     # Jinja2 cockpit UI dashboards and partials
 ├── tests/                         # Comprehensive system and security test suites
