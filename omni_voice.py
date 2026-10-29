@@ -1,4 +1,6 @@
 import os
+import re
+import threading
 import numpy as np
 
 # --- Kokoro ONNX (high-quality, requires model download) ---
@@ -24,6 +26,8 @@ _KOKORO_VOICES = os.path.join(os.path.dirname(os.path.abspath(__file__)), "voice
 
 
 class DEEPOmniVoice:
+    _lock = threading.Lock()
+
     def __init__(self):
         self.kokoro = None
         self._pyttsx3_engine = None
@@ -59,8 +63,7 @@ class DEEPOmniVoice:
         print("[OmniVoice] No TTS backend available. Voice synthesis disabled.")
 
     def speak(self, text, voice="bm_george"):
-        if not self.active:
-            print("[OmniVoice] Voice system inactive or missing dependencies.")
+        if not self.active or not text:
             return
 
         try:
@@ -71,19 +74,27 @@ class DEEPOmniVoice:
         except Exception:
             pass
 
-        print(f"[OmniVoice] Synthesizing: '{text[:50]}...'")
-        try:
-            if self.backend == "kokoro":
-                available = self.kokoro.get_voices() if hasattr(self.kokoro, 'get_voices') else []
-                target_voice = voice if voice in available else ("bm_george" if "bm_george" in available else available[0])
-                samples, sample_rate = self.kokoro.create(text, voice=target_voice, speed=1.0, lang="en-us")
-                sd.play(samples, sample_rate)
-                sd.wait()
-            elif self.backend == "pyttsx3":
-                self._pyttsx3_engine.say(text)
-                self._pyttsx3_engine.runAndWait()
-        except Exception as e:
-            print(f"[OmniVoice] Playback error: {e}")
+        # Executive Voice Brevity Directive: scrub URLs, markdown, JSON, tracebacks
+        clean_text = re.sub(r'https?://\S+', '', text)
+        clean_text = re.sub(r'[`*#_~\[\]\(\)\{\}<>|]', ' ', clean_text)
+        clean_text = re.sub(r'\s+', ' ', clean_text).strip()
+        if not clean_text:
+            return
+
+        with DEEPOmniVoice._lock:
+            print(f"[OmniVoice] Synthesizing: '{clean_text[:50]}...'")
+            try:
+                if self.backend == "kokoro":
+                    available = self.kokoro.get_voices() if hasattr(self.kokoro, 'get_voices') else []
+                    target_voice = voice if voice in available else ("bm_george" if "bm_george" in available else available[0])
+                    samples, sample_rate = self.kokoro.create(clean_text, voice=target_voice, speed=1.0, lang="en-us")
+                    sd.play(samples, sample_rate)
+                    sd.wait()
+                elif self.backend == "pyttsx3":
+                    self._pyttsx3_engine.say(clean_text)
+                    self._pyttsx3_engine.runAndWait()
+            except Exception as e:
+                print(f"[OmniVoice] Playback error: {e}")
 
 omni_voice_engine = None
 

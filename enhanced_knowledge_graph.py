@@ -9,64 +9,123 @@ import time
 import json
 import sqlite3
 import hashlib
+import logging
 from typing import Dict, List, Any, Optional
 
 from security_rbac_engine import security_rbac
+import db_engine
+
+logger = logging.getLogger("EnhancedKnowledgeGraph")
 
 DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "deep_knowledge_graph.db")
 JSON_BACKUP_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "deep_knowledge_graph.json")
 
 
 class EnhancedKnowledgeGraph:
-    def __init__(self, db_path: str = DB_PATH):
+    """
+    Tier 2 Durable Knowledge Graph & Relational Memory Engine.
+    Persists entities, observations, and bi-temporal relations in PostgreSQL (deep_db)
+    for ACID durability and enterprise queryability.
+    """
+    def __init__(self, db_path: Optional[str] = None):
         self.db_path = db_path
+        # Use PostgreSQL by default unless a specific custom SQLite file is explicitly provided
+        self.use_postgres = db_path is None or db_path == DB_PATH
         self._init_db()
         self._load_seed_data_if_empty()
 
     def _get_connection(self):
-        conn = sqlite3.connect(self.db_path)
+        if self.use_postgres:
+            try:
+                conn = db_engine.get_db_connection()
+                conn.row_factory = True
+                return conn
+            except Exception as e:
+                logger.warning(f"[EnhancedKG] PostgreSQL connection failed ({e}), falling back to SQLite.")
+                self.use_postgres = False
+
+        conn = sqlite3.connect(self.db_path or DB_PATH)
         conn.row_factory = sqlite3.Row
         return conn
 
     def _init_db(self):
         conn = self._get_connection()
         c = conn.cursor()
-        c.execute("""
-            CREATE TABLE IF NOT EXISTS kg_entities (
-                name TEXT PRIMARY KEY,
-                entity_type TEXT DEFAULT 'GENERAL',
-                description TEXT DEFAULT '',
-                created_at TEXT,
-                updated_at TEXT
-            )
-        """)
-        c.execute("""
-            CREATE TABLE IF NOT EXISTS kg_observations (
-                id TEXT PRIMARY KEY,
-                entity_name TEXT,
-                observation_text TEXT,
-                confidence REAL DEFAULT 1.0,
-                source TEXT DEFAULT 'system',
-                is_sensitive INTEGER DEFAULT 0,
-                encrypted_data TEXT,
-                revision INTEGER DEFAULT 1,
-                created_at TEXT,
-                updated_at TEXT,
-                FOREIGN KEY (entity_name) REFERENCES kg_entities(name) ON DELETE CASCADE
-            )
-        """)
-        c.execute("""
-            CREATE TABLE IF NOT EXISTS kg_relations (
-                id TEXT PRIMARY KEY,
-                from_entity TEXT,
-                to_entity TEXT,
-                relation_type TEXT,
-                confidence REAL DEFAULT 1.0,
-                created_at TEXT,
-                FOREIGN KEY (from_entity) REFERENCES kg_entities(name) ON DELETE CASCADE,
-                FOREIGN KEY (to_entity) REFERENCES kg_entities(name) ON DELETE CASCADE
-            )
-        """)
+        if self.use_postgres:
+            c.execute("""
+                CREATE TABLE IF NOT EXISTS kg_entities (
+                    name VARCHAR(255) PRIMARY KEY,
+                    entity_type VARCHAR(100) DEFAULT 'GENERAL',
+                    description TEXT DEFAULT '',
+                    created_at TEXT,
+                    updated_at TEXT
+                )
+            """)
+            c.execute("""
+                CREATE TABLE IF NOT EXISTS kg_observations (
+                    id VARCHAR(64) PRIMARY KEY,
+                    entity_name VARCHAR(255) REFERENCES kg_entities(name) ON DELETE CASCADE,
+                    observation_text TEXT,
+                    confidence REAL DEFAULT 1.0,
+                    source VARCHAR(100) DEFAULT 'system',
+                    is_sensitive INTEGER DEFAULT 0,
+                    encrypted_data TEXT,
+                    revision INTEGER DEFAULT 1,
+                    created_at TEXT,
+                    updated_at TEXT
+                )
+            """)
+            c.execute("""
+                CREATE TABLE IF NOT EXISTS kg_relations (
+                    id VARCHAR(64) PRIMARY KEY,
+                    from_entity VARCHAR(255) REFERENCES kg_entities(name) ON DELETE CASCADE,
+                    to_entity VARCHAR(255) REFERENCES kg_entities(name) ON DELETE CASCADE,
+                    relation_type VARCHAR(100),
+                    confidence REAL DEFAULT 1.0,
+                    created_at TEXT
+                )
+            """)
+            c.execute("CREATE INDEX IF NOT EXISTS idx_kg_obs_entity ON kg_observations(entity_name)")
+            c.execute("CREATE INDEX IF NOT EXISTS idx_kg_rel_from ON kg_relations(from_entity)")
+            c.execute("CREATE INDEX IF NOT EXISTS idx_kg_rel_to ON kg_relations(to_entity)")
+            c.execute("CREATE INDEX IF NOT EXISTS idx_kg_rel_type ON kg_relations(relation_type)")
+        else:
+            c.execute("""
+                CREATE TABLE IF NOT EXISTS kg_entities (
+                    name TEXT PRIMARY KEY,
+                    entity_type TEXT DEFAULT 'GENERAL',
+                    description TEXT DEFAULT '',
+                    created_at TEXT,
+                    updated_at TEXT
+                )
+            """)
+            c.execute("""
+                CREATE TABLE IF NOT EXISTS kg_observations (
+                    id TEXT PRIMARY KEY,
+                    entity_name TEXT,
+                    observation_text TEXT,
+                    confidence REAL DEFAULT 1.0,
+                    source TEXT DEFAULT 'system',
+                    is_sensitive INTEGER DEFAULT 0,
+                    encrypted_data TEXT,
+                    revision INTEGER DEFAULT 1,
+                    created_at TEXT,
+                    updated_at TEXT,
+                    FOREIGN KEY (entity_name) REFERENCES kg_entities(name) ON DELETE CASCADE
+                )
+            """)
+            c.execute("""
+                CREATE TABLE IF NOT EXISTS kg_relations (
+                    id TEXT PRIMARY KEY,
+                    from_entity TEXT,
+                    to_entity TEXT,
+                    relation_type TEXT,
+                    confidence REAL DEFAULT 1.0,
+                    created_at TEXT,
+                    FOREIGN KEY (from_entity) REFERENCES kg_entities(name) ON DELETE CASCADE,
+                    FOREIGN KEY (to_entity) REFERENCES kg_entities(name) ON DELETE CASCADE
+                )
+            """)
         conn.commit()
         conn.close()
 
@@ -183,6 +242,9 @@ class EnhancedKnowledgeGraph:
                     is_sensitive, encrypted_data, revision, created_at, updated_at
                 )
                 VALUES (?, ?, ?, ?, ?, ?, ?, 1, ?, ?)
+                ON CONFLICT(id) DO UPDATE SET
+                    confidence=excluded.confidence,
+                    updated_at=excluded.updated_at
             """, (obs_id, entity_name, storage_text, float(confidence), source, is_sensitive, encrypted_payload, now, now))
             added_ids.append(obs_id)
 
@@ -315,6 +377,16 @@ class EnhancedKnowledgeGraph:
             if not from_ent or not to_ent:
                 continue
 
+            # Ensure both entities exist in kg_entities to satisfy foreign key constraints
+            for e_name in (from_ent, to_ent):
+                c.execute("SELECT name FROM kg_entities WHERE name = ?", (e_name,))
+                if not c.fetchone():
+                    c.execute("""
+                        INSERT INTO kg_entities (name, entity_type, description, created_at, updated_at)
+                        VALUES (?, 'GENERAL', '', ?, ?)
+                        ON CONFLICT(name) DO NOTHING
+                    """, (e_name, now, now))
+
             rel_id = hashlib.md5(f"{from_ent}_{rel_type}_{to_ent}".encode()).hexdigest()
             c.execute("""
                 INSERT INTO kg_relations (id, from_entity, to_entity, relation_type, confidence, created_at)
@@ -347,8 +419,9 @@ class EnhancedKnowledgeGraph:
         # Build entity query
         ent_clauses = []
         ent_params = []
+        like_op = "ILIKE" if self.use_postgres else "LIKE"
         if entity_name:
-            ent_clauses.append("name LIKE ?")
+            ent_clauses.append(f"name {like_op} ?")
             ent_params.append(f"%{entity_name}%")
         if entity_type:
             ent_clauses.append("entity_type = ?")
@@ -372,7 +445,7 @@ class EnhancedKnowledgeGraph:
             obs_params.extend(entity_names)
 
         if search_text:
-            obs_clauses.append("observation_text LIKE ?")
+            obs_clauses.append(f"observation_text {like_op} ?")
             obs_params.append(f"%{search_text}%")
 
         obs_sql = "SELECT * FROM kg_observations WHERE " + " AND ".join(obs_clauses) + " ORDER BY confidence DESC"
@@ -452,7 +525,7 @@ class EnhancedKnowledgeGraph:
                 "type": e["entity_type"],
                 "description": e["description"],
                 "observationCount": stats["count"],
-                "confidence": round(stats["avg_conf"] or 1.0, 2)
+                "confidence": round(float(stats["avg_conf"] or 1.0), 2)
             })
 
         edges = []

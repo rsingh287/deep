@@ -1,14 +1,17 @@
 import json
 import os
+import re
 
 import requests
 
 from advanced_document_exporter import export_document
 
+OLLAMA_BASE_URL = os.environ.get("OLLAMA_HOST", "http://localhost:11434")
+
 
 def run_file_gen_tools(prompt: str) -> str:
     """Uses Ollama to generate a structured document (resume, cover letter, etc.) and saves it."""
-    url = "http://localhost:11434/api/generate"
+    url = f"{OLLAMA_BASE_URL}/api/generate"
 
     system = (
         "You are an expert Document and Resume Generator AI. "
@@ -32,9 +35,12 @@ def run_file_gen_tools(prompt: str) -> str:
             return f"Error connecting to Ollama: {response.text}"
 
         data = response.json()
-        result_text = data.get("response", "{}")
+        result_text = data.get("response", "{}").strip()
 
-        doc_data = json.loads(result_text)
+        # Strip possible markdown fences
+        clean_json = re.sub(r"^```(?:json)?\s*|\s*```$", "", result_text, flags=re.DOTALL).strip()
+
+        doc_data = json.loads(clean_json)
         title = doc_data.get("title", "Generated_Document")
         paragraphs = doc_data.get("paragraphs", ["Empty document."])
 
@@ -49,7 +55,7 @@ def run_file_gen_tools(prompt: str) -> str:
         if res.get("status") == "success":
             return f"Successfully generated '{title}'! Saved in formats: {', '.join(res.get('files', []))}"
         else:
-            return f"Failed to save document."
+            return f"Failed to save document: {res.get('message', 'Unknown export error')}"
 
     except json.JSONDecodeError:
         return "Failed to generate document: The AI returned invalid JSON."

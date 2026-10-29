@@ -17,32 +17,12 @@ def capture_webcam_hardware_vision():
         print("ANTIGRAVITY COMPUTER VISION: WEBCAM HARDWARE INSPECTION")
         print("------------------------------------------------------------")
 
-        from mjpeg_stream_engine import LiveMJPEGStreamEngine
+        from shared_memory_frame_buffer import acquire_vision_frame
 
-        frame = LiveMJPEGStreamEngine.get_latest_frame()
-
+        frame = acquire_vision_frame(camera_index=0)
         if frame is None:
-            cap = None
-            if sys.platform.startswith("win"):
-                try:
-                    cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
-                except Exception:
-                    cap = cv2.VideoCapture(0)
-            else:
-                cap = cv2.VideoCapture(0)
-
-            if cap is None or not cap.isOpened():
-                cap = cv2.VideoCapture(0)
-
-            if not cap.isOpened():
-                print("⚠️ Webcam not accessible or disconnected.")
-                return {"success": False, "error": "Webcam camera feed not accessible"}
-
-            ret, frame = cap.read()
-            cap.release()
-
-            if not ret or frame is None:
-                return {"success": False, "error": "Failed to capture webcam frame"}
+            print("⚠️ Webcam not accessible or disconnected.")
+            return {"success": False, "error": "Webcam camera feed not accessible"}
 
         h, w, _ = frame.shape
         save_path = os.path.join(os.getcwd(), "webcam_hardware_capture.jpg")

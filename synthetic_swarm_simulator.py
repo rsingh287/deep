@@ -9,8 +9,10 @@ from typing import List, Dict
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger("SwarmSimulator")
 
-OLLAMA_URL = "http://localhost:11434/api/generate"
-DEFAULT_MODEL = "qwen2.5:7b"
+import os
+
+OLLAMA_URL = os.environ.get("OLLAMA_HOST", "http://localhost:11434") + "/api/generate"
+DEFAULT_MODEL = os.environ.get("OLLAMA_MODEL", "qwen2.5-coder:7b")
 
 PERSONAS = {
     "DevOps Lead ('Alex')": "You are Alex, a senior DevOps engineer. Your job is to analyze the user's idea or code for scalability, uptime, Docker containerization, and PostgreSQL database bottlenecks. Be harsh and focus on infrastructure.",
@@ -20,34 +22,42 @@ PERSONAS = {
     "Novice User ('Dave')": "You are Dave, a confused, non-technical novice user. You click the wrong buttons and get easily frustrated by technical jargon. Explain how this idea would confuse you."
 }
 
-def invoke_persona(persona_name: str, system_prompt: str, task: str) -> Dict[str, str]:
-    prompt = f"System: {system_prompt}\n\nTask: {task}\n\nProvide your analysis:"
-    try:
-        response = requests.post(OLLAMA_URL, json={
-            "model": DEFAULT_MODEL,
-            "prompt": prompt,
-            "stream": False
-        }, timeout=120)
-        
-        if response.status_code == 200:
-            return {"persona": persona_name, "response": response.json().get("response", "").strip()}
-        else:
-            return {"persona": persona_name, "response": f"Error: {response.text}"}
-    except Exception as e:
-        return {"persona": persona_name, "response": f"Exception: {str(e)}"}
+# Concurrency semaphore to avoid overwhelming local GPU VRAM
+CONCURRENCY_SEMAPHORE = threading.Semaphore(2)
 
-def run_swarm_simulation(task: str) -> List[Dict[str, str]]:
+def invoke_persona(persona_name: str, system_prompt: str, task: str, model: str = None) -> Dict[str, str]:
+    if not model:
+        model = DEFAULT_MODEL
+    prompt = f"System: {system_prompt}\n\nTask: {task}\n\nProvide your analysis:"
+
+    with CONCURRENCY_SEMAPHORE:
+        try:
+            response = requests.post(OLLAMA_URL, json={
+                "model": model,
+                "prompt": prompt,
+                "stream": False
+            }, timeout=120)
+            
+            if response.status_code == 200:
+                return {"persona": persona_name, "response": response.json().get("response", "").strip()}
+            else:
+                return {"persona": persona_name, "response": f"Ollama Error (HTTP {response.status_code}): {response.text[:200]}"}
+        except Exception as e:
+            return {"persona": persona_name, "response": f"Exception connecting to model service: {str(e)}"}
+
+def run_swarm_simulation(task: str, model: str = None) -> List[Dict[str, str]]:
     logger.info(f"Starting swarm simulation for task: {task[:50]}...")
     
-    results = []
+    persona_keys = list(PERSONAS.keys())
+    results = [None] * len(persona_keys)
     threads = []
     
-    def worker(name, sys_prompt):
-        res = invoke_persona(name, sys_prompt, task)
-        results.append(res)
+    def worker(index, name, sys_prompt):
+        res = invoke_persona(name, sys_prompt, task, model=model)
+        results[index] = res
     
-    for name, sys_prompt in PERSONAS.items():
-        t = threading.Thread(target=worker, args=(name, sys_prompt))
+    for i, (name, sys_prompt) in enumerate(PERSONAS.items()):
+        t = threading.Thread(target=worker, args=(i, name, sys_prompt))
         threads.append(t)
         t.start()
         
@@ -55,7 +65,7 @@ def run_swarm_simulation(task: str) -> List[Dict[str, str]]:
         t.join()
         
     logger.info("Swarm simulation complete.")
-    return results
+    return [r for r in results if r is not None]
 
 if __name__ == "__main__":
     task = "I want to build a local python flask server that takes a user's picture via webcam and stores it in an unencrypted sqlite database, then emails them a link to view it using smtplib."

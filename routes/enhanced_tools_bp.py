@@ -55,6 +55,7 @@ def list_mcp_servers():
     })
 
 
+
 @enhanced_bp.route("/api/mcp/tools", methods=["GET"])
 def list_mcp_tools():
     """Returns all active tool definitions and schemas."""

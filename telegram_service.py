@@ -243,11 +243,24 @@ def process_message(chat_id: int, text: str):
                 else cv2.VideoCapture(0)
             )
             if not cap.isOpened():
+                try:
+                    cap.release()
+                except Exception:
+                    pass
                 cap = cv2.VideoCapture(0)
 
-            if cap.isOpened():
-                ret, frame = cap.read()
-                cap.release()
+            try:
+                if cap.isOpened():
+                    ret, frame = cap.read()
+                else:
+                    ret, frame = False, None
+            finally:
+                try:
+                    cap.release()
+                except Exception:
+                    pass
+
+            if ret and frame is not None:
                 if ret and frame is not None:
                     import uuid
 
@@ -302,6 +315,10 @@ def process_message(chat_id: int, text: str):
                 else cv2.VideoCapture(0)
             )
             if not cap.isOpened():
+                try:
+                    cap.release()
+                except Exception:
+                    pass
                 cap = cv2.VideoCapture(0)
 
             if cap.isOpened():
@@ -320,15 +337,22 @@ def process_message(chat_id: int, text: str):
                 out = cv2.VideoWriter(vid_clip_path, fourcc, fps, (640, 480))
 
                 start_rec = time.time()
-                while (time.time() - start_rec) < 5.0:
-                    ret, f = cap.read()
-                    if ret and f is not None:
-                        resized_f = cv2.resize(f, (640, 480))
-                        out.write(resized_f)
-                    time.sleep(1.0 / fps)
-
-                out.release()
-                cap.release()
+                try:
+                    while (time.time() - start_rec) < 5.0:
+                        ret, f = cap.read()
+                        if ret and f is not None:
+                            resized_f = cv2.resize(f, (640, 480))
+                            out.write(resized_f)
+                        time.sleep(1.0 / fps)
+                finally:
+                    try:
+                        out.release()
+                    except Exception:
+                        pass
+                    try:
+                        cap.release()
+                    except Exception:
+                        pass
 
                 send_video(chat_id, vid_clip_path, "🎥 *5-Second Live Room Video Clip*")
                 try:

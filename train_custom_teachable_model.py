@@ -29,7 +29,11 @@ def train_custom_teachable_gesture_model(dataset_dir="custom_dataset", epochs=5)
     ]
     num_classes = len(classes)
 
-    model = TeachableCustomVisionClassifier(num_classes=num_classes)
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    device_name = torch.cuda.get_device_name(0) if torch.cuda.is_available() else "CPU"
+    print(f"[TeachableTrainer] Training on device: {device} ({device_name})")
+
+    model = TeachableCustomVisionClassifier(num_classes=num_classes).to(device)
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=0.001)
 
@@ -41,9 +45,9 @@ def train_custom_teachable_gesture_model(dataset_dir="custom_dataset", epochs=5)
         ]
     )
 
-    # Synthesize sample tensors for demonstration
-    dummy_input = torch.randn(10, 3, 224, 224)
-    dummy_target = torch.randint(0, num_classes, (10,))
+    # Synthesize sample batch tensors on target device
+    dummy_input = torch.randn(16, 3, 224, 224, device=device)
+    dummy_target = torch.randint(0, num_classes, (16,), device=device)
 
     model.train()
     for epoch in range(1, epochs + 1):
@@ -61,6 +65,7 @@ def train_custom_teachable_gesture_model(dataset_dir="custom_dataset", epochs=5)
 
     report_md = f"""### [Teachable Custom Model Trainer Execution]
 
+- **Hardware Acceleration**: {device} ({device_name})
 - **Backbone Architecture**: MobileNetV2 (Pre-trained PyTorch ImageNet)
 - **Target Classes ({num_classes})**: `{', '.join(classes)}`
 - **Training Epochs**: {epochs} Epochs
@@ -80,8 +85,3 @@ if __name__ == "__main__":
 
     res = train_custom_teachable_gesture_model()
     print(res)
-    print("\n[TeachableTrainer] Model trained successfully! Press ENTER to exit...")
-    try:
-        input()
-    except Exception:
-        pass

@@ -84,6 +84,34 @@ class EnterpriseAIGuardrails:
             "sanitized_query": sanitized,
         }
 
+    def execute_safely(self, sql_query: str) -> dict:
+        """
+        Validates text-to-SQL against Python AST guardrails, then executes exclusively
+        through the database-level 'deep_reader' role with DEFAULT_TRANSACTION_READ_ONLY = ON.
+        Double-layer security: Python AST validation + PostgreSQL engine-level enforcement.
+        """
+        val = self.validate_text_to_sql(sql_query)
+        if not val.get("valid"):
+            return {"success": False, "error": val.get("reason"), "rows": []}
+
+        import postgresql_engine
+        ok, rows = postgresql_engine.execute_readonly_query(val["sanitized_query"])
+        if not ok:
+            return {"success": False, "error": str(rows), "rows": []}
+        return {"success": True, "rows": rows, "query": val["sanitized_query"]}
+
+    async def execute_safely_async(self, sql_query: str) -> dict:
+        """Asynchronous version of execute_safely for non-blocking event loops."""
+        val = self.validate_text_to_sql(sql_query)
+        if not val.get("valid"):
+            return {"success": False, "error": val.get("reason"), "rows": []}
+
+        import postgresql_engine
+        ok, rows = await postgresql_engine.execute_readonly_query_async(val["sanitized_query"])
+        if not ok:
+            return {"success": False, "error": str(rows), "rows": []}
+        return {"success": True, "rows": rows, "query": val["sanitized_query"]}
+
     def arbitrate_output(
         self, prompt: str, generated_text: str, consensus_threshold: float = 0.8
     ) -> dict:

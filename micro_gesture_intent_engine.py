@@ -54,46 +54,54 @@ class MicroGestureEngine:
     def start_tracking(self, camera_index=0):
         self.is_running = True
         cap = cv2.VideoCapture(camera_index)
-        logger.info("Initializing Micro-Gesture & Sub-Vocal Intent Engine...")
-        
-        last_pinch_time = 0
-        last_nod_time = 0
+        try:
 
-        while self.is_running and cap.isOpened():
-            ret, frame = cap.read()
-            if not ret:
-                break
+            logger.info("Initializing Micro-Gesture & Sub-Vocal Intent Engine...")
+        
+            last_pinch_time = 0
+            last_nod_time = 0
+
+            while self.is_running and cap.isOpened():
+                ret, frame = cap.read()
+                if not ret:
+                    break
                 
-            rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             
-            # Process Hands for Micro-Gestures
-            hand_results = self.hands.process(rgb_frame)
-            if hand_results.multi_hand_landmarks:
-                for hand_landmarks in hand_results.multi_hand_landmarks:
-                    if self.detect_subtle_pinch(hand_landmarks):
-                        current_time = time.time()
-                        if current_time - last_pinch_time > 2.0: # 2 second cooldown
-                            logger.info("⚡ MICRO-GESTURE DETECTED: Subtle Finger Pinch. Triggering contextual auto-fix on active window.")
-                            last_pinch_time = current_time
+                # Process Hands for Micro-Gestures
+                hand_results = self.hands.process(rgb_frame)
+                if hand_results.multi_hand_landmarks:
+                    for hand_landmarks in hand_results.multi_hand_landmarks:
+                        if self.detect_subtle_pinch(hand_landmarks):
+                            current_time = time.time()
+                            if current_time - last_pinch_time > 2.0: # 2 second cooldown
+                                logger.info("⚡ MICRO-GESTURE DETECTED: Subtle Finger Pinch. Triggering contextual auto-fix on active window.")
+                                last_pinch_time = current_time
                             
-            # Process Face for Gaze and Sub-Vocal Kinematics
-            face_results = self.face_mesh.process(rgb_frame)
-            if face_results.multi_face_landmarks:
-                for face_landmarks in face_results.multi_face_landmarks:
-                    if self.detect_head_nod(face_landmarks, frame.shape):
-                        current_time = time.time()
-                        if current_time - last_nod_time > 2.0:
-                            logger.info("⚡ MICRO-GESTURE DETECTED: Head Nod. Confirming staged autonomous action.")
-                            last_nod_time = current_time
+                # Process Face for Gaze and Sub-Vocal Kinematics
+                face_results = self.face_mesh.process(rgb_frame)
+                if face_results.multi_face_landmarks:
+                    for face_landmarks in face_results.multi_face_landmarks:
+                        if self.detect_head_nod(face_landmarks, frame.shape):
+                            current_time = time.time()
+                            if current_time - last_nod_time > 2.0:
+                                logger.info("⚡ MICRO-GESTURE DETECTED: Head Nod. Confirming staged autonomous action.")
+                                last_nod_time = current_time
                             
-                    # Sub-vocal lip kinematics would extract landmarks 0, 13, 14, 17, etc., 
-                    # tracking the distances over a sliding window and passing to a 1D-CNN or RNN 
-                    # to classify silent phonemes.
+                        # Sub-vocal lip kinematics would extract landmarks 0, 13, 14, 17, etc., 
+                        # tracking the distances over a sliding window and passing to a 1D-CNN or RNN 
+                        # to classify silent phonemes.
                     
-            # For this background daemon, we run at 10-15 Hz to save CPU
-            time.sleep(0.05)
+                # For this background daemon, we run at 10-15 Hz to save CPU
+                time.sleep(0.05)
             
-        cap.release()
+        finally:
+            if cap is not None:
+                try:
+                    cap.release()
+                except Exception:
+                    pass
+
 
 if __name__ == "__main__":
     engine = MicroGestureEngine()

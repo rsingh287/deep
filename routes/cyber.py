@@ -149,6 +149,7 @@ KNOWN_OUIS = {
 
 def init_cyber_tables():
     """Initializes tables for network sentinel devices and security incident logs."""
+    conn = None
     try:
         conn = db_engine.get_db_connection()
         cur = conn.cursor()
@@ -176,9 +177,14 @@ def init_cyber_tables():
             );
         """)
         conn.commit()
-        conn.close()
     except Exception as e:
         print(f"[CyberRoutes] DB init error: {e}")
+    finally:
+        if conn:
+            try:
+                conn.close()
+            except Exception:
+                pass
 
 
 init_cyber_tables()
@@ -236,6 +242,7 @@ def resolve_ip_hostname(ip_str):
 
 def post_chat_message(content, title="Security & Network Sentinel"):
     """Inserts a system message directly into the current active chat session."""
+    conn = None
     try:
         conn = db_engine.get_db_connection()
         cur = conn.cursor()
@@ -250,11 +257,16 @@ def post_chat_message(content, title="Security & Network Sentinel"):
         cur.execute("INSERT INTO chat_messages (chat_id, role, content) VALUES (?, ?, ?)", (chat_id, "ai", content))
         cur.execute("UPDATE chat_sessions SET updated_at = CURRENT_TIMESTAMP WHERE chat_id = ?", (chat_id,))
         conn.commit()
-        conn.close()
         return chat_id
     except Exception as e:
         print(f"[CyberRoutes] Chat insert error: {e}")
         return None
+    finally:
+        if conn:
+            try:
+                conn.close()
+            except Exception:
+                pass
 
 
 def speak_alert_text(text):
@@ -570,6 +582,7 @@ def cyber_network_alert():
     initial_status = "LOCAL VIRTUAL INTERFACE" if classification["is_virtual"] else "UNKNOWN"
 
     # 1. Upsert device into database
+    conn = None
     try:
         conn = db_engine.get_db_connection()
         cur = conn.cursor()
@@ -591,9 +604,14 @@ def cyber_network_alert():
             VALUES (?, ?, ?, ?);
         """, (log_event, severity, f"{classification['friendly_label']}: {vendor} at {ip} (MAC {mac})", ip))
         conn.commit()
-        conn.close()
     except Exception as e:
         print(f"[CyberRoutes] DB upsert error: {e}")
+    finally:
+        if conn:
+            try:
+                conn.close()
+            except Exception:
+                pass
 
     # 3. Generate HTML card and post to active chat session
     html_card = generate_alert_card(ip, mac, vendor, hostname, now_str, classification)
@@ -636,6 +654,7 @@ def cyber_network_alert():
 @cyber_bp.route("/api/cyber/devices", methods=["GET"])
 def cyber_get_devices():
     """Returns all recorded network devices, deduplicated by IP address to prevent virtual MAC duplicates."""
+    conn = None
     try:
         conn = db_engine.get_db_connection()
         cur = conn.cursor()
@@ -645,7 +664,6 @@ def cyber_get_devices():
             ORDER BY last_seen DESC;
         """)
         rows = cur.fetchall()
-        conn.close()
         
         devices = []
         seen_ips = set()
@@ -669,6 +687,12 @@ def cyber_get_devices():
         return jsonify({"success": True, "devices": devices})
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
+    finally:
+        if conn:
+            try:
+                conn.close()
+            except Exception:
+                pass
 
 
 @cyber_bp.route("/api/cyber/rescan", methods=["POST"])
@@ -687,22 +711,29 @@ def cyber_rescan():
                     hostname = resolve_ip_hostname(ip)
                     detected.append({"ip": ip, "mac": mac, "vendor": vendor, "hostname": hostname})
 
-        conn = db_engine.get_db_connection()
-        cur = conn.cursor()
-        for d in detected:
-            # Prune stale records where the IP is the same but MAC address changed (e.g. Hyper-V virtual adapter reset)
-            cur.execute("DELETE FROM network_devices WHERE ip_address = ? AND mac_address != ?;", (d['ip'], d['mac']))
-            cur.execute("""
-                INSERT INTO network_devices (mac_address, ip_address, hostname, vendor, first_seen, last_seen, status)
-                VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'UNKNOWN')
-                ON CONFLICT (mac_address) DO UPDATE SET
-                    ip_address = EXCLUDED.ip_address,
-                    hostname = EXCLUDED.hostname,
-                    vendor = EXCLUDED.vendor,
-                    last_seen = CURRENT_TIMESTAMP;
-            """, (d['mac'], d['ip'], d['hostname'], d['vendor']))
-        conn.commit()
-        conn.close()
+        conn = None
+        try:
+            conn = db_engine.get_db_connection()
+            cur = conn.cursor()
+            for d in detected:
+                # Prune stale records where the IP is the same but MAC address changed (e.g. Hyper-V virtual adapter reset)
+                cur.execute("DELETE FROM network_devices WHERE ip_address = ? AND mac_address != ?;", (d['ip'], d['mac']))
+                cur.execute("""
+                    INSERT INTO network_devices (mac_address, ip_address, hostname, vendor, first_seen, last_seen, status)
+                    VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'UNKNOWN')
+                    ON CONFLICT (mac_address) DO UPDATE SET
+                        ip_address = EXCLUDED.ip_address,
+                        hostname = EXCLUDED.hostname,
+                        vendor = EXCLUDED.vendor,
+                        last_seen = CURRENT_TIMESTAMP;
+                """, (d['mac'], d['ip'], d['hostname'], d['vendor']))
+            conn.commit()
+        finally:
+            if conn:
+                try:
+                    conn.close()
+                except Exception:
+                    pass
         
         return jsonify({"success": True, "count": len(detected), "devices": detected})
     except Exception as e:
@@ -721,6 +752,7 @@ def cyber_port_scan():
     ports_summary = ", ".join([f"{p['port']} ({p['service']})" for p in open_ports]) if open_ports else "No common services exposed"
 
     # Update open_ports in network_devices
+    conn = None
     try:
         conn = db_engine.get_db_connection()
         cur = conn.cursor()
@@ -730,9 +762,14 @@ def cyber_port_scan():
             VALUES (?, ?, ?, ?);
         """, ("PORT_SCAN", "INFO", f"Port scan completed for {ip}. Open ports: {ports_summary}", ip))
         conn.commit()
-        conn.close()
     except Exception as e:
         print(f"[CyberRoutes] DB port scan update error: {e}")
+    finally:
+        if conn:
+            try:
+                conn.close()
+            except Exception:
+                pass
 
     # Generate Report Card
     ports_html = "".join([f"<li style='margin-bottom:3px;'><strong>Port {p['port']}</strong>: <span style='color:#38bdf8;'>{p['service']}</span></li>" for p in open_ports])
@@ -763,15 +800,29 @@ def cyber_port_scan():
 @cyber_bp.route("/api/cyber/block_device", methods=["POST"])
 def cyber_block_device():
     """Blocks an IP address using Windows Firewall rule."""
+    import ipaddress
     data = request.json or {}
-    ip = data.get("ip", "").strip()
-    if not ip or ip.startswith("127."):
+    raw_ip = str(data.get("ip", "")).strip()
+    try:
+        ip_obj = ipaddress.ip_address(raw_ip)
+        if ip_obj.is_loopback or ip_obj.is_unspecified:
+            return jsonify({"success": False, "error": "Cannot block loopback or unspecified address"}), 400
+        ip = str(ip_obj)
+    except ValueError:
         return jsonify({"success": False, "error": "Invalid IP address provided"}), 400
 
+    conn = None
     try:
-        rule_name = f"DEEP_Block_{ip.replace('.', '_')}"
-        cmd = f'netsh advfirewall firewall add rule name="{rule_name}" dir=in action=block remoteip={ip}'
-        subprocess.run(["powershell", "-NoProfile", "-Command", cmd], capture_output=True, text=True)
+        rule_name = f"DEEP_Block_{ip.replace('.', '_').replace(':', '_')}"
+        subprocess.run(
+            [
+                "netsh", "advfirewall", "firewall", "add", "rule",
+                f"name={rule_name}", "dir=in", "action=block", f"remoteip={ip}"
+            ],
+            capture_output=True,
+            text=True,
+            timeout=15,
+        )
 
         conn = db_engine.get_db_connection()
         cur = conn.cursor()
@@ -781,13 +832,18 @@ def cyber_block_device():
             VALUES (?, ?, ?, ?);
         """, ("FIREWALL_BLOCK", "WARNING", f"Windows Firewall inbound block rule created for IP {ip}", ip))
         conn.commit()
-        conn.close()
 
         block_msg = f"🛡️ **DEFENSIVE ACTION EXECUTED:** Remote IP `{ip}` has been blocked at the Windows Defender Firewall layer."
         post_chat_message(block_msg)
         return jsonify({"success": True, "message": f"Successfully blocked IP {ip}"})
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
+    finally:
+        if conn:
+            try:
+                conn.close()
+            except Exception:
+                pass
 
 
 @cyber_bp.route("/api/cyber/trust_device", methods=["POST"])
@@ -800,6 +856,7 @@ def cyber_trust_device():
     if not mac and not ip:
         return jsonify({"success": False, "error": "MAC or IP address required"}), 400
 
+    conn = None
     try:
         conn = db_engine.get_db_connection()
         cur = conn.cursor()
@@ -813,13 +870,18 @@ def cyber_trust_device():
             VALUES (?, ?, ?, ?);
         """, ("DEVICE_TRUSTED", "INFO", f"Device marked as TRUSTED: MAC {mac} / IP {ip}", ip))
         conn.commit()
-        conn.close()
 
         trust_msg = f"✅ **DEVICE VERIFIED:** Host `{ip or mac}` has been marked as a trusted authorized device."
         post_chat_message(trust_msg)
         return jsonify({"success": True, "message": "Device marked as trusted"})
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
+    finally:
+        if conn:
+            try:
+                conn.close()
+            except Exception:
+                pass
 
 
 @cyber_bp.route("/api/cyber/pending_alerts", methods=["GET"])
@@ -827,3 +889,37 @@ def cyber_pending_alerts():
     """Returns any unread alerts and clears the queue."""
     alerts = get_and_clear_pending_alerts()
     return jsonify({"success": True, "alerts": alerts})
+
+
+@cyber_bp.route("/api/cyber/pentagi/status", methods=["GET"])
+@cyber_bp.route("/api/pentagi/status", methods=["GET"])
+def cyber_pentagi_status():
+    """Returns the operational status of the PentAGI autonomous security testing engine."""
+    try:
+        import pentagi_bridge_engine
+        status = pentagi_bridge_engine.get_pentagi_status()
+        return jsonify(status)
+    except Exception as e:
+        return jsonify({"active": False, "docker_running": False, "error": str(e)}), 500
+
+
+@cyber_bp.route("/api/cyber/pentagi/start", methods=["POST"])
+def cyber_pentagi_start():
+    """Starts the PentAGI multi-agent security testing stack."""
+    try:
+        import pentagi_bridge_engine
+        result = pentagi_bridge_engine.start_pentagi_stack()
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@cyber_bp.route("/api/cyber/pentagi/stop", methods=["POST"])
+def cyber_pentagi_stop():
+    """Stops the PentAGI security stack to release GPU and RAM resources."""
+    try:
+        import pentagi_bridge_engine
+        result = pentagi_bridge_engine.stop_pentagi_stack()
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500

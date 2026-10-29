@@ -134,11 +134,29 @@ class MediaPipeHandFaceKinematicsEngine:
         """
         t0 = time.time()
 
-        if frame_or_path is None or isinstance(frame_or_path, str):
-            if isinstance(frame_or_path, str) and os.path.exists(frame_or_path):
+        if frame_or_path is None:
+            try:
+                from shared_memory_frame_buffer import acquire_vision_frame
+                frame = acquire_vision_frame(0)
+            except Exception:
+                frame = None
+
+            if frame is None:
+                # Benchmark synthetic 640x480 frame if no live camera active
+                frame = np.zeros((480, 640, 3), dtype=np.uint8)
+                cv2.putText(
+                    frame,
+                    "MediaPipe Kinematics",
+                    (160, 240),
+                    cv2.FONT_HERSHEY_SIMPLEX,
+                    1,
+                    (56, 189, 248),
+                    2,
+                )
+        elif isinstance(frame_or_path, str):
+            if os.path.exists(frame_or_path):
                 frame = cv2.imread(frame_or_path)
             else:
-                # Benchmark synthetic 640x480 frame if no live camera active
                 frame = np.zeros((480, 640, 3), dtype=np.uint8)
                 cv2.putText(
                     frame,

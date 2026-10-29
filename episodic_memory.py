@@ -16,8 +16,12 @@ class DEEPEpisodicMemory:
         # PostgreSQL connection string from .env
         db_url = os.environ.get(
             "DATABASE_URL",
-            f"postgresql://postgres:{os.getenv('DB_PASSWORD', '')}@localhost:5432/deep_db"
+            f"postgresql://postgres:{os.getenv('DB_PASSWORD', 'Rtoken98$')}@localhost:5432/deep_db"
         )
+
+        ollama_url = os.environ.get("OLLAMA_HOST", "http://localhost:11434")
+        if not ollama_url.startswith("http"):
+            ollama_url = f"http://{ollama_url}"
 
         config = {
             "vector_store": {
@@ -32,14 +36,14 @@ class DEEPEpisodicMemory:
                 "provider": "ollama",
                 "config": {
                     "model": "nomic-embed-text",
-                    "ollama_base_url": "http://localhost:11434"
+                    "ollama_base_url": ollama_url
                 }
             },
             "llm": {
                 "provider": "ollama",
                 "config": {
                     "model": "qwen2.5:3b",
-                    "ollama_base_url": "http://localhost:11434"
+                    "ollama_base_url": ollama_url
                 }
             }
         }

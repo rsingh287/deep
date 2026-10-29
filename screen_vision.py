@@ -35,12 +35,9 @@ using local Ollama vision models (e.g., qwen2.5vl:7b) with zero cloud dependenci
 """
 
 import base64
-import ctypes
 import io
 import os
 import time
-from ctypes import windll
-from typing import Any, Dict, List, Optional, Tuple
 
 import requests
 from PIL import Image, ImageGrab
@@ -50,6 +47,8 @@ SCREENSHOTS_DIR = os.path.join(PROJECT_ROOT, "screenshots")
 os.makedirs(SCREENSHOTS_DIR, exist_ok=True)
 
 OLLAMA_API_BASE = os.getenv("OLLAMA_HOST", "http://localhost:11434")
+if not OLLAMA_API_BASE.startswith("http://") and not OLLAMA_API_BASE.startswith("https://"):
+    OLLAMA_API_BASE = f"http://{OLLAMA_API_BASE}"
 
 VISION_SYSTEM_PROMPT = """You are D.E.E.P. Screen Vision, a local multimodal AI desktop assistant.
 You are inspecting a live screenshot of the user's computer screen.
@@ -212,7 +211,6 @@ def analyze_desktop_screen(
     except (
         requests.exceptions.Timeout,
         requests.exceptions.RequestException,
-        Exception,
     ):
         fw = get_active_window_fallback()
         fast_analysis = f"Active Workspace: {fw['title']} ({fw['process']}). Screen analyzed successfully with zero crashes detected."

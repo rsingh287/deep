@@ -1,9 +1,24 @@
 import os
+import re
 import psycopg2
 import psycopg2.extras
 from dotenv import load_dotenv
 
 load_dotenv()
+
+KNOWN_CONFLICT_TARGETS = {
+    "user_job_profile": "id",
+    "security_settings": "key",
+    "facts": "concept",
+    "agent_skills": "id",
+    "chapter_progress": "topic",
+    "job_applications": "url",
+    "learned_skills": "topic",
+    "chat_sessions": "chat_id",
+    "active_skill_session": "id",
+    "network_devices": "mac_address",
+    "business_invoices": "filename",
+}
 
 
 class RowDict(dict):
@@ -24,6 +39,32 @@ class PostgresCursorAdapter:
         new_query = query
         if params:
             new_query = new_query.replace("?", "%s")
+
+        if re.search(r"\bINSERT\s+OR\s+IGNORE\s+INTO\b", new_query, re.IGNORECASE):
+            new_query = re.sub(r"\bINSERT\s+OR\s+IGNORE\s+INTO\b", "INSERT INTO", new_query, flags=re.IGNORECASE)
+            if "ON CONFLICT" not in new_query.upper():
+                new_query = new_query.rstrip("; ") + " ON CONFLICT DO NOTHING"
+
+        if re.search(r"\bINSERT\s+OR\s+REPLACE\s+INTO\b", new_query, re.IGNORECASE):
+            new_query = re.sub(r"\bINSERT\s+OR\s+REPLACE\s+INTO\b", "INSERT INTO", new_query, flags=re.IGNORECASE)
+            if "ON CONFLICT" not in new_query.upper():
+                m = re.search(r"\bINSERT\s+INTO\s+([a-zA-Z0-9_]+)(?:\s*\(([^)]+)\))?", new_query, re.IGNORECASE)
+                if m:
+                    tbl = m.group(1).lower()
+                    cols_str = m.group(2)
+                    target_col = KNOWN_CONFLICT_TARGETS.get(tbl)
+                    if cols_str and target_col:
+                        cols = [c.strip().strip('"').strip("'") for c in cols_str.split(",") if c.strip()]
+                        non_targets = [c for c in cols if c.lower() != target_col.lower()]
+                        if non_targets:
+                            updates = ", ".join([f"{c} = EXCLUDED.{c}" for c in non_targets])
+                            new_query = new_query.rstrip("; ") + f" ON CONFLICT ({target_col}) DO UPDATE SET {updates}"
+                        else:
+                            new_query = new_query.rstrip("; ") + f" ON CONFLICT ({target_col}) DO NOTHING"
+                    elif target_col:
+                        new_query = new_query.rstrip("; ") + f" ON CONFLICT ({target_col}) DO NOTHING"
+                    else:
+                        new_query = new_query.rstrip("; ") + " ON CONFLICT DO NOTHING"
 
         is_insert = query.strip().upper().startswith("INSERT")
         if is_insert and "RETURNING" not in query.upper():
@@ -69,11 +110,28 @@ class PostgresCursorAdapter:
         return rows
 
     def close(self):
-        self.pg_cursor.close()
+        try:
+            if hasattr(self.pg_cursor, "closed"):
+                if not self.pg_cursor.closed:
+                    self.pg_cursor.close()
+            else:
+                self.pg_cursor.close()
+        except Exception:
+            pass
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.close()
 
     @property
     def lastrowid(self):
         return self._lastrowid
+
+    @property
+    def rowcount(self):
+        return getattr(self.pg_cursor, "rowcount", 0)
 
 
 class PostgresConnectionAdapter:
@@ -98,16 +156,35 @@ class PostgresConnectionAdapter:
         return PostgresCursorAdapter(pg_cursor, is_dict_cursor)
 
     def commit(self):
-        self.pg_conn.commit()
+        try:
+            self.pg_conn.commit()
+        except Exception:
+            pass
 
     def rollback(self):
-        self.pg_conn.rollback()
+        try:
+            self.pg_conn.rollback()
+        except Exception:
+            pass
 
     def close(self):
-        self.pg_conn.close()
+        try:
+            if hasattr(self.pg_conn, "closed"):
+                if not self.pg_conn.closed:
+                    self.pg_conn.close()
+            else:
+                self.pg_conn.close()
+        except Exception:
+            pass
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.close()
 
 
-DEFAULT_PG_URL = f"postgresql://postgres:{os.getenv('DB_PASSWORD', '')}@localhost:5432/deep_db"
+DEFAULT_PG_URL = f"postgresql://postgres:{os.getenv('DB_PASSWORD', 'Rtoken98$')}@localhost:5432/deep_db"
 
 def get_db_connection():
     db_url = os.getenv("DATABASE_URL") or DEFAULT_PG_URL

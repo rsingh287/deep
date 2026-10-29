@@ -79,6 +79,17 @@
           </div>
           <button onclick="executeWarRoomCmd('git status -s; git log -1 --oneline')" style="margin-top:10px; width:100%; font-size:0.72rem; padding:5px; background:rgba(168,85,247,0.15); border:1px solid rgba(168,85,247,0.35); color:#c084fc; border-radius:6px; cursor:pointer; font-weight:600;">Run Git Log Check ↗</button>
         </div>
+
+        <!-- RESILIENCE CIRCUIT BREAKERS MATRIX -->
+        <div style="background:rgba(15,23,42,0.7); border:1px solid rgba(244,63,94,0.3); border-radius:12px; padding:14px;">
+          <div style="font-size:0.75rem; font-weight:700; color:#f43f5e; text-transform:uppercase; letter-spacing:1px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;">
+            <span>🛡️ Circuit Breakers Matrix</span>
+            <span id="wrBreakersSummary" style="color:#4ade80; font-size:0.68rem; font-weight:800;">3/3 CLOSED</span>
+          </div>
+          <div id="warRoomBreakersList" style="display:flex; flex-direction:column; gap:8px;">
+            <div style="font-size:0.75rem; color:#94a3b8;">Loading circuit breakers...</div>
+          </div>
+        </div>
       </div>
 
       <!-- COLUMN 2: REAL-TIME HOST TERMINAL STREAM & COMMAND DISPATCHER -->
@@ -144,6 +155,44 @@ Type any PowerShell or Python command below to execute directly on the PC:</div>
               <strong id="wrDiskFree" style="color:#4ade80;">-- GB</strong>
             </div>
           </div>
+        </div>
+
+        <!-- EMBEDDED MCU PIC18F85K22 & PICKIT 3 TOOLCHAIN -->
+        <div style="background:rgba(15,23,42,0.7); border:1px solid rgba(16,185,129,0.3); border-radius:12px; padding:14px;">
+          <div style="font-size:0.75rem; font-weight:700; color:#10b981; text-transform:uppercase; letter-spacing:1px; margin-bottom:6px; display:flex; justify-content:space-between; align-items:center;">
+            <span>🔌 PIC18F85K22 MCU STUDIO</span>
+            <span style="color:#38bdf8; font-size:0.68rem;">PK3 BUR181916585</span>
+          </div>
+          <div style="font-size:0.7rem; color:#94a3b8; margin-bottom:8px;">
+            Target: <strong>18F85K22 (80-Pin)</strong> • XTAL: <strong>4.9152 MHz</strong>
+          </div>
+
+          <!-- Project Selector -->
+          <div style="margin-bottom:8px;">
+            <label style="font-size:0.68rem; color:#94a3b8; display:block; margin-bottom:3px;">Select Project:</label>
+            <select id="wrMcuProjectSelect" style="width:100%; background:#040812; border:1px solid rgba(16,185,129,0.4); border-radius:6px; padding:5px 8px; color:#fff; font-size:0.75rem; font-family:'JetBrains Mono', monospace; outline:none;">
+              <option value="digital_lock.X">digital_lock.X</option>
+              <option value="temperature_reader.X">temperature_reader.X</option>
+              <option value="traffic_controller.X">traffic_controller.X</option>
+              <option value="measurement_station.X">measurement_station.X</option>
+              <option value="overheat_sentry.X">overheat_sentry.X</option>
+            </select>
+          </div>
+
+          <!-- Action Buttons -->
+          <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px; margin-bottom:8px;">
+            <button onclick="auditSelectedMcuProject()" style="padding:6px 2px; font-size:0.68rem; font-weight:700; background:rgba(56,189,248,0.15); border:1px solid rgba(56,189,248,0.4); color:#38bdf8; border-radius:6px; cursor:pointer;" title="Run Infer static checks on LCD/XTAL/pins">
+              🔍 Audit
+            </button>
+            <button onclick="compileSelectedMcuProject()" style="padding:6px 2px; font-size:0.68rem; font-weight:700; background:rgba(234,179,8,0.15); border:1px solid rgba(234,179,8,0.4); color:#facc15; border-radius:6px; cursor:pointer;" title="Compile to HEX via xc8-cc + DFP">
+              ⚙️ Build
+            </button>
+            <button onclick="flashSelectedMcuProject()" style="padding:6px 2px; font-size:0.68rem; font-weight:700; background:rgba(16,185,129,0.2); border:1px solid rgba(16,185,129,0.5); color:#4ade80; border-radius:6px; cursor:pointer;" title="Flash via PICkit 3 over USB">
+              ⚡ Flash
+            </button>
+          </div>
+
+          <div id="wrMcuFeedback" style="font-size:0.68rem; color:#94a3b8; background:rgba(0,0,0,0.5); border-radius:6px; padding:6px; max-height:85px; overflow-y:auto; font-family:'JetBrains Mono', monospace; white-space:pre-wrap;">Ready for firmware build &amp; flash.</div>
         </div>
 
         <div style="background:rgba(15,23,42,0.7); border:1px solid rgba(234,179,8,0.25); border-radius:12px; padding:14px;">

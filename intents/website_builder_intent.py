@@ -1,4 +1,5 @@
 from .base_intent import BaseIntent
+import os
 import re
 import webbrowser
 
@@ -12,6 +13,10 @@ class WebsiteBuilderIntent(BaseIntent):
 
     @classmethod
     def can_handle(cls, norm_prompt: str) -> bool:
+        # If the prompt is a long instructional prompt (e.g. system prompt) or asking for a prompt, pass directly to LLM
+        if "prompt for" in norm_prompt or norm_prompt.startswith("act as") or len(norm_prompt.split()) > 25:
+            return False
+
         return any(t in norm_prompt for t in cls.WEB_TRIGGERS) or (
             "website" in norm_prompt
             and any(w in norm_prompt for w in ["build", "make", "create", "code", "deploy"])
@@ -20,14 +25,23 @@ class WebsiteBuilderIntent(BaseIntent):
     @classmethod
     def execute(cls, user_prompt: str, norm_prompt: str):
         try:
-            topic = norm_prompt
-            for t in cls.WEB_TRIGGERS:
-                topic = topic.replace(t, "")
-            topic = re.sub(r"^(for me|for|about)\s+", "", topic.strip()).strip()
-            if not topic or topic in ["for me", "me"]:
-                topic = "iPhone 16 Pro Flagship"
+            # Strip build/make triggers including advanced 3d prefixes
+            topic = re.sub(
+                r"^(build|make|create|design|code|deploy)\s+(me\s+)?(an?\s+)?(advance[d]?\s+)?(3d\s+)?(spatial\s+)?(website|site|web\s+app)\s*(for\s+me|for|about)?\s*",
+                "",
+                user_prompt.strip(),
+                flags=re.IGNORECASE,
+            ).strip()
 
-            # Dynamically build using web architect engine
+            # Clean trailing and leading punctuation
+            topic = re.sub(r"^[^\w]+|[^\w]+$", "", topic)
+            if not topic:
+                topic = "Quantum Neural 3D HoloStudio"
+
+            # Dynamically reload web architect engine to guarantee latest domain rules
+            import importlib
+            import web_architect_skill
+            importlib.reload(web_architect_skill)
             from web_architect_skill import build_premium_website
 
             res = build_premium_website(
@@ -35,11 +49,23 @@ class WebsiteBuilderIntent(BaseIntent):
                 topic=topic,
             )
 
-            # extract url from res
+            # extract url and file path from res
+            path_match = re.search(r"Path:\s*(.*)", res)
+            index_path = path_match.group(1).strip() if path_match else None
+
             url_match = re.search(r"http://127.0.0.1:\d+", res)
             live_url = url_match.group(0) if url_match else "http://127.0.0.1:8095"
 
-            webbrowser.open(live_url)
+            # On Windows, opening the file directly via startfile or file:/// guarantees
+            # the browser loads the site immediately without connection refused or server port drops.
+            if index_path and os.path.exists(index_path):
+                try:
+                    os.startfile(index_path)
+                except Exception:
+                    file_url = f"file:///{os.path.abspath(index_path).replace(os.sep, '/')}"
+                    webbrowser.open(file_url)
+            else:
+                webbrowser.open(live_url)
 
             return (
                 f"🚀 **Autonomous Web Architect:** Website successfully generated, styled, and deployed! {res}",

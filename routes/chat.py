@@ -106,57 +106,58 @@ def _ensure_globals_bound():
 @chat_bp.route("/api/chats", methods=["GET", "POST"])
 def manage_chats():
     conn = db_engine.get_db_connection()
-    cursor = conn.cursor()
-
-    if request.method == "POST":
-        chat_id = f"chat_{int(time.time()*1000)}"
-        title = request.json.get("title", "New Chat Session")
-        cursor.execute(
-            "INSERT INTO chat_sessions (chat_id, title) VALUES (?, ?)", (chat_id, title)
-        )
-        conn.commit()
+    try:
+        cursor = conn.cursor()
+        if request.method == "POST":
+            req_data = request.get_json(silent=True) or {}
+            chat_id = f"chat_{int(time.time()*1000)}"
+            title = req_data.get("title", "New Chat Session")
+            cursor.execute(
+                "INSERT INTO chat_sessions (chat_id, title) VALUES (?, ?)", (chat_id, title)
+            )
+            conn.commit()
+            return jsonify({"success": True, "chat_id": chat_id, "title": title})
+        else:
+            cursor.execute(
+                "SELECT chat_id, title, updated_at FROM chat_sessions ORDER BY updated_at DESC"
+            )
+            rows = cursor.fetchall()
+            chats = [{"chat_id": r[0], "title": r[1], "updated_at": r[2]} for r in rows]
+            return jsonify({"success": True, "chats": chats})
+    finally:
         conn.close()
-        return jsonify({"success": True, "chat_id": chat_id, "title": title})
-    else:
-        cursor.execute(
-            "SELECT chat_id, title, updated_at FROM chat_sessions ORDER BY updated_at DESC"
-        )
-        rows = cursor.fetchall()
-        conn.close()
-        chats = [{"chat_id": r[0], "title": r[1], "updated_at": r[2]} for r in rows]
-        return jsonify({"success": True, "chats": chats})
 
 @chat_bp.route("/api/chats/<chat_id>", methods=["GET", "DELETE"])
 def chat_detail(chat_id):
     conn = db_engine.get_db_connection()
-    cursor = conn.cursor()
-
-    if request.method == "DELETE":
-        cursor.execute("DELETE FROM chat_sessions WHERE chat_id = ?", (chat_id,))
-        cursor.execute("DELETE FROM chat_messages WHERE chat_id = ?", (chat_id,))
-        conn.commit()
-        conn.close()
-        return jsonify({"success": True})
-    else:
-        cursor.execute(
-            "SELECT id, role, content, executed_details, image_b64 FROM chat_messages WHERE chat_id = ? ORDER BY id ASC",
-            (chat_id,),
-        )
-        rows = cursor.fetchall()
-        conn.close()
-        messages = []
-        for r in rows:
-            exec_d = json.loads(r[3]) if r[3] else []
-            messages.append(
-                {
-                    "id": r[0],
-                    "role": r[1],
-                    "content": r[2],
-                    "executed_details": exec_d,
-                    "image_b64": r[4],
-                }
+    try:
+        cursor = conn.cursor()
+        if request.method == "DELETE":
+            cursor.execute("DELETE FROM chat_sessions WHERE chat_id = ?", (chat_id,))
+            cursor.execute("DELETE FROM chat_messages WHERE chat_id = ?", (chat_id,))
+            conn.commit()
+            return jsonify({"success": True})
+        else:
+            cursor.execute(
+                "SELECT id, role, content, executed_details, image_b64 FROM chat_messages WHERE chat_id = ? ORDER BY id ASC",
+                (chat_id,),
             )
-        return jsonify({"success": True, "messages": messages})
+            rows = cursor.fetchall()
+            messages = []
+            for r in rows:
+                exec_d = json.loads(r[3]) if r[3] else []
+                messages.append(
+                    {
+                        "id": r[0],
+                        "role": r[1],
+                        "content": r[2],
+                        "executed_details": exec_d,
+                        "image_b64": r[4],
+                    }
+                )
+            return jsonify({"success": True, "messages": messages})
+    finally:
+        conn.close()
 
 @chat_bp.route("/api/feedback", methods=["GET", "POST"])
 def manage_human_feedback():
@@ -210,125 +211,125 @@ def chat_with_image():
         return jsonify({"error": "No image data provided"}), 400
 
     conn = db_engine.get_db_connection()
-    cursor = conn.cursor()
+    try:
+        cursor = conn.cursor()
 
-    if not chat_id:
-        chat_id = f"chat_{int(time.time()*1000)}"
-        title = "📷 Image & 3D Workstation Session"
+        if not chat_id:
+            chat_id = f"chat_{int(time.time()*1000)}"
+            title = "📷 Image & 3D Workstation Session"
+            cursor.execute(
+                "INSERT INTO chat_sessions (chat_id, title) VALUES (?, ?)", (chat_id, title)
+            )
+
         cursor.execute(
-            "INSERT INTO chat_sessions (chat_id, title) VALUES (?, ?)", (chat_id, title)
+            "INSERT INTO chat_messages (chat_id, role, content, image_b64) VALUES (?, ?, ?, ?)",
+            (chat_id, "user", user_prompt, image_b64),
         )
+        conn.commit()
 
-    cursor.execute(
-        "INSERT INTO chat_messages (chat_id, role, content, image_b64) VALUES (?, ?, ?, ?)",
-        (chat_id, "user", user_prompt, image_b64),
-    )
-    conn.commit()
-
-    # 1. Direct Autonomous Action Interceptor (3D Studio, Object Detection, App Launcher)
-    try:
-        import autonomous_intent_engine
-
-        auto_res = autonomous_intent_engine.handle_autonomous_intent(user_prompt)
-        if auto_res:
-            ai_resp, model_tag, exec_details = auto_res
-            cursor.execute(
-                "INSERT INTO chat_messages (chat_id, role, content) VALUES (?, ?, ?)",
-                (chat_id, "assistant", ai_resp),
-            )
-            conn.commit()
-            conn.close()
-            return jsonify(
-                {
-                    "response": ai_resp,
-                    "chat_id": chat_id,
-                    "model": model_tag,
-                    "executed_details": exec_details,
-                    "has_execution": True,
-                }
-            )
-    except Exception as e:
-        print(f"[AutonomousEngine Image Interceptor] Error: {e}")
-
-    # Fallback to TRELLIS 3D Studio if prompt is generic or requests 3D/Scan
-    prompt_low = user_prompt.lower()
-    if any(
-        k in prompt_low for k in ["3d", "scan", "room", "mesh", "model", "image to 3d"]
-    ):
+        # 1. Direct Autonomous Action Interceptor (3D Studio, Object Detection, App Launcher)
         try:
-            import webbrowser
+            import autonomous_intent_engine
 
-            space_url = "https://huggingface.co/spaces/microsoft/TRELLIS"
-            webbrowser.open(space_url)
-            ai_resp = f"🧊 **Autonomous 3D Model & Image-to-3D Generator:** Opened **Microsoft TRELLIS.2 3D Studio** in Google Chrome!\n\n🔗 [Direct 3D Studio Link]({space_url})"
-            cursor.execute(
-                "INSERT INTO chat_messages (chat_id, role, content) VALUES (?, ?, ?)",
-                (chat_id, "assistant", ai_resp),
+            auto_res = autonomous_intent_engine.handle_autonomous_intent(user_prompt)
+            if auto_res:
+                ai_resp, model_tag, exec_details = auto_res
+                cursor.execute(
+                    "INSERT INTO chat_messages (chat_id, role, content) VALUES (?, ?, ?)",
+                    (chat_id, "assistant", ai_resp),
+                )
+                conn.commit()
+                return jsonify(
+                    {
+                        "response": ai_resp,
+                        "chat_id": chat_id,
+                        "model": model_tag,
+                        "executed_details": exec_details,
+                        "has_execution": True,
+                    }
+                )
+        except Exception as e:
+            print(f"[AutonomousEngine Image Interceptor] Error: {e}")
+
+        # Fallback to TRELLIS 3D Studio if prompt is generic or requests 3D/Scan
+        prompt_low = user_prompt.lower()
+        if any(
+            k in prompt_low for k in ["3d", "scan", "room", "mesh", "model", "image to 3d"]
+        ):
+            try:
+                import webbrowser
+
+                space_url = "https://huggingface.co/spaces/microsoft/TRELLIS"
+                webbrowser.open(space_url)
+                ai_resp = f"🧊 **Autonomous 3D Model & Image-to-3D Generator:** Opened **Microsoft TRELLIS.2 3D Studio** in Google Chrome!\n\n🔗 [Direct 3D Studio Link]({space_url})"
+                cursor.execute(
+                    "INSERT INTO chat_messages (chat_id, role, content) VALUES (?, ?, ?)",
+                    (chat_id, "assistant", ai_resp),
+                )
+                conn.commit()
+                return jsonify(
+                    {
+                        "response": ai_resp,
+                        "chat_id": chat_id,
+                        "model": "autonomous_3d_generation",
+                        "executed_details": [
+                            {
+                                "language": "powershell",
+                                "code": f"start chrome '{space_url}'",
+                                "output": "Opened Microsoft TRELLIS.2 3D Studio",
+                            }
+                        ],
+                        "has_execution": True,
+                    }
+                )
+            except Exception:
+                pass
+
+        target_model = resolve_model_tag(model_name, user_prompt, has_image=True)
+        opts = get_model_payload_options(target_model)
+
+        payload = {
+            "model": target_model,
+            "messages": [
+                {"role": "system", "content": SYSTEM_PROMPT},
+                {"role": "user", "content": user_prompt, "images": [image_b64]},
+            ],
+            "stream": False,
+            "keep_alive": opts["keep_alive"],
+            "options": opts["options"],
+        }
+
+        try:
+            resp = requests.post(f"{OLLAMA_API}/api/chat", json=payload, timeout=(10, 600))
+            ai_response = ""
+            if resp.status_code == 200:
+                ai_response = resp.json().get("message", {}).get("content", "")
+            else:
+                ai_response = "Received image. Image saved to your AI Workstation session."
+
+        except Exception as e:
+            ai_response = (
+                f"Received image and attached to session. (Ollama model status: {str(e)})"
             )
-            conn.commit()
-            conn.close()
-            return jsonify(
-                {
-                    "response": ai_resp,
-                    "chat_id": chat_id,
-                    "model": "autonomous_3d_generation",
-                    "executed_details": [
-                        {
-                            "language": "powershell",
-                            "code": f"start chrome '{space_url}'",
-                            "output": "Opened Microsoft TRELLIS.2 3D Studio",
-                        }
-                    ],
-                    "has_execution": True,
-                }
-            )
-        except Exception:
-            pass
 
-    target_model = resolve_model_tag(model_name, user_prompt, has_image=True)
-    opts = get_model_payload_options(target_model)
-
-    payload = {
-        "model": target_model,
-        "messages": [
-            {"role": "system", "content": SYSTEM_PROMPT},
-            {"role": "user", "content": user_prompt, "images": [image_b64]},
-        ],
-        "stream": False,
-        "keep_alive": opts["keep_alive"],
-        "options": opts["options"],
-    }
-
-    try:
-        resp = requests.post(f"{OLLAMA_API}/api/chat", json=payload, timeout=(10, 600))
-        ai_response = ""
-        if resp.status_code == 200:
-            ai_response = resp.json().get("message", {}).get("content", "")
-        else:
-            ai_response = "Received image. Image saved to your AI Workstation session."
-
-    except Exception as e:
-        ai_response = (
-            f"Received image and attached to session. (Ollama model status: {str(e)})"
+        cursor.execute(
+            "INSERT INTO chat_messages (chat_id, role, content) VALUES (?, ?, ?)",
+            (chat_id, "ai", ai_response),
         )
+        conn.commit()
 
-    cursor.execute(
-        "INSERT INTO chat_messages (chat_id, role, content) VALUES (?, ?, ?)",
-        (chat_id, "ai", ai_response),
-    )
-    conn.commit()
-    conn.close()
-
-    return jsonify(
-        {"chat_id": chat_id, "response": ai_response, "executed_details": []}
-    )
+        return jsonify(
+            {"chat_id": chat_id, "response": ai_response, "executed_details": []}
+        )
+    finally:
+        conn.close()
 
 @chat_bp.route("/api/chat", methods=["POST"])
 def chat():
     data = request.json or {}
     if "bodyData" in data and isinstance(data["bodyData"], dict):
         data = data["bodyData"]
-    user_prompt = data.get("prompt", "")
+    user_prompt = data.get("prompt", "") or data.get("message", "") or data.get("text", "") or data.get("query", "")
     model_name = data.get("model", "qwen2.5")
     chat_id = data.get("chat_id")
 
@@ -387,8 +388,19 @@ def chat():
     # DeepSeek Harness moved down to allow autonomous engines first
     # Autonomous Co-Pilot Workflows (Jarvis & Friday Direct Automation)
     try:
-        import copilot_automation_engine
-        copilot_res = copilot_automation_engine.dispatch_copilot_command(user_prompt)
+        p_low = (user_prompt or "").lower()
+        coding_signals = [
+            "act as", "build a", "create a", "write a", "write code", "generate a",
+            "make a website", "create website", "build website", "html", "css", "three.js",
+            "prompt for", "how do i", "explain", "code for", "function", "class"
+        ]
+        if len(user_prompt.split()) <= 16 and not any(sig in p_low for sig in coding_signals):
+            import importlib
+            import copilot_automation_engine
+            importlib.reload(copilot_automation_engine)
+            copilot_res = copilot_automation_engine.dispatch_copilot_command(user_prompt)
+        else:
+            copilot_res = None
         if copilot_res:
             ai_resp = copilot_res["markdown"]
             speaker = copilot_res.get("speaker", "jarvis")
@@ -412,9 +424,17 @@ def chat():
 
     # Autonomous Action Interceptor (Web, Apps, Search, Commands)
     try:
-        import autonomous_intent_engine
-
-        auto_res = autonomous_intent_engine.handle_autonomous_intent(user_prompt)
+        coding_signals = [
+            "act as", "write a", "create a", "build a", "write code", "html5", "index.html",
+            "<!doctype", "three.js", "frontend", "cybersecurity ui", "single-file", "prompt for"
+        ]
+        if len(user_prompt.split()) <= 15 and not any(sig in p_low for sig in coding_signals):
+            import importlib
+            import autonomous_intent_engine
+            importlib.reload(autonomous_intent_engine)
+            auto_res = autonomous_intent_engine.handle_autonomous_intent(user_prompt)
+        else:
+            auto_res = None
         if auto_res:
             ai_resp, model_tag, exec_details = auto_res
 
@@ -552,6 +572,7 @@ def chat():
                 (chat_id,),
             )
             history_rows = cursor.fetchall()
+            conn.commit()
             history_msgs = []
             for r, c in history_rows[-11:-1]: # Exclude the very last row which is the current prompt we just inserted
                 role_name = "assistant" if r.lower() in ["ai", "assistant"] else "user"
@@ -583,6 +604,54 @@ def chat():
         except Exception as e:
             print(f"[DeepSeek Harness Error] {e}")
             # Fall through to standard logic if it fails
+
+    # ---------------------------------------------------------
+    # DUAL-CORE AGENT HARNESS (Hermes 3 + Qwen 2.5-Coder)
+    # ---------------------------------------------------------
+    if (model_name or "").lower() in ["dual-core", "dual_core", "harness", "hermes_qwen", "dual"]:
+        try:
+            from llm_harness.dual_core_engine import execute_dual_core_harness
+            
+            cursor.execute(
+                "SELECT role, content FROM chat_messages WHERE chat_id = ? ORDER BY id ASC",
+                (chat_id,),
+            )
+            history_rows = cursor.fetchall()
+            conn.commit()
+            history_msgs = []
+            for r, c in history_rows[-11:-1]:
+                role_name = "assistant" if r.lower() in ["ai", "assistant"] else "user"
+                history_msgs.append({"role": role_name, "content": c})
+                
+            harness_result = execute_dual_core_harness(user_prompt, history_msgs)
+            ai_response = harness_result.get("response", "")
+            planner_m = harness_result.get("planner_model", "hermes3:8b")
+            coder_m = harness_result.get("coder_model", "qwen2.5-coder:7b")
+            trail = harness_result.get("execution_trail", [])
+            
+            cursor.execute(
+                "INSERT INTO chat_messages (chat_id, role, content, executed_details) VALUES (?, ?, ?, ?)",
+                (chat_id, "ai", ai_response, json.dumps(trail)),
+            )
+            cursor.execute(
+                "UPDATE chat_sessions SET updated_at = CURRENT_TIMESTAMP WHERE chat_id = ?",
+                (chat_id,),
+            )
+            conn.commit()
+            conn.close()
+            
+            return jsonify({
+                "response": ai_response,
+                "chat_id": chat_id,
+                "speaker": detected_speaker or "deep",
+                "model": "dual-core",
+                "model_used": f"Dual-Core Harness ({planner_m} + {coder_m})",
+                "has_execution": len(trail) > 0,
+                "executed_details": trail
+            })
+        except Exception as e:
+            print(f"[Dual-Core Harness Error] {e}")
+            # Fall through if error
 
     router_reason = ""
     if (model_name or "").lower() in ["auto", "smart", "auto_router"] or "auto" in (
@@ -616,6 +685,7 @@ def chat():
         (chat_id,),
     )
     history_rows = cursor.fetchall()
+    conn.commit()
 
     history_msgs = []
     for r, c in history_rows[-10:]:
@@ -848,7 +918,7 @@ def chat():
 @chat_bp.route("/api/swarm_chat", methods=["POST"])
 def swarm_chat():
     data = request.json or {}
-    user_prompt = data.get("prompt", "")
+    user_prompt = data.get("prompt", "") or data.get("message", "") or data.get("text", "") or data.get("query", "")
     if not user_prompt:
         return jsonify({"error": "Prompt cannot be empty"}), 400
 
@@ -908,7 +978,7 @@ def chat_stream():
     data = request.json or {}
     if "bodyData" in data and isinstance(data["bodyData"], dict):
         data = data["bodyData"]
-    user_prompt = data.get("prompt", "")
+    user_prompt = data.get("prompt", "") or data.get("message", "") or data.get("text", "") or data.get("query", "")
     model_name = data.get("model", "qwen2.5")
     chat_id = data.get("chat_id")
     image_b64 = data.get("image")
@@ -926,21 +996,23 @@ def chat_stream():
         return Response(dup_generator(), mimetype='text/event-stream')
 
     conn = db_engine.get_db_connection()
-    cursor = conn.cursor()
+    try:
+        cursor = conn.cursor()
 
-    if not chat_id:
-        chat_id = f"chat_{int(time.time()*1000)}"
-        title = user_prompt[:30] + ("..." if len(user_prompt) > 30 else "")
-        cursor.execute("INSERT INTO chat_sessions (chat_id, title) VALUES (?, ?)", (chat_id, title))
-    else:
-        cursor.execute("SELECT title FROM chat_sessions WHERE chat_id = ?", (chat_id,))
-        if not cursor.fetchone():
+        if not chat_id:
+            chat_id = f"chat_{int(time.time()*1000)}"
             title = user_prompt[:30] + ("..." if len(user_prompt) > 30 else "")
             cursor.execute("INSERT INTO chat_sessions (chat_id, title) VALUES (?, ?)", (chat_id, title))
+        else:
+            cursor.execute("SELECT title FROM chat_sessions WHERE chat_id = ?", (chat_id,))
+            if not cursor.fetchone():
+                title = user_prompt[:30] + ("..." if len(user_prompt) > 30 else "")
+                cursor.execute("INSERT INTO chat_sessions (chat_id, title) VALUES (?, ?)", (chat_id, title))
 
-    cursor.execute("INSERT INTO chat_messages (chat_id, role, content) VALUES (?, ?, ?)", (chat_id, "user", user_prompt))
-    conn.commit()
-    conn.close()
+        cursor.execute("INSERT INTO chat_messages (chat_id, role, content) VALUES (?, ?, ?)", (chat_id, "user", user_prompt))
+        conn.commit()
+    finally:
+        conn.close()
 
     def generate():
         # Phonetic normalization for STT variations (e.g., Yarvis -> Jarvis)
@@ -1012,10 +1084,12 @@ def chat_stream():
                             except Exception:
                                 pass
                 conn = db_engine.get_db_connection()
-                cursor = conn.cursor()
-                cursor.execute("INSERT INTO chat_messages (chat_id, role, content) VALUES (?, ?, ?)", (chat_id, "assistant", full_dual_text))
-                conn.commit()
-                conn.close()
+                try:
+                    cursor = conn.cursor()
+                    cursor.execute("INSERT INTO chat_messages (chat_id, role, content) VALUES (?, ?, ?)", (chat_id, "assistant", full_dual_text))
+                    conn.commit()
+                finally:
+                    conn.close()
                 yield f"data: {json.dumps({'done': True, 'chat_id': chat_id, 'is_dual_dialogue': True})}\n\n"
                 return
             except Exception as e:
@@ -1023,8 +1097,19 @@ def chat_stream():
 
         # Autonomous Co-Pilot Workflows (Jarvis & Friday Direct Automation)
         try:
-            import copilot_automation_engine
-            copilot_res = copilot_automation_engine.dispatch_copilot_command(user_prompt)
+            p_low = (user_prompt or "").lower()
+            coding_signals = [
+                "act as", "build a", "create a", "write a", "write code", "generate a",
+                "make a website", "create website", "build website", "html", "css", "three.js",
+                "prompt for", "how do i", "explain", "code for", "function", "class"
+            ]
+            if len(user_prompt.split()) <= 16 and not any(sig in p_low for sig in coding_signals):
+                import importlib
+                import copilot_automation_engine
+                importlib.reload(copilot_automation_engine)
+                copilot_res = copilot_automation_engine.dispatch_copilot_command(user_prompt)
+            else:
+                copilot_res = None
             if copilot_res:
                 ai_resp = copilot_res["markdown"]
                 speaker = copilot_res.get("speaker", "jarvis")
@@ -1032,10 +1117,12 @@ def chat_stream():
                 spoken_text = copilot_res.get("spoken_text", "")
 
                 conn = db_engine.get_db_connection()
-                cursor = conn.cursor()
-                cursor.execute("INSERT INTO chat_messages (chat_id, role, content) VALUES (?, ?, ?)", (chat_id, "assistant", ai_resp))
-                conn.commit()
-                conn.close()
+                try:
+                    cursor = conn.cursor()
+                    cursor.execute("INSERT INTO chat_messages (chat_id, role, content) VALUES (?, ?, ?)", (chat_id, "assistant", ai_resp))
+                    conn.commit()
+                finally:
+                    conn.close()
 
                 yield f"data: {json.dumps({'response': ai_resp, 'chat_id': chat_id, 'speaker': speaker, 'is_dual_dialogue': is_dual, 'spoken_text': spoken_text, 'model': f'{speaker}_automation_core', 'done': True})}\n\n"
                 return
@@ -1044,15 +1131,26 @@ def chat_stream():
 
         # Autonomous Action Interceptor (Web, Apps, Search, Commands)
         try:
-            import autonomous_intent_engine
-            auto_res = autonomous_intent_engine.handle_autonomous_intent(user_prompt)
+            coding_signals = [
+                "act as", "write a", "create a", "build a", "write code", "html5", "index.html",
+                "<!doctype", "three.js", "frontend", "cybersecurity ui", "single-file", "prompt for"
+            ]
+            if len(user_prompt.split()) <= 15 and not any(sig in p_low for sig in coding_signals):
+                import importlib
+                import autonomous_intent_engine
+                importlib.reload(autonomous_intent_engine)
+                auto_res = autonomous_intent_engine.handle_autonomous_intent(user_prompt)
+            else:
+                auto_res = None
             if auto_res:
                 ai_resp, model_tag, exec_details = auto_res
                 conn = db_engine.get_db_connection()
-                cursor = conn.cursor()
-                cursor.execute("INSERT INTO chat_messages (chat_id, role, content) VALUES (?, ?, ?)", (chat_id, "assistant", ai_resp))
-                conn.commit()
-                conn.close()
+                try:
+                    cursor = conn.cursor()
+                    cursor.execute("INSERT INTO chat_messages (chat_id, role, content) VALUES (?, ?, ?)", (chat_id, "assistant", ai_resp))
+                    conn.commit()
+                finally:
+                    conn.close()
                 spoken_text = extract_concise_spoken_text(model_tag, ai_resp)
                 yield f"data: {json.dumps({'response': ai_resp, 'chat_id': chat_id, 'speaker': detected_speaker, 'spoken_text': spoken_text, 'model': model_tag, 'executed_details': exec_details, 'has_execution': True, 'done': True})}\n\n"
                 return
@@ -1065,10 +1163,12 @@ def chat_stream():
             if kasa_res:
                 ai_response, details = kasa_res
                 conn = db_engine.get_db_connection()
-                cursor = conn.cursor()
-                cursor.execute("INSERT INTO chat_messages (chat_id, role, content) VALUES (?, ?, ?)", (chat_id, "assistant", ai_response))
-                conn.commit()
-                conn.close()
+                try:
+                    cursor = conn.cursor()
+                    cursor.execute("INSERT INTO chat_messages (chat_id, role, content) VALUES (?, ?, ?)", (chat_id, "assistant", ai_response))
+                    conn.commit()
+                finally:
+                    conn.close()
                 yield f"data: {json.dumps({'response': ai_response, 'chat_id': chat_id, 'speaker': detected_speaker, 'model': 'kasa_smart_light_engine', 'executed_details': [{'language': 'python', 'code': 'kasa_controller.execute_kasa_intent()', 'output': json.dumps(details)}], 'has_execution': True, 'done': True})}\n\n"
                 return
         except Exception:
@@ -1146,11 +1246,13 @@ def chat_stream():
             final_swarm_resp = f"🧠 **[Tri-Agent Consensus Swarm Initiated]**\n\n<div style='display: flex; gap: 20px; width: 100%; margin-top: 15px;'>\n<div style='flex: 1; border-right: 1px solid #555; padding-right: 15px; overflow-wrap: break-word;'>\n\n### 📐 **[Agent Alpha]**\n{alpha_full}\n</div>\n<div style='flex: 1; border-right: 1px solid #555; padding-right: 15px; overflow-wrap: break-word;'>\n\n### ⚔️ **[Agent Beta]**\n{beta_full}\n</div>\n<div style='flex: 1; overflow-wrap: break-word;'>\n\n### ⚖️ **[Agent Gamma]**\n{gamma_full}\n</div>\n</div>\n\n*Council consensus reached.*"
 
             conn = db_engine.get_db_connection()
-            cursor = conn.cursor()
-            cursor.execute("INSERT INTO chat_messages (chat_id, role, content) VALUES (?, ?, ?)", (chat_id, "ai", final_swarm_resp))
-            cursor.execute("UPDATE chat_sessions SET updated_at = CURRENT_TIMESTAMP WHERE chat_id = ?", (chat_id,))
-            conn.commit()
-            conn.close()
+            try:
+                cursor = conn.cursor()
+                cursor.execute("INSERT INTO chat_messages (chat_id, role, content) VALUES (?, ?, ?)", (chat_id, "ai", final_swarm_resp))
+                cursor.execute("UPDATE chat_sessions SET updated_at = CURRENT_TIMESTAMP WHERE chat_id = ?", (chat_id,))
+                conn.commit()
+            finally:
+                conn.close()
 
             yield "data: " + json.dumps({"response": final_swarm_resp, "done": True, "chat_id": chat_id, "model_used": "tri_agent_council"}) + "\n\n"
             return
@@ -1185,10 +1287,12 @@ def chat_stream():
             pass # Removed UI routing badge per user request
 
         conn = db_engine.get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute("SELECT role, content FROM chat_messages WHERE chat_id = ? ORDER BY id ASC", (chat_id,))
-        history_rows = cursor.fetchall()
-        conn.close()
+        try:
+            cursor = conn.cursor()
+            cursor.execute("SELECT role, content FROM chat_messages WHERE chat_id = ? ORDER BY id ASC", (chat_id,))
+            history_rows = cursor.fetchall()
+        finally:
+            conn.close()
 
         history_msgs = []
         for r, c in history_rows[-10:]:
@@ -1260,17 +1364,16 @@ def chat_stream():
         mcp_tools = []
         try:
             import mcp_integration
-            if mcp_integration.HAS_MCP:
-                for srv, srv_tools in mcp_integration.MCP_TOOLS_CACHE.items():
-                    for t in srv_tools:
-                        mcp_tools.append({
-                            "type": "function",
-                            "function": {
-                                "name": f"{srv}__{t['name']}",
-                                "description": t.get("description", ""),
-                                "parameters": t.get("inputSchema", {})
-                            }
-                        })
+            raw_tools = mcp_integration.get_all_tool_definitions()
+            for t in raw_tools:
+                mcp_tools.append({
+                    "type": "function",
+                    "function": {
+                        "name": t.get("name", ""),
+                        "description": t.get("description", ""),
+                        "parameters": t.get("inputSchema", {})
+                    }
+                })
         except Exception as e:
             print("[MCP Tools Error]", e)
 
@@ -1336,7 +1439,7 @@ def chat_stream():
                     payload["messages"] = payload["messages"][:1] + history_msgs
 
                     # Strip <think> blocks before evaluating code or tools
-                    cleaned_response = re.sub(r'<think>.*?</think>', '', full_response, flags=re.DOTALL)
+                    cleaned_response = re.sub(r'<think>.*?(?:</think>|$)', '', full_response, flags=re.DOTALL)
                     
                     code_blocks = []
                     if user_wants_action:
@@ -1402,11 +1505,7 @@ def chat_stream():
                             out_text = ""
                             try:
                                 import mcp_integration
-                                if "__" in name:
-                                    srv, tname = name.split("__", 1)
-                                    out_text = str(mcp_integration.call_mcp_tool(srv, tname, args))
-                                else:
-                                    out_text = f"Tool {name} format error (expected server__tool)"
+                                out_text = str(mcp_integration.call_tool(name, args))
                             except Exception as e:
                                 out_text = f"Error calling tool: {e}"
                                 
@@ -1453,12 +1552,14 @@ def chat_stream():
                     else:
                         cumulative_full_response += full_response
                         conn = db_engine.get_db_connection()
-                        cursor = conn.cursor()
-                        cursor.execute("INSERT INTO chat_messages (chat_id, role, content, executed_details) VALUES (?, ?, ?, ?)", (chat_id, "ai", cumulative_full_response, json.dumps(all_executed_details)))
-                        msg_id = cursor.lastrowid
-                        cursor.execute("UPDATE chat_sessions SET updated_at = CURRENT_TIMESTAMP WHERE chat_id = ?", (chat_id,))
-                        conn.commit()
-                        conn.close()
+                        try:
+                            cursor = conn.cursor()
+                            cursor.execute("INSERT INTO chat_messages (chat_id, role, content, executed_details) VALUES (?, ?, ?, ?)", (chat_id, "ai", cumulative_full_response, json.dumps(all_executed_details)))
+                            msg_id = cursor.lastrowid
+                            cursor.execute("UPDATE chat_sessions SET updated_at = CURRENT_TIMESTAMP WHERE chat_id = ?", (chat_id,))
+                            conn.commit()
+                        finally:
+                            conn.close()
                         
                         yield f"data: {json.dumps({'response': cumulative_full_response, 'done': True, 'chat_id': chat_id, 'message_id': msg_id, 'model_used': target_model, 'executed_details': all_executed_details, 'speaker': detected_speaker or active_p})}\n\n"
                         response_finalized = True
@@ -1478,12 +1579,14 @@ def chat_stream():
                 all_executed_details.extend(exec_d)
                 cumulative_full_response = ai_response
             conn = db_engine.get_db_connection()
-            cursor = conn.cursor()
-            cursor.execute("INSERT INTO chat_messages (chat_id, role, content, executed_details) VALUES (?, ?, ?, ?)", (chat_id, "ai", cumulative_full_response, json.dumps(all_executed_details)))
-            msg_id = cursor.lastrowid
-            cursor.execute("UPDATE chat_sessions SET updated_at = CURRENT_TIMESTAMP WHERE chat_id = ?", (chat_id,))
-            conn.commit()
-            conn.close()
+            try:
+                cursor = conn.cursor()
+                cursor.execute("INSERT INTO chat_messages (chat_id, role, content, executed_details) VALUES (?, ?, ?, ?)", (chat_id, "ai", cumulative_full_response, json.dumps(all_executed_details)))
+                msg_id = cursor.lastrowid
+                cursor.execute("UPDATE chat_sessions SET updated_at = CURRENT_TIMESTAMP WHERE chat_id = ?", (chat_id,))
+                conn.commit()
+            finally:
+                conn.close()
             yield f"data: {json.dumps({'response': cumulative_full_response, 'done': True, 'chat_id': chat_id, 'message_id': msg_id, 'model_used': target_model, 'executed_details': all_executed_details, 'speaker': detected_speaker or active_p})}\n\n"
 
     return Response(generate(), mimetype='text/event-stream')

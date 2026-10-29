@@ -403,13 +403,14 @@ class OmnibarHUD(tk.Tk):
                             )
                             if res3b.status_code == 200:
                                 answer = res3b.json().get("response", "").strip()
-                        except Exception:
-                            answer = f"Error querying local LLM: {llm_err}"
+                        except Exception as fallback_err:
+                            answer = f"Error querying local LLM: {llm_err} ({fallback_err})"
 
                 final_text = (answer + action_trace) if answer else "No response generated."
-                self.after(0, lambda: self._on_result(final_text))
+                self.after(0, lambda res=final_text: self._on_result(res))
             except Exception as e:
-                self.after(0, lambda: self._on_result(f"Error executing command: {e}"))
+                err_msg = str(e)
+                self.after(0, lambda msg=err_msg: self._on_result(f"Error executing command: {msg}"))
 
         threading.Thread(target=_execute, daemon=True).start()
 
@@ -452,7 +453,6 @@ class OmnibarHUD(tk.Tk):
         IS_HUD_VISIBLE = False
 
     def toggle_hud(self):
-        global IS_HUD_VISIBLE
         if IS_HUD_VISIBLE:
             self.hide_hud()
         else:
@@ -460,17 +460,14 @@ class OmnibarHUD(tk.Tk):
 
 
 def show_hud():
-    global HUD_WINDOW
     if HUD_WINDOW:
         HUD_WINDOW.after(0, HUD_WINDOW.show_hud)
 
 def hide_hud():
-    global HUD_WINDOW
     if HUD_WINDOW:
         HUD_WINDOW.after(0, HUD_WINDOW.hide_hud)
 
 def toggle_hud():
-    global HUD_WINDOW
     if HUD_WINDOW:
         HUD_WINDOW.after(0, HUD_WINDOW.toggle_hud)
 

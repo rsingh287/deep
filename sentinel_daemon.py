@@ -135,7 +135,7 @@ class SentinelDaemon:
                 pass
               
         # 5. Auto-Purge Disk Janitor Check (Every ~5 mins)
-        if not hasattr(self, "last_janitor_check") or (now - getattr(self, "last_janitor_check")).total_seconds() > 300:
+        if not hasattr(self, "last_janitor_check") or (now - self.last_janitor_check).total_seconds() > 300:
             self.last_janitor_check = now
             self.run_disk_janitor()
               
@@ -144,11 +144,11 @@ class SentinelDaemon:
 
     def check_services(self):
         # 1. PostgreSQL Check
+        conn = None
         try:
             import psycopg2
             from db_engine import DEFAULT_PG_URL
             conn = psycopg2.connect(DEFAULT_PG_URL, connect_timeout=2)
-            conn.close()
             self.pg_failed = False
         except Exception as e:
             if not getattr(self, "pg_failed", False):
@@ -161,6 +161,12 @@ class SentinelDaemon:
                 except Exception as restart_e:
                     self._add_log("ERROR", f"Failed to restart PostgreSQL: {restart_e}")
                 self.pg_failed = True
+        finally:
+            if conn:
+                try:
+                    conn.close()
+                except Exception:
+                    pass
 
         # 2. Ollama Check
         try:

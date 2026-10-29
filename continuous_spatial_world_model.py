@@ -23,43 +23,51 @@ class SpatialWorldModelEngine:
         
     def _mapping_loop(self, camera_index):
         cap = cv2.VideoCapture(camera_index)
-        logger.info("Initializing Continuous Spatial World Model (Project Astra implementation)...")
+        try:
+
+            logger.info("Initializing Continuous Spatial World Model (Project Astra implementation)...")
         
-        while self.is_running and cap.isOpened():
-            ret, frame = cap.read()
-            if not ret:
-                break
+            while self.is_running and cap.isOpened():
+                ret, frame = cap.read()
+                if not ret:
+                    break
             
-            # 1. YOLOv8 Semantic Object Detection
-            results = self.yolo_model(frame, stream=True, verbose=False)
-            current_objects = {}
-            for result in results:
-                for box in result.boxes:
-                    cls_id = int(box.cls[0])
-                    class_name = self.yolo_model.names[cls_id]
-                    # Get center coordinates (approximating spatial location)
-                    x1, y1, x2, y2 = box.xyxy[0].tolist()
-                    cx, cy = (x1 + x2) / 2, (y1 + y2) / 2
+                # 1. YOLOv8 Semantic Object Detection
+                results = self.yolo_model(frame, stream=True, verbose=False)
+                current_objects = {}
+                for result in results:
+                    for box in result.boxes:
+                        cls_id = int(box.cls[0])
+                        class_name = self.yolo_model.names[cls_id]
+                        # Get center coordinates (approximating spatial location)
+                        x1, y1, x2, y2 = box.xyxy[0].tolist()
+                        cx, cy = (x1 + x2) / 2, (y1 + y2) / 2
                     
-                    # Store object with basic 2D->3D heuristic
-                    current_objects[class_name] = {"x": cx, "y": cy, "last_seen": time.time()}
+                        # Store object with basic 2D->3D heuristic
+                        current_objects[class_name] = {"x": cx, "y": cy, "last_seen": time.time()}
             
-            # 2. MediaPipe Hand/Face Kinematics (Human-Object Interaction)
-            # We would run mp_engine here to track if hand is near an object
+                # 2. MediaPipe Hand/Face Kinematics (Human-Object Interaction)
+                # We would run mp_engine here to track if hand is near an object
             
-            # 3. Update persistent grid
-            for obj_name, coords in current_objects.items():
-                if obj_name not in self.occupancy_grid:
-                    logger.info(f"New object mapped into Spatial Grid: {obj_name} at ({coords['x']:.1f}, {coords['y']:.1f})")
-                self.occupancy_grid[obj_name] = coords
+                # 3. Update persistent grid
+                for obj_name, coords in current_objects.items():
+                    if obj_name not in self.occupancy_grid:
+                        logger.info(f"New object mapped into Spatial Grid: {obj_name} at ({coords['x']:.1f}, {coords['y']:.1f})")
+                    self.occupancy_grid[obj_name] = coords
                 
-            # Write out state to spatial_memory.json
-            with open("spatial_memory.json", "w") as f:
-                json.dump(self.occupancy_grid, f, indent=2)
+                # Write out state to spatial_memory.json
+                with open("spatial_memory.json", "w") as f:
+                    json.dump(self.occupancy_grid, f, indent=2)
                 
-            time.sleep(1) # Run at 1 Hz for background semantic mapping
+                time.sleep(1) # Run at 1 Hz for background semantic mapping
             
-        cap.release()
+        finally:
+            if cap is not None:
+                try:
+                    cap.release()
+                except Exception:
+                    pass
+
 
     def query_spatial_model(self, object_name):
         obj = self.occupancy_grid.get(object_name)

@@ -5,6 +5,7 @@ Uses local Qwen 2.5-VL to locate visual UI elements and autonomously click them 
 
 import ctypes
 import json
+import os
 import re
 import time
 from typing import Any, Dict
@@ -15,7 +16,9 @@ user32 = ctypes.windll.user32
 MOUSEEVENTF_LEFTDOWN = 0x0002
 MOUSEEVENTF_LEFTUP = 0x0004
 
-OLLAMA_API_BASE = "http://localhost:11434"
+OLLAMA_API_BASE = os.getenv("OLLAMA_HOST", "http://localhost:11434")
+if not OLLAMA_API_BASE.startswith("http://") and not OLLAMA_API_BASE.startswith("https://"):
+    OLLAMA_API_BASE = f"http://{OLLAMA_API_BASE}"
 
 
 def click_screen_coordinate(x: int, y: int, clicks: int = 1) -> Dict[str, Any]:

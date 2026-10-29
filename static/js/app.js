@@ -508,12 +508,25 @@ function loadBuddyIframeIfNeeded() {
       }
     }
 
-    function closeVoiceCommandsModal(event) {
-      if (!event || event.target.id === 'voiceCommandsModal') {
-        const m = document.getElementById('voiceCommandsModal');
-        if (m) m.classList.add('hidden');
+    function openVoiceCommandsModal() {
+      const m = document.getElementById('voiceCommandsModal');
+      if (m) {
+        m.classList.remove('hidden');
+        m.style.display = 'flex';
       }
     }
+    window.openVoiceCommandsModal = openVoiceCommandsModal;
+
+    function closeVoiceCommandsModal(event) {
+      if (!event || event.target.id === 'voiceCommandsModal' || typeof event === 'undefined') {
+        const m = document.getElementById('voiceCommandsModal');
+        if (m) {
+          m.classList.add('hidden');
+          m.style.display = 'none';
+        }
+      }
+    }
+    window.closeVoiceCommandsModal = closeVoiceCommandsModal;
 
     function openWorkstationSettingsModal() {
       const m = document.getElementById('modalWorkstationSettings');
@@ -1314,8 +1327,13 @@ function loadBuddyIframeIfNeeded() {
       localStorage.setItem('deep_selected_model', val);
       const dot = document.getElementById('activeModelDot');
       if (dot) {
-        dot.style.background = val === 'auto' ? '#4ade80' : '#38bdf8';
-        dot.style.boxShadow = val === 'auto' ? '0 0 8px #4ade80' : '0 0 8px #38bdf8';
+        if (val === 'auto') {
+          dot.style.background = '#4ade80';
+          dot.style.boxShadow = '0 0 8px #4ade80';
+        } else {
+          dot.style.background = '#38bdf8';
+          dot.style.boxShadow = '0 0 8px #38bdf8';
+        }
       }
       playHoloSound('chime');
       const friendlyName = {
@@ -1890,6 +1908,18 @@ function loadBuddyIframeIfNeeded() {
                   toggleDeepQuantumHUD(false);
                   playHoloSound('chime');
                   speakVoiceFeedback('HUD closed.');
+                  return;
+                }
+                if (['voice commands', 'open voice commands', 'show voice commands', 'commands', 'voice cheatsheet', 'cheat sheet', 'help commands'].includes(cleanCmd)) {
+                  openVoiceCommandsModal();
+                  playHoloSound('chime');
+                  speakVoiceFeedback('Voice command library ready.');
+                  return;
+                }
+                if (['close voice commands', 'hide voice commands', 'dismiss voice commands'].includes(cleanCmd)) {
+                  closeVoiceCommandsModal();
+                  playHoloSound('chime');
+                  speakVoiceFeedback('Voice command library closed.');
                   return;
                 }
                 if (['summon buddy', 'open buddy', 'launch buddy', 'dock buddy', 'toggle buddy'].includes(cleanCmd)) {
@@ -3366,6 +3396,7 @@ function loadBuddyIframeIfNeeded() {
       document.head.removeChild(style);
       chatScroll.scrollTop = chatScroll.scrollHeight;
     }
+    window.triggerScreenVisionScan = triggerScreenVisionScan;
 
     sendBtn.addEventListener('click', async () => {
       if (activeAbortController) {
@@ -3379,6 +3410,42 @@ function loadBuddyIframeIfNeeded() {
       appendMessage('user', text);
       promptInput.value = '';
       resetPromptInputHeight();
+
+      // Client-Side Slash Command & Portal Navigation Router
+      const lowerCmd = text.toLowerCase().trim();
+      if (lowerCmd === '/nexus' || lowerCmd === '/cyber_nexus' || lowerCmd === 'nexus' || lowerCmd === 'open nexus') {
+        appendMessage('ai', '🚀 <strong>Launching AETHERIS // Cyber Operations Nexus...</strong><br><br>Opening <a href="/nexus" style="color:#00f0ff; text-decoration:underline; font-weight:700;">AETHERIS Cyber Nexus</a> in 1 second.');
+        setTimeout(() => { window.location.href = '/nexus'; }, 600);
+        return;
+      }
+      if (lowerCmd === '/camera' || lowerCmd === '/camera_vision' || lowerCmd === '/vision' || lowerCmd === 'camera' || lowerCmd === 'open camera') {
+        appendMessage('ai', '📷 <strong>Launching Live Camera & Gesture Tracking Cockpit...</strong><br><br>Opening <a href="/camera_vision" style="color:#00f0ff; text-decoration:underline; font-weight:700;">Camera Vision Cockpit</a> in 1 second.');
+        setTimeout(() => { window.location.href = '/camera_vision'; }, 600);
+        return;
+      }
+      if (lowerCmd === '/weather') {
+        appendMessage('ai', '📍 Opening Local Weather Portal...');
+        setTimeout(() => { window.location.href = '/weather'; }, 500);
+        return;
+      }
+      if (lowerCmd === '/gurbani') {
+        appendMessage('ai', 'ੴ Opening Sikh Heritage & Nitnem Portal...');
+        setTimeout(() => { window.location.href = '/gurbani'; }, 500);
+        return;
+      }
+      if (lowerCmd === '/3d' || lowerCmd === '/cyberpunk') {
+        appendMessage('ai', '⚡ Opening 3D Cyberpunk Matrix...');
+        setTimeout(() => { window.location.href = '/3d'; }, 500);
+        return;
+      }
+      if (lowerCmd === '/scan' || lowerCmd === '/ocr') {
+        triggerScreenVisionScan('Scan my active screen with Live Vision OCR and summarize findings');
+        return;
+      }
+      if (lowerCmd === '/clear') {
+        clearActiveChat();
+        return;
+      }
       
       // Create AI bubble
       const aiBubble = appendMessage('ai', '');
@@ -3770,8 +3837,165 @@ function loadBuddyIframeIfNeeded() {
           const diskEl = document.getElementById('wrDiskFree');
           if (diskEl) diskEl.textContent = `${data.hardware.disk_free_gb || 0} GB`;
         }
+
+        // 5. Resilience Circuit Breakers Matrix
+        if (Array.isArray(data.circuit_breakers)) {
+          const breakersList = document.getElementById('warRoomBreakersList');
+          const breakersSummary = document.getElementById('wrBreakersSummary');
+          const closedCount = data.circuit_breakers.filter(b => b.state === 'CLOSED').length;
+          if (breakersSummary) {
+            breakersSummary.textContent = `${closedCount}/${data.circuit_breakers.length} CLOSED`;
+            breakersSummary.style.color = (closedCount === data.circuit_breakers.length) ? '#4ade80' : '#f43f5e';
+          }
+          if (breakersList) {
+            breakersList.innerHTML = data.circuit_breakers.map(b => {
+              const isClosed = b.state === 'CLOSED';
+              const isHalf = b.state === 'HALF_OPEN';
+              const dotColor = isClosed ? '#4ade80' : (isHalf ? '#facc15' : '#f43f5e');
+              const badgeBg = isClosed ? 'rgba(74,222,128,0.15)' : (isHalf ? 'rgba(250,204,21,0.15)' : 'rgba(244,63,94,0.15)');
+              const badgeBorder = isClosed ? 'rgba(74,222,128,0.4)' : (isHalf ? 'rgba(250,204,21,0.4)' : 'rgba(244,63,94,0.4)');
+              return `
+                <div style="display:flex; flex-direction:column; gap:4px; background:rgba(4,8,18,0.6); border:1px solid rgba(255,255,255,0.06); border-radius:8px; padding:6px 10px;">
+                  <div style="display:flex; align-items:center; justify-content:space-between;">
+                    <div style="display:flex; align-items:center; gap:6px;">
+                      <span style="width:7px; height:7px; border-radius:50%; background:${dotColor}; box-shadow:0 0 6px ${dotColor};"></span>
+                      <strong style="font-size:0.75rem; color:#f1f5f9;">${b.name}</strong>
+                    </div>
+                    <span style="font-size:0.65rem; font-weight:800; padding:2px 6px; border-radius:4px; background:${badgeBg}; border:1px solid ${badgeBorder}; color:${dotColor};">${b.state}</span>
+                  </div>
+                  <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.65rem; color:#94a3b8;">
+                    <span>Health: <strong style="color:#4ade80;">${b.health_ratio || 100}%</strong> • Fails: ${b.consecutive_failures || 0}</span>
+                    <div style="display:flex; gap:4px;">
+                      ${isClosed ? `<button onclick="tripCircuitBreaker('${b.name}')" style="background:rgba(244,63,94,0.2); border:1px solid rgba(244,63,94,0.4); color:#f43f5e; border-radius:4px; padding:1px 5px; font-size:0.6rem; cursor:pointer;" title="Simulate fault">Trip</button>` : `<button onclick="resetCircuitBreaker('${b.name}')" style="background:rgba(74,222,128,0.2); border:1px solid rgba(74,222,128,0.4); color:#4ade80; border-radius:4px; padding:1px 5px; font-size:0.6rem; cursor:pointer;" title="Reset to CLOSED">Reset</button>`}
+                    </div>
+                  </div>
+                </div>
+              `;
+            }).join('');
+          }
+        }
+
+        // 6. Embedded MCU Projects Dropdown population
+        if (data.mcu && Array.isArray(data.mcu.projects)) {
+          const select = document.getElementById('wrMcuProjectSelect');
+          if (select && select.options.length <= 5 && data.mcu.projects.length > 5) {
+            const currentVal = select.value;
+            select.innerHTML = data.mcu.projects.map(p => `<option value="${p.name}">${p.name}</option>`).join('');
+            if (currentVal) select.value = currentVal;
+          }
+        }
       } catch (err) {
         console.warn('War room telemetry fetch error:', err);
+      }
+    };
+
+    window.tripCircuitBreaker = async function(name) {
+      try {
+        const res = await fetch('/api/system/circuit_breakers/trip', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name })
+        });
+        const data = await res.json();
+        const logs = document.getElementById('warRoomTerminalLogs');
+        if (logs) logs.textContent += `\n[Circuit Breaker] Manually tripped '${name}' -> OPEN (Fault Injection Active)`;
+        refreshWarRoomTelemetry();
+      } catch (e) {
+        console.error(e);
+      }
+    };
+
+    window.resetCircuitBreaker = async function(name) {
+      try {
+        const res = await fetch('/api/system/circuit_breakers/reset', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name })
+        });
+        const data = await res.json();
+        const logs = document.getElementById('warRoomTerminalLogs');
+        if (logs) logs.textContent += `\n[Circuit Breaker] Reset '${name}' -> CLOSED (Normal Operation Restored)`;
+        refreshWarRoomTelemetry();
+      } catch (e) {
+        console.error(e);
+      }
+    };
+
+    window.auditSelectedMcuProject = async function() {
+      const select = document.getElementById('wrMcuProjectSelect');
+      const fb = document.getElementById('wrMcuFeedback');
+      const logs = document.getElementById('warRoomTerminalLogs');
+      if (!select || !fb) return;
+      const proj = select.value;
+      fb.textContent = `Auditing ${proj} against PIC18F85K22 rules...`;
+      try {
+        const res = await fetch('/api/hardware/mcu/audit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ project: proj })
+        });
+        const data = await res.json();
+        if (data.passed) {
+          fb.innerHTML = `<span style="color:#4ade80;">[PASS]</span> ${data.message}`;
+        } else {
+          fb.innerHTML = `<span style="color:#f43f5e;">[WARN]</span> ${data.findings.join('\n')}`;
+        }
+        if (logs) logs.textContent += `\n[MCU Audit: ${proj}] ${data.message}`;
+      } catch (e) {
+        fb.textContent = `Audit error: ${e.message}`;
+      }
+    };
+
+    window.compileSelectedMcuProject = async function() {
+      const select = document.getElementById('wrMcuProjectSelect');
+      const fb = document.getElementById('wrMcuFeedback');
+      const logs = document.getElementById('warRoomTerminalLogs');
+      if (!select || !fb) return;
+      const proj = select.value;
+      fb.textContent = `Compiling ${proj} with xc8-cc + DFP...`;
+      try {
+        const res = await fetch('/api/hardware/mcu/compile', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ project: proj })
+        });
+        const data = await res.json();
+        if (data.success) {
+          fb.innerHTML = `<span style="color:#4ade80;">[SUCCESS]</span> Compiled in ${data.elapsed_seconds}s (${data.hex_size_bytes}B HEX)`;
+          if (logs) logs.textContent += `\n[xc8-cc Build: ${proj}]\n${data.output}`;
+        } else {
+          fb.innerHTML = `<span style="color:#f43f5e;">[BUILD FAILED]</span> ${data.error || 'Check compiler output'}`;
+          if (logs) logs.textContent += `\n[xc8-cc Error: ${proj}]\n${data.output || data.error}`;
+        }
+      } catch (e) {
+        fb.textContent = `Compile error: ${e.message}`;
+      }
+    };
+
+    window.flashSelectedMcuProject = async function() {
+      const select = document.getElementById('wrMcuProjectSelect');
+      const fb = document.getElementById('wrMcuFeedback');
+      const logs = document.getElementById('warRoomTerminalLogs');
+      if (!select || !fb) return;
+      const proj = select.value;
+      fb.textContent = `Flashing ${proj} via PICkit 3 (BUR181916585)...`;
+      try {
+        const res = await fetch('/api/hardware/mcu/flash', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ project: proj })
+        });
+        const data = await res.json();
+        if (data.success) {
+          fb.innerHTML = `<span style="color:#4ade80;">[FLASHED OK]</span> Target running (${data.elapsed_seconds}s)`;
+          if (logs) logs.textContent += `\n[PICkit 3 Programmed: ${proj}]\n${data.output}`;
+        } else {
+          const alertMsg = data.device_id_message || data.error || 'Programming failed';
+          fb.innerHTML = `<span style="color:#f43f5e;">[FLASH FAILED]</span> ${alertMsg}`;
+          if (logs) logs.textContent += `\n[PICkit 3 Error: ${proj}]\n${data.output || alertMsg}`;
+        }
+      } catch (e) {
+        fb.textContent = `Flash error: ${e.message}`;
       }
     };
 

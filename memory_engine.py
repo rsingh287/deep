@@ -1,15 +1,23 @@
 """
-Memory Engine for Antigravity Local AI PC Cockpit (Jarvis Tier)
-Persistent memory and fact store connected to memory.db with smart keyword search.
+===================================================================
+D.E.E.P SOVEREIGN AI COCKPIT: TIERED MEMORY ENGINE
+===================================================================
+Tiered Memory Architecture:
+- Tier 1 (Volatile / Hot): Qdrant vector session cache via gRPC 6334 for
+  immediate conversational context and sub-millisecond semantic retrieval.
+- Tier 2 (Durable / Persistent): PostgreSQL (deep_db) facts table +
+  bi-temporal Knowledge Graph (kg_entities, kg_observations, kg_relations)
+  for permanent transactional durability.
 """
 
 import os
 import re
 import time
-import requests
 from typing import Any, Dict, List
 
 import db_engine
+import qdrant_session_cache
+from enhanced_knowledge_graph import enhanced_kg
 
 STOPWORDS = {
     "what",
@@ -36,113 +44,107 @@ STOPWORDS = {
 
 def get_connection():
     conn = db_engine.get_db_connection()
-    # Setting row_factory triggers db_engine.PostgresConnectionAdapter to use DictCursor
     conn.row_factory = True
     return conn
 
 
-try:
-    import chromadb
-except Exception:
-    chromadb = None
-
-def get_chroma_collection():
-    if not chromadb:
-        return None
-    try:
-        db_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "chroma_db")
-        client = chromadb.PersistentClient(path=db_path)
-        return client.get_or_create_collection(name="long_term_memory")
-    except Exception as e:
-        print(f"[ChromaDB Init Error]: {e}")
-        return None
-
-def get_ollama_embedding(text: str):
-    try:
-        host = os.getenv("OLLAMA_HOST", "http://localhost:11434")
-        res = requests.post(f"{host}/api/embeddings", json={"model": "nomic-embed-text", "prompt": text}, timeout=10)
-        if res.status_code == 200:
-            return res.json().get("embedding", [])
-    except Exception as e:
-        print(f"[Ollama Embedding Error]: {e}")
-    return []
-
 def store_fact(concept: str, facts: str) -> Dict[str, Any]:
-    """Stores or updates a persistent concept and fact in PostgreSQL and ChromaDB."""
+    """
+    Stores or updates knowledge across both tiers:
+    1. Tier 2 (Durable): PostgreSQL facts ledger + Knowledge Graph observations.
+    2. Tier 1 (Hot): Qdrant vector working memory via gRPC 6334.
+    """
     try:
+        concept_clean = concept.strip()
+        facts_clean = facts.strip()
+        now = time.strftime("%Y-%m-%d %H:%M:%S")
+
+        # 1. Tier 2: Durable PostgreSQL storage
         conn = get_connection()
         cursor = conn.cursor()
-        now = time.strftime("%Y-%m-%d %H:%M:%S")
         cursor.execute(
             """
             INSERT INTO facts (concept, facts, timestamp) VALUES (%s, %s, %s)
             ON CONFLICT (concept) DO UPDATE SET facts = EXCLUDED.facts, timestamp = EXCLUDED.timestamp
             """,
-            (concept.strip(), facts.strip(), now),
+            (concept_clean, facts_clean, now),
         )
-        # Fetch the id of the upserted row
-        cursor.execute("SELECT id FROM facts WHERE concept = %s", (concept.strip(),))
+        cursor.execute("SELECT id FROM facts WHERE concept = %s", (concept_clean,))
         row = cursor.fetchone()
         fact_id = row["id"] if row else None
         conn.commit()
         conn.close()
-        
-        # Add to ChromaDB vector store
-        collection = get_chroma_collection()
-        if collection:
-            embedding = get_ollama_embedding(concept + "\n" + facts)
-            if embedding:
-                collection.upsert(
-                    documents=[facts],
-                    metadatas=[{"concept": concept, "timestamp": now}],
-                    ids=[str(fact_id)],
-                    embeddings=[embedding]
-                )
+
+        # 2. Tier 2: Durable Knowledge Graph observation
+        try:
+            enhanced_kg.add_observations(
+                entity_name=concept_clean,
+                observations=[facts_clean],
+                confidence=1.0,
+                source="memory_engine"
+            )
+        except Exception as kg_err:
+            print(f"[MemoryEngine] KG sync notice: {kg_err}")
+
+        # 3. Tier 1: Hot Qdrant Vector Cache (gRPC 6334)
+        try:
+            q_cache = qdrant_session_cache.get_qdrant_cache()
+            q_cache.store_hot_fact(
+                concept=concept_clean,
+                fact=facts_clean,
+                metadata={"fact_id": fact_id, "tier": 1}
+            )
+        except Exception as q_err:
+            print(f"[MemoryEngine] Qdrant cache notice: {q_err}")
 
         return {
             "status": "success",
             "fact_id": fact_id,
-            "concept": concept,
-            "facts": facts,
-            "message": f"Persisted knowledge: '{concept}' into semantic memory.",
+            "concept": concept_clean,
+            "facts": facts_clean,
+            "message": f"Persisted knowledge: '{concept_clean}' into Tiered Memory (Qdrant gRPC + PostgreSQL Durable Graph).",
         }
     except Exception as e:
         return {"status": "error", "message": str(e)}
 
+
 def recall_facts(query: str, limit: int = 5) -> List[Dict[str, Any]]:
-    """Searches memory for relevant facts using Semantic RAG and nomic-embed-text."""
+    """
+    Recalls facts combining:
+    - Tier 1: Qdrant Hot Session Vector Cache via gRPC 6334 (sub-millisecond semantic match)
+    - Tier 2: PostgreSQL Durable Relational Facts Ledger + Knowledge Graph
+    """
     try:
-        # NOTE: Disabled ChromaDB semantic search on every query to prevent Ollama
-        # from thrashing models in VRAM (swapping between nomic-embed-text and the LLM)
-        # which causes massive 5-10 second delays per message.
-        # collection = get_chroma_collection()
-        # if collection:
-        #     query_embedding = get_ollama_embedding(query)
-        #     if query_embedding:
-        #         results = collection.query(
-        #             query_embeddings=[query_embedding],
-        #             n_results=limit
-        #         )
-        #         if results and results["ids"] and results["ids"][0]:
-        #             rag_results = []
-        #             for idx, doc_id in enumerate(results["ids"][0]):
-        #                 rag_results.append({
-        #                     "id": doc_id,
-        #                     "concept": results["metadatas"][0][idx].get("concept", ""),
-        #                     "facts": results["documents"][0][idx],
-        #                     "timestamp": results["metadatas"][0][idx].get("timestamp", "")
-        #                 })
-        #             return rag_results
+        combined_results = []
+        seen_concepts = set()
 
-        # Fallback to PostgreSQL exact keyword search if Chroma fails
-        conn = get_connection()
-        cursor = conn.cursor()
+        # 1. Fast Tier 1 Lookup: Qdrant Vector Cache
+        try:
+            q_cache = qdrant_session_cache.get_qdrant_cache()
+            hot_hits = q_cache.recall_hot_facts(query, limit=limit)
+            for hit in hot_hits:
+                c = hit.get("concept", "")
+                if c and c.lower() not in seen_concepts:
+                    seen_concepts.add(c.lower())
+                    combined_results.append({
+                        "id": hit.get("id"),
+                        "concept": c,
+                        "facts": hit.get("facts", ""),
+                        "timestamp": hit.get("timestamp", ""),
+                        "tier": "Tier 1 (Qdrant Hot Cache)"
+                    })
+        except Exception as q_err:
+            print(f"[MemoryRecall] Qdrant hot recall notice: {q_err}")
 
+        # 2. Tier 2 Lookup: PostgreSQL Durable Facts Ledger
         tokens = [w.strip() for w in re.findall(r"\b[A-Za-z0-9_-]+\b", query.lower())]
         keywords = [t for t in tokens if t not in STOPWORDS and len(t) > 1]
 
         if not keywords:
             keywords = [query.strip()]
+
+        conn = get_connection()
+        cursor = conn.cursor()
 
         clauses = []
         params = []
@@ -163,21 +165,50 @@ def recall_facts(query: str, limit: int = 5) -> List[Dict[str, Any]]:
         rows = cursor.fetchall()
         conn.close()
 
-        return [
-            {
-                "id": r["id"],
-                "concept": r["concept"],
-                "facts": r["facts"],
-                "timestamp": str(r["timestamp"]),
-            }
-            for r in rows
-        ]
+        for r in rows:
+            c = r["concept"]
+            if c and c.lower() not in seen_concepts:
+                seen_concepts.add(c.lower())
+                combined_results.append({
+                    "id": r["id"],
+                    "concept": c,
+                    "facts": r["facts"],
+                    "timestamp": str(r["timestamp"]),
+                    "tier": "Tier 2 (PostgreSQL Durable Ledger)"
+                })
+
+        # 3. Tier 2 Supplementary Lookup: Knowledge Graph Observations if space remains
+        if len(combined_results) < limit:
+            try:
+                kg_res = enhanced_kg.query_graph(
+                    search_text=query,
+                    min_confidence=0.5
+                )
+                if kg_res.get("success"):
+                    for obs in kg_res.get("observations", []):
+                        ent = obs.get("entity_name", "")
+                        if ent and ent.lower() not in seen_concepts:
+                            seen_concepts.add(ent.lower())
+                            combined_results.append({
+                                "id": obs.get("id"),
+                                "concept": ent,
+                                "facts": obs.get("observation_text", ""),
+                                "timestamp": obs.get("created_at", ""),
+                                "tier": "Tier 2 (PostgreSQL Durable Graph)"
+                            })
+                            if len(combined_results) >= limit:
+                                break
+            except Exception as kg_err:
+                print(f"[MemoryRecall] KG supplementary recall notice: {kg_err}")
+
+        return combined_results[:limit]
     except Exception as e:
         print(f"[MemoryRecallError]: {e}")
         return []
 
 
 def list_all_facts(limit: int = 25) -> List[Dict[str, Any]]:
+    """Lists durable facts directly from PostgreSQL ledger."""
     try:
         conn = get_connection()
         cursor = conn.cursor()
@@ -193,6 +224,7 @@ def list_all_facts(limit: int = 25) -> List[Dict[str, Any]]:
                 "concept": r["concept"],
                 "facts": r["facts"],
                 "timestamp": str(r["timestamp"]),
+                "tier": "Tier 2 (PostgreSQL Durable Ledger)"
             }
             for r in rows
         ]

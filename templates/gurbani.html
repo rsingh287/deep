@@ -511,11 +511,11 @@
       </div>
 
       <div class="explorer-tabs">
-        <button class="tab-btn active" onclick="switchTab('gurus')">The 10 Gurus</button>
-        <button class="tab-btn" onclick="switchTab('sahibzade')">Chaar Sahibzade</button>
-        <button class="tab-btn" onclick="switchTab('panj_pyare')">Panj Pyare</button>
-        <button class="tab-btn" onclick="switchTab('takhts')">The 5 Takhts</button>
-        <button class="tab-btn" onclick="switchTab('philosophy')">Mool Mantar & 5 Ks</button>
+        <button class="tab-btn active" onclick="switchTab('gurus', this)">The 10 Gurus</button>
+        <button class="tab-btn" onclick="switchTab('sahibzade', this)">Chaar Sahibzade</button>
+        <button class="tab-btn" onclick="switchTab('panj_pyare', this)">Panj Pyare</button>
+        <button class="tab-btn" onclick="switchTab('takhts', this)">The 5 Takhts</button>
+        <button class="tab-btn" onclick="switchTab('philosophy', this)">Mool Mantar & 5 Ks</button>
       </div>
 
       <div class="explorer-content-card" id="explorerContent">
@@ -684,9 +684,10 @@
       }
     }
 
-    function switchTab(tabKey) {
+    function switchTab(tabKey, btn) {
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-      event.target.classList.add('active');
+      const targetBtn = btn || (typeof event !== 'undefined' ? (event.target || event.srcElement) : null);
+      if (targetBtn) targetBtn.classList.add('active');
 
       const tabs = ['gurus', 'sahibzade', 'panj_pyare', 'takhts', 'philosophy'];
       tabs.forEach(t => {
@@ -696,7 +697,7 @@
     }
 
     function speakContemplation() {
-      const verse = `{{ contemplation.meaning }}. {{ contemplation.reflection }}`;
+      const verse = {{ ((contemplation.meaning or '') ~ '. ' ~ (contemplation.reflection or '')) | tojson }};
       if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();
         const u = new SpeechSynthesisUtterance(verse);

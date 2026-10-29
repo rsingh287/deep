@@ -754,6 +754,9 @@ def download_and_play_track(query: str) -> Dict[str, Any]:
     }
 
 
+download_song_ytdlp = download_and_play_track
+
+
 def play_shuffle() -> Dict[str, Any]:
     """
     Creates a dynamic, fully-randomized playlist (.m3u) containing all tracks from the user's library,

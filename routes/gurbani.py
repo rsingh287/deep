@@ -37,7 +37,7 @@ def api_get_baanis():
 def api_play_gurbani():
     """Plays requested Baani on PC Speakers."""
     try:
-        data = request.get_json() or {}
+        data = request.get_json(silent=True) or {}
         query = data.get("query") or data.get("baani_id") or "japji_sahib"
         res = sikh_heritage_engine.play_gurbani_audio(query)
         return jsonify(res)
@@ -57,7 +57,7 @@ def api_get_contemplation():
 def api_search_heritage():
     """Searches offline Sikh Heritage knowledge base."""
     try:
-        data = request.get_json() or {}
+        data = request.get_json(silent=True) or {}
         query = data.get("query", "").strip()
         if not query:
             return jsonify({"status": "error", "message": "Query required"}), 400

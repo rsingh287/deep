@@ -44,36 +44,7 @@ def get_nvidia_telemetry():
         pass
     return _gpu_cache
 
-@system_bp.route("/api/mcp/servers", methods=["GET"])
-def get_mcp_servers_system():
-    servers = [
-        {"id": "postgres", "name": "PostgreSQL Relational DB MCP", "status": "ONLINE", "transport": "stdio", "capabilities": ["queries", "schema_inspection", "ast_guard"]},
-        {"id": "filesystem", "name": "Enhanced Precision Filesystem MCP", "status": "ONLINE", "transport": "native+stdio", "capabilities": ["read_lines", "append", "safe_delete", "zip_archive"]},
-        {"id": "memory", "name": "Bi-Temporal Knowledge Graph MCP", "status": "ONLINE", "transport": "native+stdio", "capabilities": ["update_observations", "add_observations", "query_graph"]},
-        {"id": "sequential-thinking", "name": "Sequential Thinking & Planning MCP", "status": "ONLINE", "transport": "stdio", "capabilities": ["multi_step_reasoning", "hypothesis_branching"]},
-        {"id": "playwright", "name": "Playwright Headless Browser MCP", "status": "ONLINE", "transport": "stdio", "capabilities": ["dom_pilot", "screenshot", "form_fill"]},
-        {"id": "pgvector", "name": "PGVector High-Dimensional Semantic MCP", "status": "ONLINE", "transport": "stdio", "capabilities": ["768d_embeddings", "cosine_similarity"]},
-        {"id": "semgrep", "name": "Semgrep AST Security Auditor MCP", "status": "ONLINE", "transport": "stdio", "capabilities": ["sast_scanning", "vulnerability_check"]},
-        {"id": "duckdb", "name": "DuckDB Embedded Analytical Engine MCP", "status": "ONLINE", "transport": "stdio", "capabilities": ["columnar_olap", "parquet_reader"]},
-        {"id": "git", "name": "Git Version Control Autopilot MCP", "status": "ONLINE", "transport": "stdio", "capabilities": ["diff_commit", "branch_autopilot"]},
-        {"id": "fetch", "name": "Web Fetch & HTTP Bridge MCP", "status": "ONLINE", "transport": "stdio", "capabilities": ["safe_scrape", "json_api"]},
-        {"id": "gemini-api-docs", "name": "Google Gemini API Docs MCP", "status": "ONLINE", "transport": "stdio", "capabilities": ["search_docs", "get_doc"]},
-        {"id": "data-agent-kit", "name": "GCP Data Agent Kit MCP", "status": "ONLINE", "transport": "stdio", "capabilities": ["bigquery_sql", "data_pipelines"]},
-        {"id": "notebooks", "name": "Persistent Jupyter Kernel MCP", "status": "ONLINE", "transport": "stdio", "capabilities": ["ipython_runtime", "cell_eval"]},
-        {"id": "visualization", "name": "3D Force & Cytoscape Graph MCP", "status": "ONLINE", "transport": "stdio", "capabilities": ["neural_mesh", "topology_export"]},
-        {"id": "puppeteer", "name": "Puppeteer Native Desktop Pilot MCP", "status": "ONLINE", "transport": "stdio", "capabilities": ["mouse_keyboard", "screen_ocr"]},
-        {"id": "docker", "name": "Self-Healing Docker Daemon MCP", "status": "ONLINE", "transport": "stdio", "capabilities": ["container_lifecycle", "log_tail"]},
-        {"id": "pqc-vault", "name": "Post-Quantum Cryptography Vault MCP", "status": "ONLINE", "transport": "stdio", "capabilities": ["ml_kem_kyber", "aes256_gcm"]},
-        {"id": "ast-refactor", "name": "Python AST Refactor Matrix MCP", "status": "ONLINE", "transport": "stdio", "capabilities": ["tree_rewriter", "dead_code_remover"]},
-        {"id": "hardware-sentinel", "name": "PIC18F85K22 & PICkit 3 Hardware MCP", "status": "ONLINE", "transport": "stdio", "capabilities": ["burn_hex", "lcd_line2_enforcer"]}
-    ]
-    return jsonify({
-        "status": "success",
-        "total_servers": len(servers),
-        "protocol": "Model Context Protocol v2024.11",
-        "ecosystem": "D.E.E.P Sovereign OS",
-        "servers": servers
-    })
+
 
 @system_bp.route("/api/system/info", methods=["GET"])
 def get_system_info():
@@ -499,17 +470,18 @@ def run_macro():
             subprocess.Popen(["explorer.exe", f"https://en.wikipedia.org/wiki/{q}"])
             msg = f"Searched Wikipedia for: {request.json.get('query', '')}"
         elif action == "open_url":
-            url = request.json.get("url", "https://www.google.com")
+            url = request.json.get("url", "https://www.google.com").strip()
+            parsed = urllib.parse.urlparse(url)
+            if parsed.scheme not in ("http", "https"):
+                return jsonify({"success": False, "error": "Invalid URL protocol; only HTTP and HTTPS allowed"}), 400
             try:
                 import webbrowser
-
                 webbrowser.open(url)
-            except Exception:
-                pass
-            try:
-                subprocess.Popen(["cmd.exe", "/c", "start", "", url], shell=True)
-            except Exception:
-                pass
+            except Exception as we:
+                try:
+                    os.startfile(url)
+                except Exception:
+                    return jsonify({"success": False, "error": f"Failed to open URL: {we}"}), 500
             msg = f"Opened URL: {url}"
         else:
             return jsonify({"success": False, "error": "Unknown macro action"}), 400
@@ -931,12 +903,12 @@ def api_war_room_status():
         # 1. Database telemetry
         db_stat = {"connected": False, "tables": 0, "latency_ms": 0}
         t0 = time.time()
+        conn = None
         try:
             conn = db_engine.get_db_connection()
             cur = conn.cursor()
             cur.execute("SELECT count(table_name) FROM information_schema.tables WHERE table_schema='public'")
             t_cnt = cur.fetchone()[0]
-            conn.close()
             db_stat = {
                 "connected": True,
                 "tables": t_cnt,
@@ -945,6 +917,12 @@ def api_war_room_status():
             }
         except Exception as e:
             db_stat["error"] = str(e)
+        finally:
+            if conn:
+                try:
+                    conn.close()
+                except Exception:
+                    pass
             
         # 2. Git status
         git_info = {"branch": "Local Workspace", "last_commit": "HEAD", "dirty_files": 0}
@@ -974,15 +952,40 @@ def api_war_room_status():
             "gpu_model": "NVIDIA RTX A2000 8GB GDDR6 (CUDA 13.2)"
         }
 
+        # Check Ollama status
+        ollama_online = False
+        try:
+            import socket
+            with socket.create_connection(("127.0.0.1", 11434), timeout=0.2):
+                ollama_online = True
+        except Exception:
+            ollama_online = False
+
         # 4. Active Daemons
         daemons = [
             {"name": "PostgreSQL 18.4", "target": "localhost:5432/deep_db", "status": "ONLINE" if db_stat["connected"] else "OFFLINE"},
             {"name": "Flask Cockpit", "target": "localhost:5000", "status": "ONLINE"},
-            {"name": "Ollama Inference", "target": "localhost:11434 (RTX A2000)", "status": "ONLINE"},
+            {"name": "Ollama Inference", "target": "localhost:11434 (RTX A2000)", "status": "ONLINE" if ollama_online else "OFFLINE"},
             {"name": "Cyber Sentinel", "target": "Firewall & Watchdog", "status": "ONLINE"},
             {"name": "Astra Visual Memory", "target": "Screen Capture Engine", "status": "ONLINE"},
             {"name": "TTS Speech Engine", "target": "Windows SAPI Dual-Voice", "status": "ONLINE"}
         ]
+
+        # 5. Resilience Circuit Breakers Matrix
+        circuit_breakers = []
+        try:
+            from hystrix_circuit_breaker import global_circuit_registry
+            circuit_breakers = global_circuit_registry.get_telemetry_matrix()
+        except Exception as e:
+            circuit_breakers = [{"error": str(e)}]
+
+        # 6. Embedded MCU & PICkit 3 Hardware Profile
+        mcu_status = {}
+        try:
+            import embedded_mcu_engine
+            mcu_status = embedded_mcu_engine.get_toolchain_status()
+        except Exception as e:
+            mcu_status = {"error": str(e)}
 
         return jsonify({
             "success": True,
@@ -990,7 +993,67 @@ def api_war_room_status():
             "database": db_stat,
             "git": git_info,
             "hardware": hardware,
-            "daemons": daemons
+            "daemons": daemons,
+            "circuit_breakers": circuit_breakers,
+            "mcu": mcu_status
         })
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
+
+@system_bp.route("/api/system/circuit_breakers", methods=["GET"])
+def api_circuit_breakers_status():
+    """Returns real-time Netflix Hystrix resilience telemetry across all services."""
+    try:
+        from hystrix_circuit_breaker import global_circuit_registry
+        matrix = global_circuit_registry.get_telemetry_matrix()
+        return jsonify({"success": True, "resilience_matrix": matrix})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@system_bp.route("/api/system/circuit_breakers/trip", methods=["POST"])
+def api_trip_circuit_breaker():
+    """Fault-injection endpoint: manually trips a circuit breaker to OPEN."""
+    try:
+        from flask import request
+        from hystrix_circuit_breaker import global_circuit_registry
+        data = request.json or {}
+        name = data.get("name")
+        breaker = global_circuit_registry.get(name)
+        if not breaker:
+            return jsonify({"success": False, "error": f"Circuit breaker '{name}' not found"}), 404
+        breaker.trip()
+        return jsonify({
+            "success": True,
+            "message": f"Circuit breaker '{name}' tripped to OPEN",
+            "breaker": breaker.get_status()
+        })
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@system_bp.route("/api/system/circuit_breakers/reset", methods=["POST"])
+def api_reset_circuit_breaker():
+    """Recovers a circuit breaker back to CLOSED state."""
+    try:
+        from flask import request
+        from hystrix_circuit_breaker import global_circuit_registry
+        data = request.json or {}
+        name = data.get("name")
+        breaker = global_circuit_registry.get(name)
+        if not breaker:
+            return jsonify({"success": False, "error": f"Circuit breaker '{name}' not found"}), 404
+        breaker.reset()
+        return jsonify({
+            "success": True,
+            "message": f"Circuit breaker '{name}' reset to CLOSED",
+            "breaker": breaker.get_status()
+        })
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+
+
+
+

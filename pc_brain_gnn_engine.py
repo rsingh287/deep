@@ -58,7 +58,7 @@ def generate_dynamic_pc_brain_gnn():
         mermaid_lines.append(f'    {clean_u} -->|{d.get("relation", "connects")}| {clean_v}')
         
     mermaid_lines.append("```")
-    mermaid_graph = "\\n".join(mermaid_lines)
+    mermaid_graph = "\n".join(mermaid_lines)
 
     report = f"""🕸️ **Dynamic Graph RAG — PC Workstation Graph**
 
@@ -80,6 +80,8 @@ def generate_dynamic_pc_brain_gnn():
 ✅ **Dynamic Graph Updated!** Ask any systemic impact question to traverse relations.
 """
     return report
+
+generate_pc_brain_gnn = generate_dynamic_pc_brain_gnn
 
 if __name__ == "__main__":
     print(generate_dynamic_pc_brain_gnn())

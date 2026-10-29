@@ -1,0 +1,72 @@
+version: '3.8'
+
+volumes:
+  pentagi-data:
+    driver: local
+  pentagi-ssl:
+    driver: local
+  pentagi-postgres-data:
+    driver: local
+
+networks:
+  pentagi-net:
+    driver: bridge
+    name: pentagi-network
+
+services:
+  # -------------------------------------------------------------
+  # PostgreSQL with pgvector (Persistent memory for PentAGI agents)
+  # -------------------------------------------------------------
+  pgvector:
+    image: pgvector/pgvector:pg16
+    container_name: pentagi-pgvector
+    restart: unless-stopped
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB:-pentagi}
+      - POSTGRES_USER=${POSTGRES_USER:-pentagi}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-pentagi_secure_pass_2026}
+    volumes:
+      - pentagi-postgres-data:/var/lib/postgresql/data
+    networks:
+      - pentagi-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pentagi -d pentagi"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  # -------------------------------------------------------------
+  # PentAGI Multi-Agent Offensive Security Framework (VXControl)
+  # -------------------------------------------------------------
+  pentagi:
+    image: vxcontrol/pentagi:latest
+    container_name: pentagi
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8443:8443"
+    depends_on:
+      pgvector:
+        condition: service_healthy
+    environment:
+      - DEBUG=false
+      - PENTAGI_LISTEN_PORT=8443
+      - DB_HOST=pgvector
+      - DB_PORT=5432
+      - DB_NAME=${POSTGRES_DB:-pentagi}
+      - DB_USER=${POSTGRES_USER:-pentagi}
+      - DB_PASSWORD=${POSTGRES_PASSWORD:-pentagi_secure_pass_2026}
+      # LLM Providers (Shared with D.E.E.P)
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-}
+      - OPEN_AI_KEY=${OPENAI_API_KEY:-}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+      - DEEPSEEK_API_KEY=${DEEPSEEK_API_KEY:-}
+      # Local Ollama fallback on host
+      - OLLAMA_HOST=http://host.docker.internal:11434
+    volumes:
+      - pentagi-data:/data
+      - pentagi-ssl:/ssl
+      - /var/run/docker.sock:/var/run/docker.sock
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - pentagi-net

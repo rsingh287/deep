@@ -21,9 +21,11 @@ def export_document(
     title: str,
     paragraphs: list,
     output_dir: str,
-    formats: list = ["docx", "pdf", "md", "html", "pptx"],
+    formats: list = None,
 ) -> dict:
     """Exports a document in multiple formats."""
+    if formats is None:
+        formats = ["docx", "pdf", "md", "html", "pptx"]
     os.makedirs(output_dir, exist_ok=True)
     safe_title = "".join([c if c.isalnum() else "_" for c in title])
     base_path = os.path.join(output_dir, safe_title)
@@ -72,13 +74,15 @@ def export_document(
             pdf = PDFExporter()
             pdf.add_page()
             pdf.set_font("Arial", "B", 16)
-            pdf.cell(0, 10, title, ln=True, align="C")
+            safe_title_text = str(title).encode("latin-1", "replace").decode("latin-1")
+            pdf.cell(0, 10, safe_title_text, ln=True, align="C")
             pdf.ln(10)
 
             pdf.set_font("Arial", "", 11)
             for p in paragraphs:
-                # Add simple support for basic text, ignoring bold/italic for now to keep it safe
-                pdf.multi_cell(0, 8, p)
+                # Sanitize characters outside latin-1 to keep basic core Arial fonts safe
+                safe_p = str(p).encode("latin-1", "replace").decode("latin-1")
+                pdf.multi_cell(0, 8, safe_p)
                 pdf.ln(4)
 
             pdf_path = f"{base_path}.pdf"

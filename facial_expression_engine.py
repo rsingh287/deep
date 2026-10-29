@@ -15,37 +15,16 @@ class FacialExpressionEngine:
     def analyze_facial_expression(self):
         """Captures camera frame (or active stream buffer), detects human face landmarks & mouth/eye geometry, and classifies facial expressions/emotions."""
         from mjpeg_stream_engine import LiveMJPEGStreamEngine
+        from shared_memory_frame_buffer import acquire_vision_frame
 
         telemetry = LiveMJPEGStreamEngine.get_latest_telemetry()
-        frame = LiveMJPEGStreamEngine.get_latest_frame()
+        frame = acquire_vision_frame(self.camera_index)
 
         if frame is None:
-            cap = None
-            if sys.platform.startswith("win"):
-                try:
-                    cap = cv2.VideoCapture(self.camera_index, cv2.CAP_DSHOW)
-                except Exception:
-                    cap = cv2.VideoCapture(self.camera_index)
-            else:
-                cap = cv2.VideoCapture(self.camera_index)
-
-            if cap is None or not cap.isOpened():
-                cap = cv2.VideoCapture(0)
-
-            if not cap.isOpened():
-                return {
-                    "success": False,
-                    "error": "Camera feed not accessible for facial expression analysis",
-                }
-
-            ret, frame = cap.read()
-            cap.release()
-
-            if not ret or frame is None:
-                return {
-                    "success": False,
-                    "error": "Failed to capture live camera frame",
-                }
+            return {
+                "success": False,
+                "error": "Camera feed not accessible (hardware busy or camera unattached)",
+            }
 
         detected_emotion_en = telemetry.get("emotion", "NEUTRAL")
         face_count = telemetry.get(

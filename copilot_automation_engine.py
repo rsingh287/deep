@@ -425,6 +425,17 @@ def dispatch_copilot_command(prompt: str) -> dict:
     Returns result dict if matched, or None if prompt should fall through to LLM.
     """
     low = (prompt or "").lower().strip()
+    words = low.split()
+
+    # Guard: Never intercept long prompts or coding/generation requests as voice copilot shortcuts
+    coding_or_generation_signals = [
+        "act as", "build a", "create a", "write a", "write code", "generate a",
+        "make a website", "create website", "build website", "html", "css", "three.js",
+        "prompt for", "how do i", "explain", "code for", "function", "class"
+    ]
+    if len(words) > 16 or any(sig in low for sig in coding_or_generation_signals):
+        return None
+
     # Normalize phonetic variations
     low = re.sub(r'\b(yarvis|jarves|jervis|yarves)\b', 'jarvis', low)
 
@@ -455,25 +466,30 @@ def dispatch_copilot_command(prompt: str) -> dict:
 
     # 3. F.R.I.D.A.Y. Specific Workflows
     # RAM Purge
-    if (("ram" in low or "memory" in low) and any(w in low for w in ["purge", "free", "clean", "reclaim", "boost", "clear"])) or (
+    if (("ram" in low or "memory" in low) and any(w in low for w in ["purge", "free memory", "free ram", "clean ram", "reclaim", "boost ram", "clear ram"])) or (
         "friday" in low and any(w in low for w in ["purge", "free memory", "free ram", "ram boost", "boost ram"])
     ):
         return friday_ram_purge()
 
-    # Security Sweep
-    if (("security" in low or "firewall" in low or "socket" in low or "perimeter" in low) and any(w in low for w in ["sweep", "scan", "check", "audit"])) or (
-        "friday" in low and any(w in low for w in ["security", "sweep", "perimeter", "scan network", "defense"])
+    # Security Sweep (Specific triggers only)
+    sweep_phrases = [
+        "security sweep", "perimeter sweep", "network sweep", "scan network",
+        "check firewall", "check sockets", "audit sockets", "security audit",
+        "friday security", "friday sweep", "friday perimeter", "defense sweep"
+    ]
+    if any(phrase in low for phrase in sweep_phrases) or (
+        "friday" in low and any(w in low for w in ["sweep", "perimeter", "scan network", "defense level"])
     ):
         return friday_security_sweep()
 
     # Process Hunt
-    if ("process" in low and any(w in low for w in ["hunt", "heavy", "rogue", "eating", "hogs", "kill", "find"])) or any(
+    if ("process" in low and any(w in low for w in ["hunt", "heavy", "rogue", "eating", "hogs", "kill"])) or any(
         k in low for k in ["who is eating cpu", "what is eating ram", "top processes", "resource hogs", "heavy processes"]
     ):
         return friday_process_hunt()
 
     # Lockdown
-    if (any(w in low for w in ["lock", "lockdown"]) and any(w in low for w in ["workstation", "pc", "desktop", "system", "screen", "computer"])) or (
+    if (any(w in low for w in ["lockdown", "emergency lock"])) or (
         "friday" in low and any(w in low for w in ["lock", "lockdown", "emergency lock"])
     ):
         return friday_lockdown()

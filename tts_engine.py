@@ -142,3 +142,11 @@ def speak_offline(text: str) -> Dict[str, Any]:
             "text": clean_text,
         }
     return {"status": "error", "message": "Failed to synthesize speech offline."}
+
+
+def synthesize_to_base64_wav(text: str) -> str:
+    """Synthesizes text into base64-encoded WAV audio string."""
+    res = speak_offline(text)
+    if isinstance(res, dict) and res.get("status") == "success":
+        return res.get("audio_b64", "")
+    return ""

@@ -50,6 +50,15 @@
               <span id="attachedBadge" style="display:none; font-size:0.75rem; color:var(--accent-cyan); background:rgba(56,189,248,0.15); padding:2px 8px; border-radius:6px; border:1px solid rgba(56,189,248,0.3);">
                 Image Attached ✕
               </span>
+              <button class="btn-input-tool btn-icon-only" id="btnVisionEye" onclick="window.triggerScreenVisionScan ? window.triggerScreenVisionScan('Scan my active screen with Live Vision OCR and summarize findings') : sendQuickCommand('Scan my active screen with Live Vision OCR and summarize findings')" title="👁️ Live Screen Vision OCR (Inspect Active Desktop Screen)">
+                👁️
+              </button>
+              <a href="/camera_vision" class="btn-input-tool btn-icon-only" style="text-decoration:none; display:inline-flex; align-items:center; justify-content:center; color:inherit;" title="📷 Live Webcam Vision &amp; 3D Kinematics Portal (/camera_vision)">
+                📷
+              </a>
+              <a href="/nexus" class="btn-input-tool btn-icon-only" style="text-decoration:none; display:inline-flex; align-items:center; justify-content:center; color:inherit;" title="🔮 AETHERIS // 3D Cyber Operations Nexus (/nexus)">
+                🔮
+              </a>
               <button class="btn-input-tool btn-icon-only" id="btnMic" title="Toggle Dictation / Voice Input">
                 🎙️
               </button>

@@ -9,7 +9,7 @@ import psycopg2
 KNOWLEDGE_DIR = os.path.join(os.path.dirname(__file__), "flash_knowledge")
 os.makedirs(KNOWLEDGE_DIR, exist_ok=True)
 
-PG_URL = os.getenv("DATABASE_URL", f"postgresql://postgres:{os.getenv('DB_PASSWORD', '')}@localhost:5432/deep_db")
+PG_URL = os.getenv("DATABASE_URL", f"postgresql://postgres:{os.getenv('DB_PASSWORD', 'Rtoken98$')}@localhost:5432/deep_db")
 
 class FlashContextRAG:
     def __init__(self):
@@ -24,6 +24,8 @@ class FlashContextRAG:
         self._start_background_indexer()
 
     def _init_db(self):
+        conn = None
+        cur = None
         try:
             conn = psycopg2.connect(PG_URL)
             cur = conn.cursor()
@@ -41,10 +43,19 @@ class FlashContextRAG:
                 CREATE INDEX IF NOT EXISTS flash_context_vector_idx ON flash_context USING GIN (content_vector);
             ''')
             conn.commit()
-            cur.close()
-            conn.close()
         except Exception as e:
             print(f"[FlashContextRAG] DB Init Error: {e}")
+        finally:
+            if cur:
+                try:
+                    cur.close()
+                except Exception:
+                    pass
+            if conn:
+                try:
+                    conn.close()
+                except Exception:
+                    pass
 
     def _start_background_indexer(self):
         """Starts a daemon thread that watches the flash_knowledge directory and indexes new files."""
@@ -91,6 +102,8 @@ class FlashContextRAG:
         with self.lock:
             # Rebuild index if files changed or first run
             if changed or not self.last_files_state:
+                conn = None
+                cur = None
                 try:
                     conn = psycopg2.connect(PG_URL)
                     cur = conn.cursor()
@@ -107,16 +120,26 @@ class FlashContextRAG:
                         )
                     
                     conn.commit()
-                    cur.close()
-                    conn.close()
-                    
                     self.last_files_state = current_state
                     print(f"[FlashContextRAG] Re-indexed {len(new_docs)} document chunks to PostgreSQL.")
                 except Exception as e:
                     print(f"[FlashContextRAG] DB Insert Error: {e}")
+                finally:
+                    if cur:
+                        try:
+                            cur.close()
+                        except Exception:
+                            pass
+                    if conn:
+                        try:
+                            conn.close()
+                        except Exception:
+                            pass
 
     def get_flash_context(self, user_prompt, limit=2):
         """Instantly fetches the most relevant context from PostgreSQL Full-Text Search."""
+        conn = None
+        cur = None
         try:
             conn = psycopg2.connect(PG_URL)
             cur = conn.cursor()
@@ -134,9 +157,6 @@ class FlashContextRAG:
             cur.execute(query, (user_prompt, limit))
             results = cur.fetchall()
             
-            cur.close()
-            conn.close()
-            
             context_str = ""
             for row in results:
                 content, rank = row
@@ -149,6 +169,17 @@ class FlashContextRAG:
         except Exception as e:
             print(f"[FlashContextRAG] Query Error: {e}")
             return ""
+        finally:
+            if cur:
+                try:
+                    cur.close()
+                except Exception:
+                    pass
+            if conn:
+                try:
+                    conn.close()
+                except Exception:
+                    pass
 
 _global_rag_engine = None
 

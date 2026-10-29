@@ -24,6 +24,7 @@ app.add_middleware(
 class SkillRequest(BaseModel):
     skill_name: str
     prompt: str
+    model: str = ""
 
 
 class SkillResponse(BaseModel):
@@ -33,6 +34,10 @@ class SkillResponse(BaseModel):
 
 
 import os
+import ipaddress
+import urllib.parse
+
+OLLAMA_BASE_URL = os.environ.get("OLLAMA_HOST", "http://localhost:11434")
 
 DEEP_WORKSPACE = os.path.join(
     os.path.dirname(os.path.abspath(__file__)), "generated_apps", "deep_workspace"
@@ -40,8 +45,32 @@ DEEP_WORKSPACE = os.path.join(
 os.makedirs(DEEP_WORKSPACE, exist_ok=True)
 
 
+def is_safe_fetch_url(target_url: str) -> bool:
+    try:
+        parsed = urllib.parse.urlparse(target_url)
+        if parsed.scheme not in ("http", "https"):
+            return False
+        hostname = parsed.hostname
+        if not hostname:
+            return False
+        if hostname.lower() in ("localhost", "127.0.0.1", "::1"):
+            return False
+        try:
+            ip = ipaddress.ip_address(hostname)
+            if ip.is_private or ip.is_loopback or ip.is_link_local:
+                return False
+        except ValueError:
+            pass
+        return True
+    except Exception:
+        return False
+
+
 def execute_ollama_prompt(model: str, prompt: str, system: str = "") -> str:
-    url = "http://localhost:11434/api/chat"
+    if not model:
+        model = os.environ.get("OLLAMA_MODEL", "qwen2.5-coder:7b")
+
+    url = f"{OLLAMA_BASE_URL}/api/chat"
 
     tools = [
         {
@@ -188,27 +217,34 @@ def execute_ollama_prompt(model: str, prompt: str, system: str = "") -> str:
                             tool_result = f"Successfully created directory {safe_path}"
                     elif func_name == "fetch_webpage":
                         url = args.get("url", "")
-                        try:
-                            resp = requests.get(url, timeout=30)
-                            resp.raise_for_status()
-                            soup = BeautifulSoup(resp.text, "html.parser")
-                            for script in soup(["script", "style"]):
-                                script.extract()
-                            text = soup.get_text(separator=" ", strip=True)
-                            tool_result = text[:10000]  # Limit to 10k chars
-                        except Exception as e:
-                            tool_result = f"Error fetching webpage: {e}"
+                        if not is_safe_fetch_url(url):
+                            tool_result = "Security Error: Access to private or local loopback networks is blocked."
+                        else:
+                            try:
+                                resp = requests.get(url, timeout=30)
+                                resp.raise_for_status()
+                                soup = BeautifulSoup(resp.text, "html.parser")
+                                for script in soup(["script", "style"]):
+                                    script.extract()
+                                text = soup.get_text(separator=" ", strip=True)
+                                tool_result = text[:10000]  # Limit to 10k chars
+                            except Exception as e:
+                                tool_result = f"Error fetching webpage: {e}"
                     elif func_name == "execute_git_command":
                         cmd = args.get("command", "")
                         try:
-                            if not cmd.startswith("git "):
-                                cmd = "git " + cmd
+                            import shlex
+                            parts = shlex.split(cmd, posix=False) if os.name == "nt" else shlex.split(cmd)
+                            if not parts:
+                                raise ValueError("Empty git command.")
+                            if parts[0].lower() != "git":
+                                parts.insert(0, "git")
                             result = subprocess.run(
-                                cmd,
+                                parts,
                                 cwd=DEEP_WORKSPACE,
                                 capture_output=True,
                                 text=True,
-                                shell=True,
+                                shell=False,
                                 timeout=120,
                             )
                             tool_result = (
@@ -235,6 +271,9 @@ def run_web_architect(prompt: str) -> str:
     """Invokes the web architect skill to build a website."""
     # We can import the existing logic or just call the function if it's in the same dir
     try:
+        import importlib
+        import web_architect_skill
+        importlib.reload(web_architect_skill)
         from web_architect_skill import build_premium_website
 
         # extract a topic or project name from the prompt
@@ -252,7 +291,7 @@ async def execute_skill(req: SkillRequest):
 
     print(f"[Skills API] Received request for skill: '{skill}' with prompt: '{prompt}'")
 
-    if skill == "web-architect":
+    if skill in ["web-architect", "web-architect-pro-max", "frontend-design", "tasteskill-anti-slop", "ui-ux-pro-max"]:
         result = run_web_architect(prompt)
         return SkillResponse(status="success", result=result)
 
@@ -306,11 +345,13 @@ async def execute_skill(req: SkillRequest):
             None,
         )
 
+        target_model = req.model.strip() if req.model else os.environ.get("OLLAMA_MODEL", "qwen2.5-coder:7b")
+
         if matched_skill:
             print(f"[Skills API] Skill '{matched_skill['name']}' loaded from registry!")
             description = matched_skill.get("description", "")
             system_prompt = f"You are the '{matched_skill['name']}' expert. Your capabilities: {description}\nAddress the user's request using these capabilities."
-            result = execute_ollama_prompt("qwen2.5:7b", prompt, system=system_prompt)
+            result = execute_ollama_prompt(target_model, prompt, system=system_prompt)
             return SkillResponse(
                 status="success", result=result, data={"skill_info": matched_skill}
             )
@@ -318,9 +359,11 @@ async def execute_skill(req: SkillRequest):
     except Exception as e:
         print(f"[Skills API] Warning: Could not query registry: {e}")
 
+    target_model = req.model.strip() if req.model else os.environ.get("OLLAMA_MODEL", "qwen2.5-coder:7b")
+
     if skill == "general":
         # General chat/assistant fallback
-        result = execute_ollama_prompt("qwen2.5:7b", prompt)
+        result = execute_ollama_prompt(target_model, prompt)
         return SkillResponse(status="success", result=result)
 
     else:
@@ -328,7 +371,7 @@ async def execute_skill(req: SkillRequest):
         system_prompt = (
             f"You are acting as the {skill} skill. Assist the user with their request."
         )
-        result = execute_ollama_prompt("qwen2.5:7b", prompt, system=system_prompt)
+        result = execute_ollama_prompt(target_model, prompt, system=system_prompt)
         return SkillResponse(status="success", result=result)
 
 

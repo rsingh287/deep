@@ -10,7 +10,7 @@
  *   RH0..RH7 --> LCD Data Lines D0..D7 (PORTH, 8-Bit Bus)
  *   RE1      --> LCD Enable Line (EN)
  *   RE0      --> LCD RS (Register Select) Line
- *   RA4      --> LCD Backlight Control (High = ON)
+ *   RA4      --> LCD Backlight Control (Active Low: 0 = ON, 1 = OFF)
  * ===================================================================
  */
 
@@ -18,7 +18,8 @@
 #include <stdint.h>
 
 #pragma config XINST = OFF      // Extended Instruction Set Disabled
-#pragma config FOSC = HS1       // High-Speed Crystal Oscillator (4.9152 MHz)
+#pragma config FOSC = HS2       // High-Speed Crystal Oscillator (4.9152 MHz)
+#pragma config SOSCSEL = DIG    // Secondary Oscillator Pins as Digital I/O (frees RC0/RC1)
 #pragma config WDTEN = OFF      // Watchdog Timer Disabled
 #pragma config CP0 = OFF        // Code Protect Disabled
 #pragma config BOREN = ON       // Brown-out Reset Enabled
@@ -32,7 +33,7 @@
 #define LCD_DATA_TRIS TRISH      // PORTH Data Direction Register
 #define LCD_RS        LATEbits.LATE0 // RE0 -> RS (0=Command, 1=Data)
 #define LCD_EN        LATEbits.LATE1 // RE1 -> EN (Enable Pulse)
-#define LCD_BACKLIGHT LATAbits.LATA4 // RA4 -> Backlight (1=ON, 0=OFF)
+#define LCD_BACKLIGHT LATAbits.LATA4 // RA4 -> Backlight (0=ON, 1=OFF)
 
 // -------------------------------------------------------------------
 // LCD HARDWARE LOW-LEVEL DRIVER SUBROUTINES
@@ -81,7 +82,7 @@ void LCD_Init(void) {
     
     LCD_RS = 0;
     LCD_EN = 0;
-    LCD_BACKLIGHT = 1;    // Turn ON LCD Backlight
+    LCD_BACKLIGHT = 0;    // Turn ON LCD Backlight (Active Low)
     
     __delay_ms(50);       // Wait for LCD Controller Power-Up
     
@@ -99,11 +100,10 @@ void LCD_Init(void) {
 void main(void) {
     LCD_Init();
     
-    LCD_Set_Cursor(1, 1);
-    LCD_String("PIC18F85K22 MCU");
-    
+    // STRICT DIRECTIVE: Line 1 (0x80..0x8F) is broken/unreadable on this board.
+    // All UI and status must be rendered solely on Line 2 (0xC0..0xCF, max 16 chars).
     LCD_Set_Cursor(2, 1);
-    LCD_String("LCD_PT2 4.9152M");
+    LCD_String("D.E.E.P 4.9152M");
     
     while (1) {
         // Main Loop

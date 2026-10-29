@@ -71,9 +71,56 @@ def get_media_status():
         return jsonify({"success": False, "error": str(e)})
 
 
+# ==============================================================================
+# Embedded MCU & PICkit 3 1-Click Toolchain Routes (PIC18F85K22)
+# ==============================================================================
+
+@hardware_bp.route("/api/hardware/mcu/status", methods=["GET"])
+@hardware_bp.route("/api/mcu/status", methods=["GET"])
+def get_mcu_toolchain_status():
+    """Returns detected status of xc8-cc compiler, ipecmd, and MPLABX projects."""
+    try:
+        import embedded_mcu_engine
+        return jsonify(embedded_mcu_engine.get_toolchain_status())
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
 
 
+@hardware_bp.route("/api/hardware/mcu/audit", methods=["POST"])
+def audit_mcu_firmware():
+    """Runs pre-flash static analysis on C source files for hardware directive compliance."""
+    try:
+        from flask import request
+        import embedded_mcu_engine
+        data = request.json or {}
+        project = data.get("project", "digital_lock.X")
+        return jsonify(embedded_mcu_engine.audit_project_firmware(project))
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
 
 
+@hardware_bp.route("/api/hardware/mcu/compile", methods=["POST"])
+def compile_mcu_firmware():
+    """Compiles C firmware into a hex artifact via xc8-cc and DFP pack."""
+    try:
+        from flask import request
+        import embedded_mcu_engine
+        data = request.json or {}
+        project = data.get("project", "digital_lock.X")
+        return jsonify(embedded_mcu_engine.compile_project(project))
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
 
 
+@hardware_bp.route("/api/hardware/mcu/flash", methods=["POST"])
+def flash_mcu_firmware():
+    """Flashes target PIC18F85K22 over USB mutex via PICkit 3 and ipecmd."""
+    try:
+        from flask import request
+        import embedded_mcu_engine
+        data = request.json or {}
+        project = data.get("project", "digital_lock.X")
+        hex_path = data.get("hex_path")
+        return jsonify(embedded_mcu_engine.flash_project(project, hex_path=hex_path))
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500

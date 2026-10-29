@@ -23,14 +23,14 @@ def init_job_db():
         cursor = conn.cursor()
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS job_applications (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                id SERIAL PRIMARY KEY,
                 job_title TEXT NOT NULL,
                 company TEXT NOT NULL,
                 location TEXT,
                 url TEXT UNIQUE,
                 cover_letter TEXT,
                 status TEXT DEFAULT 'Applied',
-                timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+                timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         """)
 

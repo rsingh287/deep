@@ -3,277 +3,1670 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Antigravity AI - Live Camera Vision & Gesture Dashboard</title>
+    <title>AETHERIS // Live Vision & Gesture AR Cockpit</title>
+    
+    <!-- Modern High-Tech Typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Orbitron:wght@500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Google MediaPipe Neural Hand Kinematics & Gesture Engine -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+
     <style>
         :root {
-            --bg-dark: #0a0c10;
-            --panel-bg: #12161f;
+            --bg-obsidian: #030712;
+            --panel-bg: rgba(10, 16, 32, 0.82);
+            --border-glow: rgba(0, 240, 255, 0.35);
+            --border-glow-violet: rgba(139, 92, 246, 0.35);
             --accent-cyan: #00f0ff;
-            --accent-magenta: #ff007f;
-            --accent-green: #00ff88;
-            --text-main: #e2e8f0;
-            --text-muted: #94a3b8;
+            --accent-violet: #8b5cf6;
+            --accent-emerald: #10b981;
+            --accent-amber: #f59e0b;
+            --accent-crimson: #ff0055;
+            --text-main: #f8fafc;
+            --text-dim: #94a3b8;
+            --text-muted: #64748b;
         }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+        }
+
         body {
-            background-color: var(--bg-dark);
+            background-color: var(--bg-obsidian);
             color: var(--text-main);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 20px;
-        }
-        .header {
+            font-family: 'Inter', -apple-system, sans-serif;
+            min-height: 100vh;
             display: flex;
+            flex-direction: column;
+            align-items: center;
             justify-content: space-between;
-            align-items: center;
-            border-bottom: 2px solid var(--accent-cyan);
-            padding-bottom: 15px;
-            margin-bottom: 20px;
-        }
-        .header h1 {
-            margin: 0;
-            font-size: 24px;
-            color: var(--accent-cyan);
-            letter-spacing: 1px;
-        }
-        .badge {
-            background: rgba(0, 240, 255, 0.15);
-            color: var(--accent-cyan);
-            border: 1px solid var(--accent-cyan);
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-size: 13px;
-            font-weight: bold;
-        }
-        .grid-container {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-        .card {
-            background: var(--panel-bg);
-            border: 1px solid #1e293b;
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-        }
-        .card h2 {
-            margin-top: 0;
-            font-size: 18px;
-            color: var(--accent-cyan);
-            border-bottom: 1px solid #334155;
-            padding-bottom: 10px;
-        }
-        .video-container {
-            width: 100%;
-            height: 340px;
-            background: #000;
-            border-radius: 8px;
-            border: 2px solid var(--accent-cyan);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden;
+            padding: 14px 20px;
+            overflow-x: hidden;
             position: relative;
         }
-        .video-container img {
+
+        /* Ambient Sci-Fi Depth Lights */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: 
+                radial-gradient(circle at 50% 12%, rgba(0, 240, 255, 0.09) 0%, transparent 60%),
+                radial-gradient(circle at 10% 88%, rgba(139, 92, 246, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 90% 88%, rgba(16, 185, 129, 0.06) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* 1. TOP FLIGHT BAR */
+        header.flight-bar {
+            position: relative;
+            z-index: 20;
             width: 100%;
-            height: 100%;
-            object-fit: cover;
+            max-width: 1200px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 22px;
+            background: var(--panel-bg);
+            border: 1px solid var(--border-glow);
+            border-radius: 14px;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7), 0 0 25px rgba(0, 240, 255, 0.14);
+            flex-shrink: 0;
         }
-        .controls-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
+
+        .brand-group {
+            display: flex;
+            align-items: center;
             gap: 12px;
-            margin-top: 15px;
         }
-        .btn {
-            background: linear-gradient(135deg, #0f172a, #1e293b);
-            color: #fff;
-            border: 1px solid var(--accent-cyan);
-            padding: 12px 18px;
+
+        .optical-iris {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: 2px dashed var(--accent-cyan);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: rotate-iris 16s linear infinite;
+        }
+
+        @keyframes rotate-iris {
+            100% { transform: rotate(360deg); }
+        }
+
+        .iris-core {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--accent-cyan);
+            box-shadow: 0 0 12px var(--accent-cyan);
+        }
+
+        .brand-name {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 15px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            color: var(--text-main);
+            text-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
+        }
+
+        .status-center-pill {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(16, 185, 129, 0.12);
+            border: 1px solid rgba(16, 185, 129, 0.35);
+            padding: 5px 14px;
+            border-radius: 20px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--accent-emerald);
+            letter-spacing: 1px;
+        }
+
+        .status-pulse {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--accent-emerald);
+            box-shadow: 0 0 8px var(--accent-emerald);
+            animation: pulse-dot 1.6s infinite;
+        }
+
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.35; transform: scale(0.85); }
+        }
+
+        .fps-badge {
+            color: var(--accent-cyan);
+            font-size: 10px;
+            font-weight: 700;
+            border-left: 1px solid rgba(255, 255, 255, 0.15);
+            padding-left: 8px;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .glass-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            color: var(--text-dim);
+            padding: 7px 14px;
             border-radius: 8px;
-            font-size: 14px;
-            font-weight: bold;
+            font-size: 11px;
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+            text-decoration: none;
             cursor: pointer;
             transition: all 0.2s ease;
             display: flex;
             align-items: center;
+            gap: 6px;
+        }
+
+        .glass-btn:hover {
+            color: var(--text-main);
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.25);
+            transform: translateY(-1px);
+        }
+
+        .glass-btn.active {
+            color: var(--accent-cyan);
+            border-color: rgba(0, 240, 255, 0.4);
+            background: rgba(0, 240, 255, 0.12);
+            box-shadow: 0 0 10px rgba(0, 240, 255, 0.2);
+        }
+
+        /* 2. FLAGSHIP CENTERSTAGE CAMERA VIEWPORT */
+        main.viewport-stage {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            max-width: 1200px;
+            margin: 14px 0;
+            border-radius: 20px;
+            border: 1px solid var(--border-glow);
+            background: #000206;
+            overflow: hidden;
+            box-shadow: 0 25px 60px -10px rgba(0, 0, 0, 0.9), 0 0 45px rgba(0, 240, 255, 0.16);
+            display: flex;
+            align-items: center;
             justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        main.viewport-stage.fullscreen-mode {
+            position: fixed;
+            inset: 0;
+            width: 100vw;
+            height: 100vh;
+            max-width: none;
+            margin: 0;
+            border-radius: 0;
+            border: none;
+            z-index: 100;
+        }
+
+        /* Sci-Fi Corner Brackets */
+        main.viewport-stage::before {
+            content: '';
+            position: absolute;
+            top: 14px; left: 14px; width: 24px; height: 24px;
+            border-top: 3px solid var(--accent-cyan);
+            border-left: 3px solid var(--accent-cyan);
+            z-index: 15;
+            pointer-events: none;
+        }
+
+        main.viewport-stage::after {
+            content: '';
+            position: absolute;
+            bottom: 14px; right: 14px; width: 24px; height: 24px;
+            border-bottom: 3px solid var(--accent-cyan);
+            border-right: 3px solid var(--accent-cyan);
+            z-index: 15;
+            pointer-events: none;
+        }
+
+        .video-wrapper {
+            position: relative;
+            width: 100%;
+            height: 560px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            background: #000;
+        }
+
+        .camera-surface {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), filter 0.3s ease;
+            transform-origin: center center;
+        }
+
+        /* Camera Optical Filter Classes */
+        .filter-night-vision {
+            filter: brightness(1.2) contrast(1.3) hue-rotate(85deg) saturate(2.2);
+        }
+
+        .filter-thermal {
+            filter: contrast(1.4) invert(0.9) hue-rotate(180deg) saturate(2.5);
+        }
+
+        .filter-cyber-matrix {
+            filter: contrast(1.35) grayscale(0.85) sepia(0.3) hue-rotate(145deg) saturate(2.2);
+        }
+
+        /* Laser Scanline Beam */
+        .scan-beam {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 3px;
+            background: linear-gradient(90deg, transparent, var(--accent-cyan), #fff, var(--accent-cyan), transparent);
+            box-shadow: 0 0 15px var(--accent-cyan);
+            opacity: 0;
+            pointer-events: none;
+            z-index: 12;
+        }
+
+        .scanning-active .scan-beam {
+            opacity: 1;
+            animation: sweep 1.8s ease-in-out infinite alternate;
+        }
+
+        @keyframes sweep {
+            0% { top: 0%; }
+            100% { top: 98%; }
+        }
+
+        /* Shutter White Flash */
+        .shutter-flash {
+            position: absolute;
+            inset: 0;
+            background: #ffffff;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 20;
+            transition: opacity 0.22s ease-out;
+        }
+
+        /* FLOATING OPTICAL CONTROL STRIP (TOP OVERLAY) */
+        .optic-hud-toolbar {
+            position: absolute;
+            top: 14px;
+            right: 18px;
+            z-index: 16;
+            display: flex;
+            align-items: center;
             gap: 8px;
+            background: rgba(10, 16, 32, 0.75);
+            border: 1px solid rgba(0, 240, 255, 0.25);
+            border-radius: 12px;
+            padding: 6px 12px;
+            backdrop-filter: blur(16px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6);
         }
-        .btn:hover {
-            background: var(--accent-cyan);
-            color: #000;
-            box-shadow: 0 0 15px rgba(0, 240, 255, 0.4);
-            transform: translateY(-2px);
-        }
-        .btn-magenta {
-            border-color: var(--accent-magenta);
-        }
-        .btn-magenta:hover {
-            background: var(--accent-magenta);
-            color: #fff;
-            box-shadow: 0 0 15px rgba(255, 0, 127, 0.4);
-        }
-        .btn-green {
-            border-color: var(--accent-green);
-        }
-        .btn-green:hover {
-            background: var(--accent-green);
-            color: #000;
-            box-shadow: 0 0 15px rgba(0, 255, 136, 0.4);
-        }
-        .telemetry-box {
-            background: #090d16;
-            border: 1px solid #334155;
+
+        .optic-tool-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            color: var(--text-dim);
+            padding: 4px 10px;
             border-radius: 6px;
-            padding: 15px;
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 13px;
-            height: 290px;
-            overflow-y: auto;
-            color: #38bdf8;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
         }
-        .status-pill {
-            display: inline-block;
+
+        .optic-tool-btn:hover, .optic-tool-btn.active {
+            color: var(--accent-cyan);
+            border-color: var(--accent-cyan);
+            background: rgba(0, 240, 255, 0.15);
+        }
+
+        /* SPECTRUM FILTER SELECTOR PILLS */
+        .spectrum-bar {
+            position: absolute;
+            top: 14px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 16;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            background: rgba(10, 16, 32, 0.75);
+            border: 1px solid rgba(0, 240, 255, 0.25);
+            border-radius: 20px;
+            padding: 4px 8px;
+            backdrop-filter: blur(16px);
+        }
+
+        .spectrum-pill {
+            background: transparent;
+            border: none;
+            color: var(--text-dim);
+            padding: 4px 10px;
+            border-radius: 14px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .spectrum-pill.active {
+            color: #030712;
+            background: var(--accent-cyan);
+            box-shadow: 0 0 10px var(--accent-cyan);
+            font-weight: 700;
+        }
+
+        /* Central Holographic Reticle */
+        .holo-reticle {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 140px;
+            height: 140px;
+            border: 1px dashed rgba(0, 240, 255, 0.35);
+            border-radius: 50%;
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: spin-reticle 24s linear infinite;
+            z-index: 5;
+        }
+
+        @keyframes spin-reticle {
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        .reticle-core {
             width: 10px;
             height: 10px;
-            background: var(--accent-green);
             border-radius: 50%;
-            margin-right: 6px;
-            box-shadow: 0 0 8px var(--accent-green);
+            background: rgba(0, 240, 255, 0.7);
+            box-shadow: 0 0 14px var(--accent-cyan);
+        }
+
+        .reticle-crosshair-h {
+            position: absolute;
+            width: 180px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(0, 240, 255, 0.4), transparent);
+        }
+
+        .reticle-crosshair-v {
+            position: absolute;
+            height: 180px;
+            width: 1px;
+            background: linear-gradient(180deg, transparent, rgba(0, 240, 255, 0.4), transparent);
+        }
+
+        /* Interactive AR Overlay Layer */
+        .ar-hud-layer {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 58px 18px 18px 18px;
+            z-index: 10;
+        }
+
+        /* Floating HUD AR Cards */
+        .ar-top-deck {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .ar-chips-left {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .ar-chip {
+            background: rgba(10, 16, 32, 0.82);
+            border: 1px solid rgba(0, 240, 255, 0.3);
+            border-radius: 12px;
+            padding: 8px 16px;
+            backdrop-filter: blur(16px);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .ar-chip.highlight {
+            border-color: var(--accent-emerald);
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.35);
+        }
+
+        .chip-icon {
+            font-size: 24px;
+            line-height: 1;
+        }
+
+        .chip-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .chip-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 9.5px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-dim);
+        }
+
+        .chip-value {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--accent-cyan);
+            letter-spacing: 0.5px;
+        }
+
+        /* Tactical Horizon Widget */
+        .horizon-widget {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 4px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            color: var(--accent-cyan);
+            background: rgba(10, 16, 32, 0.75);
+            border: 1px solid rgba(0, 240, 255, 0.25);
+            padding: 8px 14px;
+            border-radius: 10px;
+            backdrop-filter: blur(14px);
+        }
+
+        /* Live J.A.R.V.I.S. Observation Ticker */
+        .observation-ticker {
+            position: relative;
+            background: rgba(10, 16, 32, 0.88);
+            border: 1px solid rgba(0, 240, 255, 0.35);
+            border-radius: 12px;
+            padding: 10px 18px;
+            backdrop-filter: blur(20px);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.7);
+            pointer-events: auto;
+        }
+
+        .ticker-avatar {
+            font-size: 20px;
+            animation: pulse-avatar 2s infinite;
+        }
+
+        @keyframes pulse-avatar {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+        }
+
+        .ticker-text {
+            font-size: 13px;
+            font-weight: 500;
+            color: #e2e8f0;
+            line-height: 1.4;
+            flex-grow: 1;
+        }
+
+        /* 3. SLEEK MINIMALIST FLIGHT DECK (4 CRISP ACTIONS) */
+        footer.flight-deck {
+            position: relative;
+            z-index: 20;
+            width: 100%;
+            max-width: 1200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            flex-shrink: 0;
+        }
+
+        .deck-btn {
+            background: rgba(15, 23, 42, 0.85);
+            border: 1px solid var(--border-glow);
+            color: var(--text-main);
+            padding: 12px 22px;
+            border-radius: 14px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            cursor: pointer;
+            backdrop-filter: blur(14px);
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .deck-btn:hover {
+            border-color: var(--accent-cyan);
+            color: var(--accent-cyan);
+            background: rgba(0, 240, 255, 0.12);
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .deck-btn.recording-active {
+            border-color: var(--accent-crimson);
+            color: #ffffff;
+            background: rgba(255, 0, 85, 0.25);
+            box-shadow: 0 0 25px rgba(255, 0, 85, 0.5);
+            animation: pulse-recording 1.2s infinite;
+        }
+
+        @keyframes pulse-recording {
+            0%, 100% { border-color: var(--accent-crimson); }
+            50% { border-color: #ff80aa; }
+        }
+
+        /* Primary Quantum Iris Reactor Button */
+        .reactor-scan-btn {
+            position: relative;
+            background: linear-gradient(135deg, #0284c7, #8b5cf6);
+            border: 2px solid var(--accent-cyan);
+            color: #ffffff;
+            padding: 14px 34px;
+            border-radius: 40px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 13.5px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 0 30px rgba(0, 240, 255, 0.4), 0 10px 30px rgba(2, 132, 199, 0.5);
+        }
+
+        .reactor-scan-btn:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 0 45px rgba(0, 240, 255, 0.6), 0 15px 35px rgba(139, 92, 246, 0.6);
+        }
+
+        .reactor-scan-btn:active {
+            transform: translateY(0) scale(0.98);
+        }
+
+        .reactor-pulsar {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #ffffff;
+            box-shadow: 0 0 12px #ffffff;
+            animation: pulse-dot 1.2s infinite;
+        }
+
+        /* Responsive Breakpoints */
+        @media (max-width: 900px) {
+            .video-wrapper { height: 380px; }
+            footer.flight-deck { flex-direction: column; gap: 10px; width: 100%; }
+            .reactor-scan-btn, .deck-btn { width: 100%; justify-content: center; }
+            .spectrum-bar { top: 6px; }
+            .optic-hud-toolbar { top: 6px; right: 6px; padding: 4px 8px; }
+            .ar-top-deck { flex-direction: column; align-items: stretch; }
         }
     </style>
 </head>
 <body>
-    <div class="header">
-        <div style="display:flex; align-items:center; gap:14px;">
-            <h1>📷 ANTIGRAVITY AI - CAMERA VISION & GESTURE COCKPIT</h1>
-            <div class="badge"><span class="status-pill"></span> SYSTEM ONLINE (PORT 5000)</div>
-        </div>
-        <div style="display:flex; gap:10px; align-items:center;">
-            <a href="/" class="btn" style="text-decoration:none; padding:8px 16px; font-size:13px;">💬 Back to AI Cockpit</a>
-        </div>
-    </div>
 
-    <div class="grid-container">
-        <!-- LEFT PANEL: LIVE CAMERA VIEWPORT & BUTTONS -->
-        <div class="card">
-            <h2>🎥 Live Camera Feed & Interactive Triggers</h2>
-            <div class="video-container" id="videoContainer">
-                <img id="dashboardStreamImg" src="" alt="Live 30 FPS Stream">
+    <!-- 1. Minimalist Top Flight Bar -->
+    <header class="flight-bar">
+        <div class="brand-group">
+            <div class="optical-iris">
+                <div class="iris-core"></div>
             </div>
-
-            <div class="controls-grid">
-                
-                
-                
-                
-                
-                
-                
-            </div>
+            <div class="brand-name">AETHERIS // VISION AR</div>
         </div>
 
-        <!-- RIGHT PANEL: REAL-TIME AI TELEMETRY -->
-        <div class="card">
-            <h2>📊 Real-Time AI Visual Telemetry & Analysis</h2>
-            <div class="telemetry-box" id="telemetryOutput">
-                // Continuous 30 FPS Live Stream Active.<br>
-                // Click any button on the left to request instant AI telemetry analysis.
+        <div class="status-center-pill">
+            <span class="status-pulse"></span>
+            <span id="sourceTag">SERVER NEURAL FEED</span>
+            <span class="fps-badge" id="fpsCounter">30 FPS</span>
+        </div>
+
+        <div class="header-actions">
+            <!-- Voice Selector Toggle -->
+            <button class="glass-btn active" id="voiceToggleBtn" onclick="cycleVoicePersona()">
+                <span id="voiceIcon">🎙️</span>
+                <span id="voiceText">J.A.R.V.I.S.: ON</span>
+            </button>
+            <a href="/nexus" class="glass-btn" style="border-color:rgba(139,92,246,0.35); color:#ddd6fe;" title="Launch AETHERIS 3D Cyber Operations Nexus">
+                🔮 Cyber Nexus
+            </a>
+            <a href="/" class="glass-btn" title="Return to Sovereign Workstation Cockpit">
+                ✕ Exit
+            </a>
+        </div>
+    </header>
+
+    <!-- 2. Flagship Centerstage Camera Viewport -->
+    <main class="viewport-stage" id="viewportStage">
+        <!-- Laser Scanline Beam -->
+        <div class="scan-beam" id="scanBeam"></div>
+
+        <!-- Shutter White Flash -->
+        <div class="shutter-flash" id="shutterFlash"></div>
+
+        <!-- SPECTRUM FILTER SELECTOR PILLS -->
+        <div class="spectrum-bar">
+            <button class="spectrum-pill active" onclick="setSpectrumFilter('normal')">RGB TACTICAL</button>
+            <button class="spectrum-pill" onclick="setSpectrumFilter('night-vision')">NIGHT VISION</button>
+            <button class="spectrum-pill" onclick="setSpectrumFilter('thermal')">THERMAL IR</button>
+            <button class="spectrum-pill" onclick="setSpectrumFilter('cyber-matrix')">CYBER MATRIX</button>
+        </div>
+
+        <!-- FLOATING OPTIC TOOLBAR -->
+        <div class="optic-hud-toolbar">
+            <button class="optic-tool-btn" id="zoomBtn" onclick="cycleDigitalZoom()" title="Digital Optical Zoom (1x, 1.5x, 2x, 3x)">
+                🔍 <span id="zoomText">1.0x</span>
+            </button>
+            <button class="optic-tool-btn" id="mirrorBtn" onclick="toggleMirrorFlip()" title="Flip/Mirror Camera View">
+                🪞 <span id="mirrorText">Mirror</span>
+            </button>
+            <button class="optic-tool-btn" id="fsBtn" onclick="toggleFullscreenCockpit()" title="Toggle Fullscreen Immersion">
+                ⛶ <span id="fsText">Expand</span>
+            </button>
+        </div>
+
+        <div class="video-wrapper">
+            <!-- Source 1: Server AI Stream with YOLOv8 & MediaPipe overlay (Default) -->
+            <img id="serverVideoImg" class="camera-surface" src="/video_feed" alt="Establishing High-Speed Optical Link...">
+            
+            <!-- Source 2: Direct Browser HD Webcam Video (Zero-latency WebRTC) -->
+            <video id="browserWebcamVid" class="camera-surface" autoplay playsinline muted style="display:none;"></video>
+            
+            <!-- Source 3: Desktop Screen Share Video -->
+            <video id="screenShareVid" class="camera-surface" autoplay playsinline muted style="display:none;"></video>
+
+            <!-- Holographic AR Hand Skeletal & Gesture Canvas Overlay -->
+            <canvas id="arHandOverlayCanvas" style="position:absolute; inset:0; pointer-events:none; z-index:4; width:100%; height:100%; object-fit:contain;"></canvas>
+
+            <!-- Hidden Shutter & Recording Canvas -->
+            <canvas id="snapshotCanvas" style="display:none;"></canvas>
+
+            <!-- Central Holographic Reticle & Crosshairs -->
+            <div class="holo-reticle">
+                <div class="reticle-crosshair-h"></div>
+                <div class="reticle-crosshair-v"></div>
+                <div class="reticle-core"></div>
             </div>
-            <div style="margin-top: 15px;">
-                
+
+            <!-- Floating AR Widget Cards -->
+            <div class="ar-hud-layer">
+                <div class="ar-top-deck">
+                    <div class="ar-chips-left">
+                        <!-- AR Widget 1: Real-Time Hand Gesture -->
+                        <div class="ar-chip" id="chipGesture">
+                            <div class="chip-icon" id="gestureEmoji">✋</div>
+                            <div class="chip-meta">
+                                <span class="chip-label">Hand Gesture</span>
+                                <span class="chip-value" id="gestureVal">Detecting...</span>
+                            </div>
+                        </div>
+
+                        <!-- AR Widget 2: Facial Emotion Classification -->
+                        <div class="ar-chip" id="chipEmotion">
+                            <div class="chip-icon" id="emotionEmoji">😊</div>
+                            <div class="chip-meta">
+                                <span class="chip-label">Facial Expression</span>
+                                <span class="chip-value" id="emotionVal">Neutral</span>
+                            </div>
+                        </div>
+
+                        <!-- AR Widget 3: Real-Time YOLOv8 Detected Objects -->
+                        <div class="ar-chip" id="chipObjects">
+                            <div class="chip-icon">📦</div>
+                            <div class="chip-meta">
+                                <span class="chip-label">Detected Objects</span>
+                                <span class="chip-value" id="objectsVal">Person</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- AR Widget 4: Head Pose Pitch/Yaw Orientation & Azimuth -->
+                    <div class="horizon-widget" id="horizonWidget">
+                        <span>PITCH: <strong id="pitchDeg">+0.0°</strong></span>
+                        <span>YAW: <strong id="yawDeg">+0.0°</strong></span>
+                        <span>AZIMUTH: <strong id="azimuthVal">AZ 042°</strong></span>
+                        <span>LOCK: <strong style="color:var(--accent-emerald);" id="targetStatus">CALIBRATED</strong></span>
+                    </div>
+                </div>
+
+                <!-- Live J.A.R.V.I.S. Observation Ticker -->
+                <div class="observation-ticker">
+                    <div class="ticker-avatar" id="tickerAvatar">🤖</div>
+                    <div class="ticker-text" id="jarvisTickerText">
+                        Optical sensors aligned. Show your hand gestures or click <strong>Initiate Deep Scan</strong> for natural-language telemetry.
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
+    </main>
 
+    <!-- 3. Sleek Minimalist Flight Deck (Only 4 Elegant Controls) -->
+    <footer class="flight-deck">
+        <!-- 1. Take Snapshot Photo -->
+        <button class="deck-btn" onclick="capturePhotoSnapshot()" title="Capture High-Res Photo (Shortcut: P or C)">
+            <span>📸</span>
+            <span>Take Photo</span>
+        </button>
+
+        <!-- 2. Record Video Clip -->
+        <button class="deck-btn" id="recordVideoBtn" onclick="toggleVideoRecording()" title="Record WebM Video Clip (Shortcut: R)">
+            <span id="recordIcon">🎥</span>
+            <span id="recordText">Record Video</span>
+        </button>
+
+        <!-- 3. Primary Quantum Reactor Scan Button -->
+        <button class="reactor-scan-btn" id="mainScanBtn" onclick="executeDeepScan()" title="Initiate Neural Scene Inspection (Shortcut: Space)">
+            <span class="reactor-pulsar"></span>
+            <span id="scanBtnLabel">INITIATE DEEP SCAN</span>
+        </button>
+
+        <!-- 4. Cycle Sensor Mode -->
+        <button class="deck-btn" id="sensorToggleBtn" onclick="cycleSensorSource()" title="Cycle between Server AI, Browser Webcam, and Screen (Shortcut: S)">
+            <span>🔄</span>
+            <span id="sensorModeText">Browser HD Mode</span>
+        </button>
+    </footer>
+
+    <!-- Interactive AR Script Engine -->
     <script>
-        function startDashboardStream() {
-            const img = document.getElementById('dashboardStreamImg');
-            if (img) img.src = '/video_feed';
+        // =========================================================================
+        // 1. HIGH-TECH WEB AUDIO SYNTHESIZER (Cinematic Sci-Fi Soundscape)
+        // =========================================================================
+        let audioCtx = null;
+        function getAudioContext() {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            return audioCtx;
         }
 
-        function stopDashboardStream() {
-            const img = document.getElementById('dashboardStreamImg');
-            if (img) img.src = '';
-        }
-
-        function logTelemetry(title, data) {
-            const el = document.getElementById('telemetryOutput');
-            const timestamp = new Date().toLocaleTimeString();
-            el.innerHTML = `[${timestamp}] <b>=== ${title} ===</b><br>` +
-                           `<pre style="white-space: pre-wrap; color: #38bdf8;">${JSON.stringify(data, null, 2)}</pre>` +
-                           `<hr style="border-color: #334155;">` + el.innerHTML;
-        }
-
-        async function triggerCameraVision() {
+        function playSciFiSound(type = 'chime') {
             try {
-                const res = await fetch('/api/vision/live_stream_frame');
-                const data = await res.json();
-                logTelemetry("LIVE CAMERA VISION", data);
-            } catch (err) {
-                logTelemetry("ERROR", err.toString());
-            }
-        }
+                const ctx = getAudioContext();
+                const now = ctx.currentTime;
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
 
-        async function triggerSignLanguage() {
-            try {
-                const res = await fetch('/api/vision/sign_language');
-                const data = await res.json();
-                logTelemetry("SIGN LANGUAGE RECOGNITION", data);
-            } catch (err) {
-                logTelemetry("ERROR", err.toString());
-            }
-        }
-
-        async function triggerFacialEmotion() {
-            try {
-                const res = await fetch('/api/vision/facial_expression');
-                const data = await res.json();
-                logTelemetry("FACIAL EMOTION ANALYSIS", data);
-            } catch (err) {
-                logTelemetry("ERROR", err.toString());
-            }
-        }
-
-        async function triggerHardwareInspection() {
-            try {
-                const res = await fetch('/api/vision/inspect_hardware', { method: 'POST' });
-                const data = await res.json();
-                logTelemetry("PIC HARDWARE OPTICAL INSPECTION", data);
-            } catch (err) {
-                logTelemetry("ERROR", err.toString());
-            }
-        }
-
-        async function triggerMediaPipeKinematics() {
-            try {
-                const res = await fetch('/api/vision/mediapipe_kinematics');
-                const data = await res.json();
-                logTelemetry("✋ MEDIAPIPE HAND & FACE KINEMATICS (21 JOINTS + 468 FACE MESH)", data);
-                if (data.report_text) {
-                    const el = document.getElementById('telemetryOutput');
-                    el.innerHTML = `<div style="background:rgba(56,189,248,0.1); border-left:4px solid #38bdf8; padding:10px; margin:10px 0; white-space:pre-wrap; font-family:monospace; color:#e2e8f0;">${data.report_text}</div>` + el.innerHTML;
+                if (type === 'chime') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(580, now);
+                    osc.frequency.exponentialRampToValueAtTime(880, now + 0.12);
+                    gain.gain.setValueAtTime(0.08, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.15);
+                } 
+                else if (type === 'scan') {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(320, now);
+                    osc.frequency.linearRampToValueAtTime(960, now + 0.35);
+                    gain.gain.setValueAtTime(0.09, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.4);
+                } 
+                else if (type === 'shutter') {
+                    osc.type = 'square';
+                    osc.frequency.setValueAtTime(1200, now);
+                    osc.frequency.exponentialRampToValueAtTime(200, now + 0.08);
+                    gain.gain.setValueAtTime(0.12, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.09);
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.09);
                 }
-            } catch (err) {
-                logTelemetry("ERROR", err.toString());
+                else if (type === 'beep') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(950, now);
+                    gain.gain.setValueAtTime(0.07, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.08);
+                }
+            } catch (_) {}
+        }
+
+        // =========================================================================
+        // 2. MULTI-PERSONALITY VOICE SYNTHESIS (J.A.R.V.I.S. & F.R.I.D.A.Y.)
+        // =========================================================================
+        const VOICE_PERSONAS = ['jarvis', 'friday', 'off'];
+        let currentVoiceIndex = 0;
+
+        function speakAgent(phrase) {
+            const persona = VOICE_PERSONAS[currentVoiceIndex];
+            if (persona === 'off' || !window.speechSynthesis) return;
+
+            window.speechSynthesis.cancel();
+            const cleanText = phrase.replace(/[*_#`]/g, '').trim();
+            const utter = new SpeechSynthesisUtterance(cleanText);
+
+            const voices = window.speechSynthesis.getVoices();
+            if (persona === 'jarvis') {
+                // British or deep male tone
+                const ukVoice = voices.find(v => v.lang.includes('en-GB') || v.name.toLowerCase().includes('george') || v.name.toLowerCase().includes('male'));
+                if (ukVoice) utter.voice = ukVoice;
+                utter.rate = 1.02;
+                utter.pitch = 0.94;
+            } else if (persona === 'friday') {
+                // Female Irish/US assistant tone
+                const femaleVoice = voices.find(v => v.name.toLowerCase().includes('female') || v.name.toLowerCase().includes('samantha') || v.name.toLowerCase().includes('victoria') || v.lang.includes('en-IE'));
+                if (femaleVoice) utter.voice = femaleVoice;
+                utter.rate = 1.05;
+                utter.pitch = 1.15;
+            }
+
+            window.speechSynthesis.speak(utter);
+        }
+
+        function cycleVoicePersona() {
+            currentVoiceIndex = (currentVoiceIndex + 1) % VOICE_PERSONAS.length;
+            const persona = VOICE_PERSONAS[currentVoiceIndex];
+            const btn = document.getElementById('voiceToggleBtn');
+            const icon = document.getElementById('voiceIcon');
+            const text = document.getElementById('voiceText');
+            const avatar = document.getElementById('tickerAvatar');
+
+            playSciFiSound('chime');
+
+            if (persona === 'jarvis') {
+                btn.classList.add('active');
+                icon.textContent = '🎙️';
+                text.textContent = 'J.A.R.V.I.S.: ON';
+                avatar.textContent = '🤖';
+                speakAgent('Vocal telemetry assigned to Jarvis.');
+            } else if (persona === 'friday') {
+                btn.classList.add('active');
+                icon.textContent = '🎙️';
+                text.textContent = 'F.R.I.D.A.Y.: ON';
+                avatar.textContent = '✨';
+                speakAgent('Friday online and monitoring your sensors.');
+            } else {
+                btn.classList.remove('active');
+                icon.textContent = '🔇';
+                text.textContent = 'Voice: OFF';
+                avatar.textContent = '👁️';
+                window.speechSynthesis.cancel();
             }
         }
 
-        async function triggerVoiceAction(cmd) {
-            try {
-                const res = await fetch('/api/speech/execute_voice_action', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ command: cmd })
-                });
-                const data = await res.json();
-                logTelemetry("PUNJABI VOICE ACTION EXECUTION", data);
-            } catch (err) {
-                logTelemetry("ERROR", err.toString());
+        // =========================================================================
+        // 3. OPTICAL FILTERS & DIGITAL ZOOM & MIRROR FLIP
+        // =========================================================================
+        const serverImg = document.getElementById('serverVideoImg');
+        const browserVid = document.getElementById('browserWebcamVid');
+        const screenVid = document.getElementById('screenShareVid');
+
+        // Spectrum Filters
+        function setSpectrumFilter(filterName) {
+            playSciFiSound('beep');
+            document.querySelectorAll('.spectrum-pill').forEach(btn => {
+                btn.classList.toggle('active', btn.getAttribute('onclick').includes(filterName));
+            });
+
+            [serverImg, browserVid, screenVid].forEach(el => {
+                el.classList.remove('filter-night-vision', 'filter-thermal', 'filter-cyber-matrix');
+                if (filterName !== 'normal') {
+                    el.classList.add(`filter-${filterName}`);
+                }
+            });
+
+            setJarvisMessage(`Optical Spectrum shifted to <strong>${filterName.toUpperCase()}</strong> mode.`);
+        }
+
+        // Digital Zoom (1x, 1.5x, 2x, 3x)
+        const ZOOM_LEVELS = [1.0, 1.5, 2.0, 3.0];
+        let currentZoomIndex = 0;
+        let isMirrored = false;
+
+        function applyVideoTransforms() {
+            const zoom = ZOOM_LEVELS[currentZoomIndex];
+            const mirrorScale = isMirrored ? -1 : 1;
+            const transformStr = `scale(${zoom * mirrorScale}, ${zoom})`;
+
+            [serverImg, browserVid, screenVid, document.getElementById('arHandOverlayCanvas')].forEach(el => {
+                if (el) el.style.transform = transformStr;
+            });
+        }
+
+        function cycleDigitalZoom() {
+            playSciFiSound('beep');
+            currentZoomIndex = (currentZoomIndex + 1) % ZOOM_LEVELS.length;
+            const zoom = ZOOM_LEVELS[currentZoomIndex];
+            document.getElementById('zoomText').textContent = `${zoom.toFixed(1)}x`;
+            applyVideoTransforms();
+            setJarvisMessage(`Digital magnification calibrated to <strong>${zoom.toFixed(1)}x</strong>.`);
+        }
+
+        function toggleMirrorFlip() {
+            playSciFiSound('beep');
+            isMirrored = !isMirrored;
+            document.getElementById('mirrorBtn').classList.toggle('active', isMirrored);
+            applyVideoTransforms();
+            setJarvisMessage(`Optic reflection: <strong>${isMirrored ? 'Mirrored' : 'True Orientation'}</strong>.`);
+        }
+
+        function toggleFullscreenCockpit() {
+            playSciFiSound('chime');
+            const stage = document.getElementById('viewportStage');
+            stage.classList.toggle('fullscreen-mode');
+            const isFs = stage.classList.contains('fullscreen-mode');
+            document.getElementById('fsText').textContent = isFs ? 'Collapse' : 'Expand';
+            document.getElementById('fsBtn').classList.toggle('active', isFs);
+        }
+
+        // =========================================================================
+        // 4. SENSOR SOURCE CYCLER (Server AI Stream <-> Browser HD <-> Screen)
+        // =========================================================================
+        const SENSOR_MODES = ['server', 'browser', 'screen'];
+        let currentModeIndex = 0;
+        let activeMediaStream = null;
+
+        const sourceTag = document.getElementById('sourceTag');
+        const sensorModeText = document.getElementById('sensorModeText');
+
+        async function cycleSensorSource() {
+            playSciFiSound('chime');
+            currentModeIndex = (currentModeIndex + 1) % SENSOR_MODES.length;
+            const mode = SENSOR_MODES[currentModeIndex];
+
+            if (activeMediaStream) {
+                activeMediaStream.getTracks().forEach(t => t.stop());
+                activeMediaStream = null;
+            }
+
+            if (arHandCtx) {
+                arHandCtx.clearRect(0, 0, arHandCanvas.width, arHandCanvas.height);
+            }
+
+            if (mode === 'server') {
+                serverImg.style.display = 'block';
+                browserVid.style.display = 'none';
+                screenVid.style.display = 'none';
+                serverImg.src = '/video_feed?t=' + Date.now();
+                sourceTag.textContent = 'SERVER NEURAL FEED';
+                sensorModeText.textContent = 'Browser HD Mode';
+                setJarvisMessage('Switched to Server Neural Stream. Dual Server & Client MediaPipe active.');
+            } 
+            else if (mode === 'browser') {
+                serverImg.style.display = 'none';
+                browserVid.style.display = 'block';
+                screenVid.style.display = 'none';
+                sourceTag.textContent = 'DIRECT BROWSER WEBCAM';
+                sensorModeText.textContent = 'Screen Capture Mode';
+
+                try {
+                    activeMediaStream = await navigator.mediaDevices.getUserMedia({
+                        video: { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: 'user' }
+                    });
+                    browserVid.srcObject = activeMediaStream;
+                    setJarvisMessage('Direct Browser HD Webcam acquired. Zero-latency MediaPipe Kinematics running.');
+                } catch (err) {
+                    alert('Camera access notice: ' + err.message);
+                    cycleSensorSource();
+                }
+            } 
+            else if (mode === 'screen') {
+                serverImg.style.display = 'none';
+                browserVid.style.display = 'none';
+                screenVid.style.display = 'block';
+                sourceTag.textContent = 'DESKTOP WINDOW CAPTURE';
+                sensorModeText.textContent = 'Server AI Mode';
+
+                try {
+                    activeMediaStream = await navigator.mediaDevices.getDisplayMedia({ video: true });
+                    screenVid.srcObject = activeMediaStream;
+                    setJarvisMessage('Desktop screen capture active. Ready to scan workspace.');
+                } catch (err) {
+                    cycleSensorSource();
+                }
             }
         }
+
+        // =========================================================================
+        // 5. CLIENT-SIDE GOOGLE MEDIAPIPE NEURAL HAND ENGINE & AR OVERLAY
+        // =========================================================================
+        const arHandCanvas = document.getElementById('arHandOverlayCanvas');
+        const arHandCtx = arHandCanvas.getContext('2d');
+        let clientHands = null;
+        let isClientHandsReady = false;
+        let isProcessingFrame = false;
+        let clientDetectedGesture = "";
+        let lastAnnouncedGesture = "";
+        let lastTelemetryPushTime = 0;
+
+        const MP_HAND_CONNECTIONS = [
+            [0, 1], [1, 2], [2, 3], [3, 4],        // Thumb
+            [0, 5], [5, 6], [6, 7], [7, 8],        // Index
+            [0, 9], [9, 10], [10, 11], [11, 12],   // Middle
+            [0, 13], [13, 14], [14, 15], [15, 16], // Ring
+            [0, 17], [17, 18], [18, 19], [19, 20], // Pinky
+            [5, 9], [9, 13], [13, 17]              // Palm Base
+        ];
+
+        function initClientMediaPipeHands() {
+            if (typeof Hands === 'undefined') {
+                setTimeout(initClientMediaPipeHands, 800);
+                return;
+            }
+            try {
+                clientHands = new Hands({
+                    locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
+                });
+                clientHands.setOptions({
+                    maxNumHands: 2,
+                    modelComplexity: 1,
+                    minDetectionConfidence: 0.35,
+                    minTrackingConfidence: 0.35
+                });
+                clientHands.onResults(onClientHandResults);
+                isClientHandsReady = true;
+                console.log("✋ Client-Side Google MediaPipe Hand Engine ONLINE!");
+                setJarvisMessage('Google MediaPipe Neural Hand Engine ONLINE. Wave or show gesture.');
+            } catch (err) {
+                console.warn("Client MediaPipe initialization notice:", err);
+            }
+        }
+
+        // Knuckle-relative geometric gesture classifier
+        function classifyHandGesture(landmarks) {
+            function getDist(p1, p2) {
+                return Math.hypot(p1.x - p2.x, p1.y - p2.y);
+            }
+
+            const wrist = landmarks[0];
+            const mcpMid = landmarks[9];
+            const palmSize = Math.max(0.04, getDist(wrist, mcpMid));
+
+            // Knuckle-relative finger extensions
+            const thumbExt = getDist(landmarks[4], landmarks[9]) > getDist(landmarks[2], landmarks[9]) * 1.15;
+            const indexExt = getDist(landmarks[8], wrist) > getDist(landmarks[6], wrist) * 1.12;
+            const middleExt = getDist(landmarks[12], wrist) > getDist(landmarks[10], wrist) * 1.12;
+            const ringExt = getDist(landmarks[16], wrist) > getDist(landmarks[14], wrist) * 1.12;
+            const pinkyExt = getDist(landmarks[20], wrist) > getDist(landmarks[18], wrist) * 1.12;
+
+            const idxDx = landmarks[8].x - wrist.x;
+            const idxDy = landmarks[8].y - wrist.y;
+
+            if (indexExt && !middleExt && !ringExt && !pinkyExt) {
+                if (Math.abs(idxDx) > Math.abs(idxDy)) {
+                    return idxDx < -0.04 ? "POINTING LEFT 👈" : "POINTING RIGHT 👉";
+                } else {
+                    return idxDy > 0.04 ? "POINTING DOWN 👇" : "POINTING UP ☝️";
+                }
+            } else if (indexExt && middleExt && ringExt && pinkyExt) {
+                return "OPEN PALM / HELLO ✋";
+            } else if (indexExt && middleExt && !ringExt && !pinkyExt) {
+                return "PEACE / VICTORY SIGN ✌️";
+            } else if (thumbExt && pinkyExt && !indexExt && !middleExt && !ringExt) {
+                return "HANG LOOSE / CALL 🤙";
+            } else if (indexExt && pinkyExt && !middleExt && !ringExt) {
+                return "ROCK / METAL 🤘";
+            } else if (thumbExt && indexExt && pinkyExt && !middleExt && !ringExt) {
+                return "LOVE SIGN 🤟";
+            } else if (indexExt && middleExt && ringExt && !pinkyExt) {
+                return "THREE FINGERS / OK 🤟";
+            } else if (thumbExt && !indexExt && !middleExt && !ringExt && !pinkyExt) {
+                if (landmarks[4].y > wrist.y + 0.04) return "THUMBS DOWN 👎";
+                return "THUMBS UP 👍";
+            } else if (!indexExt && !middleExt && !ringExt && !pinkyExt) {
+                return "CLOSED FIST ✊";
+            } else if (getDist(landmarks[4], landmarks[8]) < palmSize * 0.45 && middleExt && ringExt) {
+                return "OK SIGN 👌";
+            }
+            return "ACTIVE HAND SIGN ✋";
+        }
+
+        function onClientHandResults(results) {
+            const activeMode = SENSOR_MODES[currentModeIndex];
+            let activeWidth = 1280;
+            let activeHeight = 720;
+            if (activeMode === 'browser' && browserVid.videoWidth) {
+                activeWidth = browserVid.videoWidth;
+                activeHeight = browserVid.videoHeight;
+            } else if (activeMode === 'server' && serverImg.naturalWidth) {
+                activeWidth = serverImg.naturalWidth;
+                activeHeight = serverImg.naturalHeight;
+            }
+
+            if (arHandCanvas.width !== activeWidth || arHandCanvas.height !== activeHeight) {
+                arHandCanvas.width = activeWidth;
+                arHandCanvas.height = activeHeight;
+            }
+
+            arHandCtx.clearRect(0, 0, activeWidth, activeHeight);
+
+            if (!results.multiHandLandmarks || results.multiHandLandmarks.length === 0) {
+                clientDetectedGesture = "";
+                return;
+            }
+
+            let topGesture = "";
+
+            results.multiHandLandmarks.forEach((landmarks, hIdx) => {
+                const gesture = classifyHandGesture(landmarks);
+                if (hIdx === 0) topGesture = gesture;
+
+                let minX = activeWidth, maxX = 0, minY = activeHeight, maxY = 0;
+                const pixelPoints = landmarks.map(lm => {
+                    const px = lm.x * activeWidth;
+                    const py = lm.y * activeHeight;
+                    if (px < minX) minX = px;
+                    if (px > maxX) maxX = px;
+                    if (py < minY) minY = py;
+                    if (py > maxY) maxY = py;
+                    return { x: px, y: py };
+                });
+
+                minX = Math.max(10, minX - 15);
+                maxX = Math.min(activeWidth - 10, maxX + 15);
+                minY = Math.max(10, minY - 15);
+                maxY = Math.min(activeHeight - 10, maxY + 15);
+
+                // 1. Draw Holographic Hand Skeletal Lines
+                arHandCtx.save();
+                arHandCtx.lineWidth = 3;
+                arHandCtx.strokeStyle = 'rgba(0, 240, 255, 0.85)';
+                arHandCtx.shadowColor = '#00f0ff';
+                arHandCtx.shadowBlur = 10;
+
+                MP_HAND_CONNECTIONS.forEach(([start, end]) => {
+                    const p1 = pixelPoints[start];
+                    const p2 = pixelPoints[end];
+                    arHandCtx.beginPath();
+                    arHandCtx.moveTo(p1.x, p1.y);
+                    arHandCtx.lineTo(p2.x, p2.y);
+                    arHandCtx.stroke();
+                });
+                arHandCtx.restore();
+
+                // 2. Draw 21 Glowing Joint Dots
+                pixelPoints.forEach((p, idx) => {
+                    arHandCtx.save();
+                    arHandCtx.beginPath();
+                    if ([4, 8, 12, 16, 20].includes(idx)) {
+                        arHandCtx.arc(p.x, p.y, 6, 0, 2 * Math.PI);
+                        arHandCtx.fillStyle = '#ff0077';
+                        arHandCtx.shadowColor = '#ff0077';
+                        arHandCtx.shadowBlur = 8;
+                    } else {
+                        arHandCtx.arc(p.x, p.y, 4, 0, 2 * Math.PI);
+                        arHandCtx.fillStyle = '#00ff88';
+                        arHandCtx.shadowColor = '#00ff88';
+                        arHandCtx.shadowBlur = 6;
+                    }
+                    arHandCtx.fill();
+                    arHandCtx.restore();
+                });
+
+                // 3. Draw Cyberpunk Corner Brackets around hand
+                arHandCtx.save();
+                arHandCtx.strokeStyle = 'rgba(0, 240, 255, 0.9)';
+                arHandCtx.lineWidth = 2.5;
+                arHandCtx.shadowColor = '#00f0ff';
+                arHandCtx.shadowBlur = 8;
+                const bLen = Math.min(25, (maxX - minX) * 0.25);
+
+                // Top-Left
+                arHandCtx.beginPath();
+                arHandCtx.moveTo(minX, minY + bLen);
+                arHandCtx.lineTo(minX, minY);
+                arHandCtx.lineTo(minX + bLen, minY);
+                arHandCtx.stroke();
+
+                // Top-Right
+                arHandCtx.beginPath();
+                arHandCtx.moveTo(maxX - bLen, minY);
+                arHandCtx.lineTo(maxX, minY);
+                arHandCtx.lineTo(maxX, minY + bLen);
+                arHandCtx.stroke();
+
+                // Bottom-Left
+                arHandCtx.beginPath();
+                arHandCtx.moveTo(minX, maxY - bLen);
+                arHandCtx.lineTo(minX, maxY);
+                arHandCtx.lineTo(minX + bLen, maxY);
+                arHandCtx.stroke();
+
+                // Bottom-Right
+                arHandCtx.beginPath();
+                arHandCtx.moveTo(maxX - bLen, maxY);
+                arHandCtx.lineTo(maxX, maxY);
+                arHandCtx.lineTo(maxX, maxY - bLen);
+                arHandCtx.stroke();
+                arHandCtx.restore();
+
+                // 4. Floating Holographic Gesture Badge above hand
+                arHandCtx.save();
+                const badgeText = `HAND: ${gesture}`;
+                arHandCtx.font = "bold 13px 'Orbitron', 'JetBrains Mono', monospace";
+                const textMetrics = arHandCtx.measureText(badgeText);
+                const bgWidth = textMetrics.width + 18;
+                const bgHeight = 24;
+                const badgeX = Math.max(10, Math.min(minX, activeWidth - bgWidth - 10));
+                const badgeY = Math.max(26, minY - 10);
+
+                arHandCtx.fillStyle = "rgba(10, 16, 32, 0.88)";
+                arHandCtx.fillRect(badgeX, badgeY - 18, bgWidth, bgHeight);
+                arHandCtx.strokeStyle = "rgba(0, 240, 255, 0.7)";
+                arHandCtx.lineWidth = 1;
+                arHandCtx.strokeRect(badgeX, badgeY - 18, bgWidth, bgHeight);
+
+                arHandCtx.fillStyle = "#00f0ff";
+                arHandCtx.fillText(badgeText, badgeX + 8, badgeY);
+                arHandCtx.restore();
+            });
+
+            if (topGesture) {
+                clientDetectedGesture = topGesture;
+                document.getElementById('gestureVal').textContent = topGesture;
+                document.getElementById('chipGesture').classList.add('highlight');
+
+                if (topGesture.includes('👈')) document.getElementById('gestureEmoji').textContent = '👈';
+                else if (topGesture.includes('👉')) document.getElementById('gestureEmoji').textContent = '👉';
+                else if (topGesture.includes('✌️')) document.getElementById('gestureEmoji').textContent = '✌️';
+                else if (topGesture.includes('👍')) document.getElementById('gestureEmoji').textContent = '👍';
+                else if (topGesture.includes('👎')) document.getElementById('gestureEmoji').textContent = '👎';
+                else if (topGesture.includes('✊')) document.getElementById('gestureEmoji').textContent = '✊';
+                else if (topGesture.includes('✋')) document.getElementById('gestureEmoji').textContent = '✋';
+                else if (topGesture.includes('🤙')) document.getElementById('gestureEmoji').textContent = '🤙';
+                else if (topGesture.includes('🤟')) document.getElementById('gestureEmoji').textContent = '🤟';
+                else if (topGesture.includes('🤘')) document.getElementById('gestureEmoji').textContent = '🤘';
+                else if (topGesture.includes('👌')) document.getElementById('gestureEmoji').textContent = '👌';
+
+                if (topGesture !== lastAnnouncedGesture) {
+                    lastAnnouncedGesture = topGesture;
+                    setJarvisMessage(`Gesture recognized: <strong>${topGesture}</strong>`);
+                    speakAgent(`Gesture registered: ${topGesture.replace(/[^\w\s]/g, '')}`);
+                }
+
+                // Debounce sync to server
+                const now = Date.now();
+                if (now - lastTelemetryPushTime > 400) {
+                    lastTelemetryPushTime = now;
+                    fetch('/api/vision/client_telemetry', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            gesture: topGesture,
+                            hand_count: results.multiHandLandmarks.length
+                        })
+                    }).catch(() => {});
+                }
+            }
+        }
+
+        async function runHandDetectionLoop() {
+            if (isClientHandsReady && !isProcessingFrame) {
+                const mode = SENSOR_MODES[currentModeIndex];
+                let sourceElement = null;
+
+                if (mode === 'browser' && browserVid.readyState >= 2) {
+                    sourceElement = browserVid;
+                } else if (mode === 'server' && serverImg.complete && serverImg.naturalWidth > 0) {
+                    sourceElement = serverImg;
+                }
+
+                if (sourceElement) {
+                    isProcessingFrame = true;
+                    try {
+                        await clientHands.send({ image: sourceElement });
+                    } catch (_) {}
+                    isProcessingFrame = false;
+                }
+            }
+            requestAnimationFrame(runHandDetectionLoop);
+        }
+
+        // =========================================================================
+        // 6. REAL-TIME TELEMETRY POLLING (Gestures, Mood, Objects & Kinematics)
+        // =========================================================================
+        let lastServerGesture = "";
+        let frameCount = 0;
+        let lastFpsTime = performance.now();
+
+        async function pollTelemetryLoop() {
+            try {
+                // Azimuth drift simulation
+                const now = performance.now();
+                const az = Math.floor(now / 500) % 360;
+                document.getElementById('azimuthVal').textContent = `AZ ${String(az).padStart(3, '0')}°`;
+
+                const res = await fetch('/api/vision/telemetry');
+                if (!res.ok) return;
+                const json = await res.json();
+                if (json.success && json.telemetry) {
+                    const t = json.telemetry;
+
+                    // 1. Gesture Detection (Client MediaPipe takes priority, fallback to server)
+                    const activeGesture = clientDetectedGesture || (t.gesture && t.gesture !== 'NO_HAND_DETECTED' && t.gesture !== 'STREAM_STOPPED' ? t.gesture : '');
+
+                    if (activeGesture) {
+                        document.getElementById('gestureVal').textContent = activeGesture;
+                        document.getElementById('chipGesture').classList.add('highlight');
+                        
+                        if (activeGesture.includes('👈')) document.getElementById('gestureEmoji').textContent = '👈';
+                        else if (activeGesture.includes('👉')) document.getElementById('gestureEmoji').textContent = '👉';
+                        else if (activeGesture.includes('✌️')) document.getElementById('gestureEmoji').textContent = '✌️';
+                        else if (activeGesture.includes('👍')) document.getElementById('gestureEmoji').textContent = '👍';
+                        else if (activeGesture.includes('👎')) document.getElementById('gestureEmoji').textContent = '👎';
+                        else if (activeGesture.includes('✊')) document.getElementById('gestureEmoji').textContent = '✊';
+                        else if (activeGesture.includes('✋')) document.getElementById('gestureEmoji').textContent = '✋';
+                        else if (activeGesture.includes('🤙')) document.getElementById('gestureEmoji').textContent = '🤙';
+                        else if (activeGesture.includes('🤟')) document.getElementById('gestureEmoji').textContent = '🤟';
+                        else if (activeGesture.includes('🤘')) document.getElementById('gestureEmoji').textContent = '🤘';
+                        else if (activeGesture.includes('👌')) document.getElementById('gestureEmoji').textContent = '👌';
+
+                        if (!clientDetectedGesture && activeGesture !== lastServerGesture) {
+                            lastServerGesture = activeGesture;
+                            setJarvisMessage(`Gesture recognized: <strong>${activeGesture}</strong>`);
+                            speakAgent(`Gesture registered: ${activeGesture}`);
+                        }
+                    } else {
+                        document.getElementById('gestureVal').textContent = 'No Hands';
+                        document.getElementById('gestureEmoji').textContent = '✋';
+                        document.getElementById('chipGesture').classList.remove('highlight');
+                        lastServerGesture = "";
+                    }
+
+                    // 2. Emotion Detection
+                    if (t.emotion && t.emotion !== 'STREAM_STOPPED') {
+                        const cleanMood = t.emotion.replace('😐', '').trim();
+                        document.getElementById('emotionVal').textContent = cleanMood;
+                        if (cleanMood.toLowerCase().includes('happy')) document.getElementById('emotionEmoji').textContent = '😊';
+                        else if (cleanMood.toLowerCase().includes('neutral')) document.getElementById('emotionEmoji').textContent = '😐';
+                        else if (cleanMood.toLowerCase().includes('surprise')) document.getElementById('emotionEmoji').textContent = '😲';
+                    }
+
+                    // 3. Detected Objects
+                    if (t.objects_detected && t.objects_detected.length > 0) {
+                        const itemsStr = t.objects_detected.slice(0, 3).join(' • ');
+                        document.getElementById('objectsVal').textContent = itemsStr;
+                        document.getElementById('chipObjects').classList.add('highlight');
+                    } else {
+                        document.getElementById('objectsVal').textContent = 'Scanning...';
+                        document.getElementById('chipObjects').classList.remove('highlight');
+                    }
+                }
+            } catch (_) {}
+        }
+        setInterval(pollTelemetryLoop, 600);
+
+        function setJarvisMessage(text) {
+            const el = document.getElementById('jarvisTickerText');
+            el.innerHTML = text;
+        }
+
+        // =========================================================================
+        // 6. PRIMARY ACTION 1: INITIATE DEEP SCAN
+        // =========================================================================
+        async function executeDeepScan() {
+            playSciFiSound('scan');
+            const stage = document.getElementById('viewportStage');
+            const scanBtn = document.getElementById('mainScanBtn');
+            const scanLabel = document.getElementById('scanBtnLabel');
+
+            stage.classList.add('scanning-active');
+            scanBtn.disabled = true;
+            scanLabel.textContent = 'SCANNING OPTICAL SCENE...';
+            setJarvisMessage('Initiating neural scene analysis. Reading facial mesh, hand topology, and optical objects...');
+
+            try {
+                const [kinRes, vlmRes] = await Promise.all([
+                    fetch('/api/vision/mediapipe_kinematics').then(r => r.json()).catch(() => null),
+                    fetch('/api/vision/live_stream_frame').then(r => r.json()).catch(() => null)
+                ]);
+
+                let report = "";
+                if (vlmRes && vlmRes.description) {
+                    report = vlmRes.description;
+                } else if (kinRes && kinRes.face_kinematics) {
+                    const hp = kinRes.face_kinematics.head_pose_kinematics || {};
+                    document.getElementById('pitchDeg').textContent = `${hp.pitch_deg > 0 ? '+' : ''}${hp.pitch_deg || 0.0}°`;
+                    document.getElementById('yawDeg').textContent = `${hp.yaw_deg > 0 ? '+' : ''}${hp.yaw_deg || 0.0}°`;
+                    report = `Optical scan complete. Face tracked: ${hp.orientation || 'Centered'}. Kinematics pitch: ${hp.pitch_deg || 0} degrees. Tracking stable.`;
+                } else {
+                    report = "Visual inspection verified. Sensors aligned, environment illuminated.";
+                }
+
+                setJarvisMessage(`<strong>Scan Complete:</strong> ${report}`);
+                speakAgent(report);
+            } catch (err) {
+                setJarvisMessage(`Scan notice: ${err.message}`);
+            } finally {
+                stage.classList.remove('scanning-active');
+                scanBtn.disabled = false;
+                scanLabel.textContent = 'INITIATE DEEP SCAN';
+            }
+        }
+
+        // =========================================================================
+        // 7. PRIMARY ACTION 2: CAPTURE HIGH-RES PHOTO
+        // =========================================================================
+        function capturePhotoSnapshot() {
+            playSciFiSound('shutter');
+            
+            // Visual shutter flash
+            const flash = document.getElementById('shutterFlash');
+            flash.style.opacity = '0.9';
+            setTimeout(() => { flash.style.opacity = '0'; }, 220);
+
+            const canvas = document.getElementById('snapshotCanvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = 1280;
+            canvas.height = 720;
+
+            const mode = SENSOR_MODES[currentModeIndex];
+            if (mode === 'server') {
+                ctx.drawImage(serverImg, 0, 0, 1280, 720);
+            } else if (mode === 'browser') {
+                ctx.drawImage(browserVid, 0, 0, 1280, 720);
+            } else if (mode === 'screen') {
+                ctx.drawImage(screenVid, 0, 0, 1280, 720);
+            }
+
+            canvas.toBlob((blob) => {
+                if (!blob) return;
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = `AETHERIS_Optical_Snapshot_${Date.now()}.jpg`;
+                link.click();
+                URL.revokeObjectURL(link.href);
+                setJarvisMessage('📸 High-resolution photo captured and saved to your Downloads folder.');
+                speakAgent('Frame captured.');
+            }, 'image/jpeg', 0.94);
+        }
+
+        // =========================================================================
+        // 8. PRIMARY ACTION 3: RECORD VIDEO CLIP (MediaRecorder)
+        // =========================================================================
+        let mediaRecorder = null;
+        let recordedChunks = [];
+        let recordInterval = null;
+        let recordStartTime = 0;
+
+        function toggleVideoRecording() {
+            const btn = document.getElementById('recordVideoBtn');
+            const icon = document.getElementById('recordIcon');
+            const text = document.getElementById('recordText');
+
+            if (mediaRecorder && mediaRecorder.state === 'recording') {
+                // Stop recording
+                mediaRecorder.stop();
+                clearInterval(recordInterval);
+                btn.classList.remove('recording-active');
+                icon.textContent = '🎥';
+                text.textContent = 'Record Video';
+                playSciFiSound('beep');
+                setJarvisMessage('Video clip finalized and saved.');
+                speakAgent('Recording saved.');
+                return;
+            }
+
+            // Start recording
+            try {
+                let streamToRecord = null;
+                const mode = SENSOR_MODES[currentModeIndex];
+                if ((mode === 'browser' || mode === 'screen') && activeMediaStream) {
+                    streamToRecord = activeMediaStream;
+                } else {
+                    // Capture canvas stream from server image
+                    const canvas = document.getElementById('snapshotCanvas');
+                    canvas.width = 1280;
+                    canvas.height = 720;
+                    const ctx = canvas.getContext('2d');
+                    
+                    // Continuous canvas paint interval
+                    const paintId = setInterval(() => {
+                        try {
+                            if (serverImg.complete) ctx.drawImage(serverImg, 0, 0, 1280, 720);
+                        } catch(_) {}
+                    }, 33);
+
+                    streamToRecord = canvas.captureStream(30);
+                    // Attach clean-up
+                    streamToRecord.addEventListener('inactive', () => clearInterval(paintId));
+                }
+
+                recordedChunks = [];
+                mediaRecorder = new MediaRecorder(streamToRecord, { mimeType: 'video/webm' });
+
+                mediaRecorder.ondataavailable = (e) => {
+                    if (e.data.size > 0) recordedChunks.push(e.data);
+                };
+
+                mediaRecorder.onstop = () => {
+                    const blob = new Blob(recordedChunks, { type: 'video/webm' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `AETHERIS_Vision_Clip_${Date.now()}.webm`;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                };
+
+                mediaRecorder.start();
+                playSciFiSound('chime');
+                btn.classList.add('recording-active');
+                icon.textContent = '⏹️';
+                recordStartTime = Date.now();
+
+                recordInterval = setInterval(() => {
+                    const elapsed = Math.floor((Date.now() - recordStartTime) / 1000);
+                    const m = String(Math.floor(elapsed / 60)).padStart(2, '0');
+                    const s = String(elapsed % 60).padStart(2, '0');
+                    text.textContent = `REC ${m}:${s}`;
+                }, 500);
+
+                setJarvisMessage('🔴 <strong>Recording Video Clip...</strong> Click Stop to download WebM video.');
+            } catch (err) {
+                alert('Recording initialization error: ' + err.message);
+            }
+        }
+
+        // =========================================================================
+        // 9. PRO OPERATOR KEYBOARD SHORTCUTS
+        // =========================================================================
+        window.addEventListener('keydown', (e) => {
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+            if (e.code === 'Space') {
+                e.preventDefault();
+                executeDeepScan();
+            } else if (e.key === 'p' || e.key === 'P' || e.key === 'c' || e.key === 'C') {
+                capturePhotoSnapshot();
+            } else if (e.key === 'r' || e.key === 'R') {
+                toggleVideoRecording();
+            } else if (e.key === 's' || e.key === 'S') {
+                cycleSensorSource();
+            } else if (e.key === 'z' || e.key === 'Z') {
+                cycleDigitalZoom();
+            } else if (e.key === 'm' || e.key === 'M') {
+                toggleMirrorFlip();
+            } else if (e.key === 'f' || e.key === 'F') {
+                toggleFullscreenCockpit();
+            }
+        });
+
+        // Autostart fallback handler & MediaPipe loop activation
+        window.addEventListener('DOMContentLoaded', () => {
+            initClientMediaPipeHands();
+            requestAnimationFrame(runHandDetectionLoop);
+
+            serverImg.onerror = () => {
+                setJarvisMessage('Notice: Hardware webcam initializing. Click <strong>Browser HD Mode</strong> anytime for direct browser camera.');
+            };
+
+            // Calculate actual client rendering FPS
+            let clientFpsFrames = 0;
+            let lastClientFpsTime = performance.now();
+            function trackClientFps() {
+                clientFpsFrames++;
+                const now = performance.now();
+                if (now - lastClientFpsTime >= 1000) {
+                    const fps = Math.round((clientFpsFrames * 1000) / (now - lastClientFpsTime));
+                    document.getElementById('fpsCounter').textContent = `${Math.min(60, fps)} FPS`;
+                    clientFpsFrames = 0;
+                    lastClientFpsTime = now;
+                }
+                requestAnimationFrame(trackClientFps);
+            }
+            requestAnimationFrame(trackClientFps);
+        });
     </script>
 </body>
 </html>

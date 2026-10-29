@@ -60,12 +60,14 @@
         <span id="activeModelDot" style="display:inline-block; width:7px; height:7px; border-radius:50%; background:#4ade80; box-shadow:0 0 8px #4ade80;"></span>
         <label for="modelSelect" style="color:#94a3b8; font-weight:600; font-size:0.75rem; margin:0;">AI Model:</label>
         <select id="modelSelect" onchange="onModelSelectChange(this.value)" style="background:transparent; border:none; color:#38bdf8; font-weight:700; font-size:0.8rem; cursor:pointer; outline:none; padding:2px 0;">
-          <option value="auto" style="background:#0f172a; color:#38bdf8;" selected>⚡ Auto (Workload Router)</option>
-          <option value="qwen2.5-coder:7b" style="background:#0f172a; color:#f8fafc;">💻 Qwen 2.5 Coder 7B (Code & Web)</option>
-          <option value="deepseek-r1:8b" style="background:#0f172a; color:#f8fafc;">🧠 DeepSeek R1 8B (Reasoning & Math)</option>
-          <option value="qwen2.5vl:7b" style="background:#0f172a; color:#f8fafc;">👁️ Qwen 2.5-VL 7B (Vision & OCR)</option>
-          <option value="qwen2.5:3b" style="background:#0f172a; color:#f8fafc;">⚡ Qwen 2.5 3B (Fast Reflex & Banter)</option>
-          <option value="qwen2.5:7b" style="background:#0f172a; color:#f8fafc;">🌐 Qwen 2.5 7B (General Balanced)</option>
+          <optgroup label="⚡ Fast Real-Time (Ollama / GGUF)">
+            <option value="auto" style="background:#0f172a; color:#38bdf8;" selected>⚡ Auto (Workload Router)</option>
+            <option value="qwen2.5-coder:7b" style="background:#0f172a; color:#f8fafc;">💻 Qwen 2.5 Coder 7B (Code & Web)</option>
+            <option value="deepseek-r1:8b" style="background:#0f172a; color:#f8fafc;">🧠 DeepSeek R1 8B (Reasoning & Math)</option>
+            <option value="qwen2.5vl:7b" style="background:#0f172a; color:#f8fafc;">👁️ Qwen 2.5-VL 7B (Vision & OCR)</option>
+            <option value="qwen2.5:3b" style="background:#0f172a; color:#f8fafc;">⚡ Qwen 2.5 3B (Fast Reflex & Banter)</option>
+            <option value="qwen2.5:7b" style="background:#0f172a; color:#f8fafc;">🌐 Qwen 2.5 7B (General Balanced)</option>
+          </optgroup>
         </select>
         <span id="activeAutoModelLabel" style="display:none;">Auto</span>
       </div>

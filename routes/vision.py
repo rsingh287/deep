@@ -1,5 +1,5 @@
 import os
-from flask import Blueprint, jsonify, Response
+from flask import Blueprint, jsonify, Response, request
 
 DB_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "memory.db")
 OLLAMA_API = os.getenv("OLLAMA_HOST", "http://localhost:11434")
@@ -90,16 +90,64 @@ def vision_mediapipe_kinematics_api():
             }
         )
 
+_shared_stream_engine = None
+
+def get_shared_stream_engine():
+    global _shared_stream_engine
+    if _shared_stream_engine is None:
+        from mjpeg_stream_engine import LiveMJPEGStreamEngine
+        _shared_stream_engine = LiveMJPEGStreamEngine()
+    return _shared_stream_engine
+
 @vision_bp.route("/video_feed")
 def video_feed():
     """Continuous 30 FPS Live MJPEG Video Stream Route."""
-    from mjpeg_stream_engine import LiveMJPEGStreamEngine
-
-    engine = LiveMJPEGStreamEngine()
+    engine = get_shared_stream_engine()
     return Response(
         engine.generate_mjpeg_frames(),
         mimetype="multipart/x-mixed-replace; boundary=frame",
     )
+
+
+@vision_bp.route("/api/vision/telemetry")
+def vision_telemetry_api():
+    """Returns real-time AI computer vision telemetry (gestures, emotions, faces, hands, items)."""
+    try:
+        from mjpeg_stream_engine import LiveMJPEGStreamEngine
+
+        with LiveMJPEGStreamEngine.lock:
+            return jsonify({
+                "success": True,
+                "is_streaming": LiveMJPEGStreamEngine.is_streaming,
+                "telemetry": LiveMJPEGStreamEngine.latest_telemetry
+            })
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@vision_bp.route("/api/vision/client_telemetry", methods=["POST"])
+def client_vision_telemetry():
+    """Receives client-side MediaPipe hand gesture & emotion telemetry for zero-latency sync."""
+    try:
+        from mjpeg_stream_engine import LiveMJPEGStreamEngine
+
+        data = request.get_json(silent=True) or {}
+        gesture = data.get("gesture")
+        hand_count = data.get("hand_count")
+        emotion = data.get("emotion")
+
+        with LiveMJPEGStreamEngine.lock:
+            if gesture:
+                LiveMJPEGStreamEngine.latest_telemetry["gesture"] = gesture
+            if hand_count is not None:
+                LiveMJPEGStreamEngine.latest_telemetry["hand_count"] = hand_count
+            if emotion:
+                LiveMJPEGStreamEngine.latest_telemetry["emotion"] = emotion
+
+        return jsonify({"success": True})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
 
 
 

@@ -23,6 +23,14 @@ def handle_autonomous_intent(user_prompt: str):
 
     norm_prompt = user_prompt.lower().strip()
 
+    # Guard: Prompts with coding directives or long prompts belong to the LLM, not desktop automation
+    coding_signals = [
+        "act as", "write a", "create a", "build a", "write code", "html5", "index.html",
+        "<!doctype", "three.js", "frontend", "cybersecurity ui", "single-file", "prompt for"
+    ]
+    if len(norm_prompt.split()) > 15 or any(sig in norm_prompt for sig in coding_signals):
+        return None
+
     # --- MODULAR INTENT REGISTRY ---
     try:
         from intents.registry import execute_intent
@@ -32,7 +40,31 @@ def handle_autonomous_intent(user_prompt: str):
     except Exception as e:
         print(f"[Modular Registry] Error: {e}")
 
+    # 0.4 Portal Navigation Interceptor (/nexus, /camera_vision, etc.)
+    portal_clean = norm_prompt.strip()
+    if portal_clean in ["/nexus", "nexus", "open nexus", "launch nexus", "cyber nexus", "/cyber_nexus"]:
+        try:
+            webbrowser.open("http://127.0.0.1:5000/nexus")
+        except Exception:
+            pass
+        return (
+            "🚀 **Launching AETHERIS // Cyber Operations Nexus**\n\n"
+            "Opening the [AETHERIS Cyber Nexus](http://127.0.0.1:5000/nexus). Zero-Trust telemetry, 3D WebGL neural core, and cryptographic vault are now live.",
+            "nexus_portal_router",
+            {"portal": "/nexus", "status": "navigated"}
+        )
 
+    if portal_clean in ["/camera", "/camera_vision", "camera", "open camera", "camera vision", "launch camera"]:
+        try:
+            webbrowser.open("http://127.0.0.1:5000/camera_vision")
+        except Exception:
+            pass
+        return (
+            "📷 **Launching Live Camera & Gesture Tracking Cockpit**\n\n"
+            "Opening the [Camera Vision Cockpit](http://127.0.0.1:5000/camera_vision). Real-time webcam kinematics, MediaPipe face mesh, and sign language tracking active.",
+            "camera_portal_router",
+            {"portal": "/camera_vision", "status": "navigated"}
+        )
 
     # 0.5 Human Feedback & Conversational Praise / Correction Interceptor
     try:
@@ -61,7 +93,7 @@ def handle_autonomous_intent(user_prompt: str):
                 "#### 1. 🔍 **Real-Time Internet Access & Autonomous Research**\n"
                 "* **Live Web Intelligence & Scraping:** I search the web, fetch live URLs, query real-time public APIs, and scrape technical documentation directly via native Python and MCP tools.\n"
                 "* **Live Browser Pilot (`browser_use_agent`):** I can launch and navigate Microsoft Edge or Google Chrome to read documentation, verify websites, inspect web apps, or gather live data.\n"
-                "* **Background Research Swarm (`background_research_intent`):** On request, I deploy asynchronous background workers that monitor topics, scrape GitHub/arXiv/technical portals, and compile complete research dossiers directly to your Desktop.\n\n"
+                "* **Background Research Swarm (`background_research_intent`):** On request, I deploy asynchronous background workers that monitor topics, scrape GitHub/arXiv/technical portals, and compile complete research dossiers directly to your workspace scratch directory.\n\n"
                 "---\n\n"
                 "#### 2. 🧠 **How You Train Me Everyday (Continuous Learning Loop)**\n"
                 "You do **not** need to wait for external model retraining—my cognitive architecture continuously learns and adapts from you every single day through 5 integrated layers:\n\n"
@@ -1121,7 +1153,10 @@ I have generated the Python Tkinter script and launched the live desktop animati
             if not clean_query:
                 clean_query = "trending music"
                 
-            force_youtube_web = ("youtube" in prompt_low or "video" in prompt_low or "on yt" in prompt_low)
+            force_youtube_web = any(
+                p in prompt_low
+                for p in ["youtube", "on youtube", "in youtube", "on yt", "open youtube", "watch on youtube"]
+            )
 
             if not force_youtube_web:
                 track = local_music_engine.find_track(clean_query)
@@ -1155,7 +1190,14 @@ I have generated the Python Tkinter script and launched the live desktop animati
                         ],
                     )
 
-            # Explicit YouTube or Video request -> Open in Google Chrome (PC Speakers)
+                err_msg = download_res.get("message") or "Download and local playback failed."
+                return (
+                    f"⚠️ Could not find or play '{clean_query}' locally: {err_msg}",
+                    "autonomous_music_engine_error",
+                    [],
+                )
+
+            # Explicit YouTube request -> Open in Google Chrome (PC Speakers)
             encoded_query = urllib.parse.quote(clean_query)
             target_url = f"https://www.youtube.com/results?search_query={encoded_query}"
             local_music_engine.open_in_chrome(target_url)
@@ -3419,9 +3461,7 @@ I have generated the Python Tkinter script and launched the live desktop animati
     )
     is_explicit_yt_0c = (
         ("youtube" in prompt_low and any(w in prompt_low for w in ["search", "play", "open", "watch"]))
-        or ("on youtube" in prompt_low or "on yt" in prompt_low)
-        or bool(re.search(r"^play\s+(.+?\s+by\s+[a-zA-Z0-9\s]+)$", prompt_low))
-        or bool(re.search(r"^play\s+(?:the\s+)?(?:song|track|music|video)\b", prompt_low))
+        or ("on youtube" in prompt_low or "on yt" in prompt_low or "in youtube" in prompt_low)
     )
     if (
         not is_conv_play_0c
@@ -4403,16 +4443,30 @@ I have generated the Python Tkinter script and launched the live desktop animati
     # ---------------------------------------------------------
     web_keywords = [
         "make a website", "build a website", "create a website", "design a website",
-        "build website", "make website", "create website", "web architect"
+        "build website", "make website", "create website", "web architect",
+        "build a 3d website", "make a 3d website", "create a 3d website", "3d website"
     ]
     if any(k in prompt_low for k in web_keywords):
         try:
+            # Strip build/make triggers including advanced 3d prefixes
+            clean_topic = re.sub(
+                r"^(build|make|create|design|code|deploy)\s+(me\s+)?(an?\s+)?(advance[d]?\s+)?(3d\s+)?(spatial\s+)?(website|site|web\s+app)\s*(for\s+me|for|about)?\s*",
+                "",
+                user_prompt.strip(),
+                flags=re.IGNORECASE,
+            ).strip()
+            clean_topic = re.sub(r"^[^\w]+|[^\w]+$", "", clean_topic) or user_prompt
+
+            import importlib
+            import sys
+            import web_architect_skill
+            importlib.reload(web_architect_skill)
             from web_architect_skill import build_premium_website
 
             res_web = build_premium_website(
-                project_name=re.sub(r"[^a-zA-Z0-9]", "-", user_prompt.lower())[:25]
+                project_name=re.sub(r"[^a-zA-Z0-9]", "-", clean_topic.lower())[:25]
                 or "auto-project",
-                topic=user_prompt,
+                topic=clean_topic,
             )
             url_match = re.search(r"http://127.0.0.1:\d+", res_web)
             live_url = url_match.group(0) if url_match else "http://127.0.0.1:8095"
@@ -4420,7 +4474,13 @@ I have generated the Python Tkinter script and launched the live desktop animati
             local_path = (
                 path_match.group(1).strip() if path_match else "Unknown Path"
             )
-            webbrowser.open(live_url)
+            if os.path.exists(local_path):
+                try:
+                    os.startfile(local_path)
+                except Exception:
+                    webbrowser.open(live_url)
+            else:
+                webbrowser.open(live_url)
             return (
                 f"🚀 **Autonomous Web Architect:** Website successfully generated, styled, and deployed!\nLive URL: {live_url}\nLocal Path: `{local_path}`",
                 "autonomous_web_architect",

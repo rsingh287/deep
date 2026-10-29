@@ -10,16 +10,19 @@ class SelfHealingIntent(BaseIntent):
     @classmethod
     def execute(cls, user_prompt: str, norm_prompt: str):
         try:
-            import requests
-            url = "http://127.0.0.1:5000/api/agent/self_heal"
-            payload = {"context": user_prompt}
-            try:
-                res = requests.post(url, json=payload, timeout=10)
-                if res.status_code == 200:
-                    return (f"Self-Healing initiated. Analyzing the workspace and terminal logs...\n\nResult:\n{res.json().get('status', 'Started')}", "self_healing_agent", [])
-            except:
-                pass
-            return ("Self-Healing daemon engaged. Scanning `app_err.log` and active files for stack traces. Stand by...", "self_healing_agent", [{"language": "bash", "code": "tail -n 50 app_err.log | grep -A 10 Traceback", "output": "Analyzing..."}])
+            import agentic_orchestrator
+            res = agentic_orchestrator.orchestrator.tool_self_heal()
+            actions = "\n".join(f"- {a}" for a in res.get("actions_executed", []))
+            eq = res.get("system_equilibrium", "OPTIMAL")
+            ollama = res.get("ollama_status", "Unknown")
+            
+            msg = (
+                f"🩺 **Self-Healing Diagnostics & Remediation Completed** (Status: `{eq}`)\n\n"
+                f"**Diagnostics & Actions Executed:**\n{actions}\n\n"
+                f"- **Ollama Inference Engine:** {ollama}\n"
+                f"- **Memory & Process State:** Cleaned & Synchronized."
+            )
+            return (msg, "self_healing_agent", [{"language": "python", "code": "agentic_orchestrator.orchestrator.tool_self_heal()", "output": f"Equilibrium: {eq}"}])
         except Exception as e:
-            pass
-        return None
+            return (f"⚠️ **Self-Healing Diagnostics Warning:** {e}", "self_healing_agent", [])
+

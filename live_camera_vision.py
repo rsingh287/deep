@@ -15,37 +15,14 @@ class LiveCameraVisionEngine:
 
     def capture_live_frame_analysis(self):
         """Captures a frame from live webcam (or in-memory stream buffer), performs real-time visual analysis, and returns Base64 frame + AI scene description."""
-        from mjpeg_stream_engine import LiveMJPEGStreamEngine
+        from shared_memory_frame_buffer import acquire_vision_frame
 
-        frame = LiveMJPEGStreamEngine.get_latest_frame()
-
+        frame = acquire_vision_frame(camera_index=self.camera_index)
         if frame is None:
-            cap = None
-            if sys.platform.startswith("win"):
-                try:
-                    cap = cv2.VideoCapture(self.camera_index, cv2.CAP_DSHOW)
-                except Exception:
-                    cap = cv2.VideoCapture(self.camera_index)
-            else:
-                cap = cv2.VideoCapture(self.camera_index)
-
-            if cap is None or not cap.isOpened():
-                cap = cv2.VideoCapture(0)
-
-            if not cap.isOpened():
-                return {
-                    "success": False,
-                    "error": "Webcam camera device not accessible or currently in use by another app.",
-                }
-
-            ret, frame = cap.read()
-            cap.release()
-
-            if not ret or frame is None:
-                return {
-                    "success": False,
-                    "error": "Failed to read live camera video stream",
-                }
+            return {
+                "success": False,
+                "error": "Webcam camera device not accessible or currently in use by another app.",
+            }
 
         h, w, _ = frame.shape
 

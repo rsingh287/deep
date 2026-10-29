@@ -1,6 +1,8 @@
 import time
 
-def watch_screen_region(x, y, w, h, trigger_words=["Failed", "Error", "Exception"]):
+def watch_screen_region(x, y, w, h, trigger_words=None):
+    if trigger_words is None:
+        trigger_words = ["Failed", "Error", "Exception"]
     print(f"[RegionWatcher] Pinning Region x:{x} y:{y} w:{w} h:{h}. Watching for: {trigger_words}")
     
     # In a full GUI environment, this would loop and run OCR (e.g. pytesseract) 

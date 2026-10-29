@@ -9,15 +9,18 @@ OLLAMA_API = os.getenv("OLLAMA_HOST", "http://localhost:11434")
 def get_deepseek_tools_schema():
     """Convert MCP tools into a schema string for DeepSeek."""
     schema = []
-    # If mcp_integration has loaded tools, format them
-    if hasattr(mcp_integration, "MCP_TOOLS_CACHE"):
-        for server, tools in mcp_integration.MCP_TOOLS_CACHE.items():
-            for t in tools:
-                schema.append({
-                    "server": server,
-                    "tool": t.get("name"),
-                    "description": t.get("description")
-                })
+    if hasattr(mcp_integration, "get_all_tool_definitions"):
+        for t in mcp_integration.get_all_tool_definitions():
+            name = t.get("name", "")
+            server = name.split("__")[0] if "__" in name else "native"
+            tool = name.split("__", 1)[1] if "__" in name else name
+            schema.append({
+                "server": server,
+                "tool": tool,
+                "full_name": name,
+                "description": t.get("description", ""),
+                "parameters": t.get("inputSchema", {})
+            })
     return schema
 
 def execute_deepseek_harness(prompt, history=None):
@@ -70,28 +73,25 @@ If you do NOT want to use a tool, or after you have sufficient information, just
         if resp.status_code == 200:
             content = resp.json().get("message", {}).get("content", "")
             
-            # Extract and remove <think> blocks
-            think_match = re.search(r'<think>(.*?)</think>', content, re.DOTALL)
-            if think_match:
-                # Optionally, you can log or preserve the thought process somewhere else
-                pass
-            content = re.sub(r'<think>.*?</think>', '', content, flags=re.DOTALL).strip()
+            # Extract and remove <think> blocks (including unclosed tags if truncated)
+            content = re.sub(r'<think>.*?(?:</think>|$)', '', content, flags=re.DOTALL).strip()
             
             # Simple extractor for the JSON tool call
             match = re.search(r'```json\s*(\{.*?"action":\s*"call_tool".*?\})\s*```', content, re.DOTALL)
             if match:
                 try:
                     tool_call = json.loads(match.group(1))
-                    server = tool_call.get("server")
-                    tool = tool_call.get("tool")
+                    server = tool_call.get("server", "")
+                    tool = tool_call.get("tool", "")
                     args = tool_call.get("args", {})
                     
-                    # Execute tool synchronously
-                    result = mcp_integration.call_mcp_tool(server, tool, args)
+                    # Resolve full tool identifier
+                    tool_name = tool if "__" in tool else (f"{server}__{tool}" if server and server != "native" else tool)
                     
-                    # Optional: feed the result back to the model for a final synthesis pass
-                    # For now, we return the reasoning + tool output to the UI
-                    return f"{content}\n\n**Tool Executed: {server}/{tool}**\nOutput:\n```\n{result}\n```"
+                    # Execute tool synchronously via mcp_integration
+                    result = mcp_integration.call_tool(tool_name, args)
+                    
+                    return f"{content}\n\n**Tool Executed: {tool_name}**\nOutput:\n```\n{json.dumps(result, indent=2) if isinstance(result, dict) else result}\n```"
                 except Exception as e:
                     return f"{content}\n\n**Tool Execution Failed:** {e}"
                     

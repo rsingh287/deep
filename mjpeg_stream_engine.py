@@ -8,6 +8,7 @@ os.environ["OPENCV_VIDEOIO_PRIORITY_MSMF"] = "0"
 os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"
 
 import cv2
+from shared_memory_frame_buffer import SharedMemoryFrameWriter, SharedMemoryFrameReader
 
 try:
     from ultralytics import YOLO
@@ -75,60 +76,62 @@ class LiveMJPEGStreamEngine:
     worker_thread = None
     lock = threading.Lock()
 
-    def __init__(self, camera_index=0):
-        self.camera_index = camera_index
-        cascade_path = cv2.data.haarcascades + "haarcascade_frontalface_default.xml"
-        self.face_cascade = (
-            cv2.CascadeClassifier(cascade_path)
-            if os.path.exists(cascade_path)
-            else None
-        )
+    _shared_face_cascade = None
+    _shared_yolo_model = None
+    _shared_mp_hands = None
+    _shared_emotion_pipeline = None
+    _models_initialized = False
 
-        # 1. Load YOLOv8 Deep Learning Model for All Items, Animals, Birds & Tech
-        self.yolo_model = None
+    @classmethod
+    def _ensure_models_loaded(cls):
+        """Loads neural models ONCE at class level to avoid blocking client requests."""
+        if cls._models_initialized:
+            return
+        cls._models_initialized = True
+
+        cascade_path = cv2.data.haarcascades + "haarcascade_frontalface_default.xml"
+        if os.path.exists(cascade_path):
+            cls._shared_face_cascade = cv2.CascadeClassifier(cascade_path)
+
         if YOLO_AVAILABLE:
             try:
-                self.yolo_model = YOLO("yolov8n.pt")
-                print("🧠 YOLOv8 Multi-Object & Animal Neural Network Model Active!")
+                cls._shared_yolo_model = YOLO("yolov8n.pt")
+                print("🧠 YOLOv8 Multi-Object & Animal Neural Network Model Active!", flush=True)
             except Exception as e:
-                print(f"⚠️ Failed to load YOLOv8 model: {e}")
+                print(f"⚠️ Failed to load YOLOv8 model: {e}", flush=True)
 
-        # 2. Load Google MediaPipe Gesture Recognizer Model for 100% Precision Hand Bounding & Gesture Recognition
-        self.gesture_recognizer = None
-        task_path = os.path.join(os.path.dirname(__file__), "gesture_recognizer.task")
-        if MEDIAPIPE_AVAILABLE and os.path.exists(task_path):
+        if MEDIAPIPE_AVAILABLE:
             try:
-                base_options = python.BaseOptions(model_asset_path=task_path)
-                options = vision.GestureRecognizerOptions(
-                    base_options=base_options,
-                    num_hands=2,
-                    min_hand_detection_confidence=0.3,
-                    min_hand_presence_confidence=0.3,
-                    min_tracking_confidence=0.3,
+                cls._shared_mp_hands = mp.solutions.hands.Hands(
+                    static_image_mode=False,
+                    max_num_hands=2,
+                    min_detection_confidence=0.35,
+                    min_tracking_confidence=0.35,
                 )
-                self.gesture_recognizer = vision.GestureRecognizer.create_from_options(
-                    options
-                )
-                print("✋ Google MediaPipe Neural Network Gesture Recognizer Active!")
-            except Exception as e:
-                print(f"⚠️ Failed to load MediaPipe Gesture Recognizer: {e}")
+                print("✋ Google MediaPipe Native Kinematics Hands Engine Active!", flush=True)
+            except Exception as he:
+                print(f"⚠️ Failed to load MediaPipe Hands solution: {he}", flush=True)
 
-        # 3. Load HuggingFace Vision Transformer (ViT) Deep Learning Model for Facial Emotion
-        self.emotion_pipeline = None
+        try:
+            from transformers import pipeline
+            cls._shared_emotion_pipeline = pipeline(
+                "image-classification", model="dima806/facial_emotions_image_detection"
+            )
+            print("😊 HuggingFace Deep Learning Facial Emotion ViT Model Active!", flush=True)
+        except Exception as e:
+            print(f"⚠️ Failed to load HuggingFace Emotion ViT Model: {e}", flush=True)
+
+    def __init__(self, camera_index=0):
+        self.camera_index = camera_index
+        self._ensure_models_loaded()
+        self.face_cascade = self._shared_face_cascade
+        self.yolo_model = self._shared_yolo_model
+        self.gesture_recognizer = None
+        self.mp_hands_solution = self._shared_mp_hands
+        self.emotion_pipeline = self._shared_emotion_pipeline
         self.cached_emotion = "NEUTRAL (92%)"
         self.emotion_busy = False
         self.last_emotion_time = 0
-        try:
-            from transformers import pipeline
-
-            self.emotion_pipeline = pipeline(
-                "image-classification", model="dima806/facial_emotions_image_detection"
-            )
-            print(
-                "😊 HuggingFace Deep Learning Facial Emotion ViT Model Active (Async Accelerated)!"
-            )
-        except Exception as e:
-            print(f"⚠️ Failed to load HuggingFace Emotion ViT Model: {e}")
 
     def _async_emotion_predict(self, face_crop):
         try:
@@ -152,6 +155,12 @@ class LiveMJPEGStreamEngine:
         with cls.lock:
             if cls.latest_raw_frame is not None:
                 return cls.latest_raw_frame.copy()
+        try:
+            reader = SharedMemoryFrameReader(name="deep_mjpeg_frame_buffer")
+            frame, _ = reader.read_frame(copy=True)
+            reader.close()
+            return frame
+        except Exception:
             return None
 
     @classmethod
@@ -208,9 +217,19 @@ class LiveMJPEGStreamEngine:
                 LiveMJPEGStreamEngine.is_streaming = False
             return
 
-        cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
-        cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
-        cap.set(cv2.CAP_PROP_BUFFERSIZE, 1)
+        try:
+            cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
+            cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
+            cap.set(cv2.CAP_PROP_BUFFERSIZE, 1)
+        except Exception as prop_err:
+            print(f"⚠️ Camera property setting notice: {prop_err}")
+
+        shm_writer = None
+        try:
+            shm_writer = SharedMemoryFrameWriter(name="deep_mjpeg_frame_buffer")
+            print("⚡ Zero-Copy Shared Memory Frame Buffer Active (deep_mjpeg_frame_buffer)!")
+        except Exception as shm_err:
+            print(f"⚠️ Shared memory buffer init notice: {shm_err}")
 
         try:
             while LiveMJPEGStreamEngine.is_streaming:
@@ -219,29 +238,37 @@ class LiveMJPEGStreamEngine:
                     time.sleep(0.02)
                     continue
 
-                # Digital Zoom Out (0.85x Wide Angle Canvas for maximum room)
-                h_orig, w_orig = frame.shape[:2]
-                zoom_out_factor = 0.85
-                nw = int(w_orig * zoom_out_factor)
-                nh = int(h_orig * zoom_out_factor)
-                resized_frame = cv2.resize(
-                    frame, (nw, nh), interpolation=cv2.INTER_AREA
-                )
+                display_frame = frame.copy()
+                h_img, w_img, _ = display_frame.shape
 
-                # Create padded canvas (Zoom Out effect)
-                display_frame = cv2.copyMakeBorder(
-                    resized_frame,
-                    top=(h_orig - nh) // 2,
-                    bottom=(h_orig - nh) // 2,
-                    left=(w_orig - nw) // 2,
-                    right=(w_orig - nw) // 2,
-                    borderType=cv2.BORDER_CONSTANT,
-                    value=[15, 15, 20],
-                )
+                # Check if camera optic is covered or privacy slider is shut
+                if frame.mean() < 3.0:
+                    cv2.putText(
+                        display_frame,
+                        "OPTICAL SENSOR BLOCKED OR PRIVACY SHUTTER CLOSED",
+                        (max(15, w_img // 2 - 270), h_img // 2 - 12),
+                        cv2.FONT_HERSHEY_SIMPLEX,
+                        0.58,
+                        (0, 165, 255),
+                        2,
+                    )
+                    cv2.putText(
+                        display_frame,
+                        "Slide camera shutter open or switch to Direct Browser HD Mode",
+                        (max(15, w_img // 2 - 290), h_img // 2 + 22),
+                        cv2.FONT_HERSHEY_SIMPLEX,
+                        0.50,
+                        (0, 240, 255),
+                        1,
+                    )
+
+                # Publish frame to leak-proof Shared Physical RAM Buffer (IPC Zero-Copy)
+                if shm_writer is not None:
+                    shm_writer.write_frame(display_frame)
 
                 # Store raw frame
                 with LiveMJPEGStreamEngine.lock:
-                    LiveMJPEGStreamEngine.latest_raw_frame = display_frame.copy()
+                    LiveMJPEGStreamEngine.latest_raw_frame = display_frame
 
                 h_img, w_img, _ = display_frame.shape
 
@@ -423,38 +450,18 @@ class LiveMJPEGStreamEngine:
                     (13, 17),  # Palm
                 ]
 
+                detected_hands = []
                 if self.gesture_recognizer is not None:
                     # Convert BGR frame to RGB MediaPipe Image
                     rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
                     mp_image = mp.Image(
                         image_format=mp.ImageFormat.SRGB, data=rgb_frame
                     )
-
                     try:
                         recognition_result = self.gesture_recognizer.recognize(mp_image)
-
                         if recognition_result and recognition_result.hand_landmarks:
-                            hands_found = len(recognition_result.hand_landmarks)
-
-                            for hand_idx, hand_landmarks in enumerate(
-                                recognition_result.hand_landmarks
-                            ):
-                                # Extract 21 hand joint coordinates for THIS hand
-                                coords = [
-                                    (int(lm.x * w_img), int(lm.y * h_img))
-                                    for lm in hand_landmarks
-                                ]
-                                x_coords = [c[0] for c in coords]
-                                y_coords = [c[1] for c in coords]
-
-                                # Calculate tight hand box
-                                min_x = max(0, min(x_coords) - 10)
-                                max_x = min(w_img, max(x_coords) + 10)
-                                min_y = max(0, min(y_coords) - 10)
-                                max_y = min(h_img, max(y_coords) + 10)
-
-                                # 21 Landmark Rotation-Invariant Kinematic & MediaPipe Deep Learning Gesture Engine
-                                mp_gesture = ""
+                            for hand_idx, hand_landmarks in enumerate(recognition_result.hand_landmarks):
+                                g_cand = ""
                                 if (
                                     hasattr(recognition_result, "gestures")
                                     and recognition_result.gestures
@@ -462,159 +469,177 @@ class LiveMJPEGStreamEngine:
                                     and recognition_result.gestures[hand_idx]
                                 ):
                                     top_g = recognition_result.gestures[hand_idx][0]
-                                    if (
-                                        top_g.score > 0.3
-                                        and top_g.category_name
-                                        not in ["None", "Unrecognized", ""]
-                                    ):
-                                        g_name = top_g.category_name.upper().replace(
-                                            "_", " "
-                                        )
-                                        if g_name == "VICTORY":
-                                            g_name = "PEACE / VICTORY SIGN"
-                                        elif g_name == "OPEN PALM":
-                                            g_name = "OPEN PALM / HELLO"
-                                        mp_gesture = g_name
-
-                                wrist = coords[0]
-                                mcp_mid = coords[9]
-
-                                def get_dist(p1, p2):
-                                    return math.hypot(p1[0] - p2[0], p1[1] - p2[1])
-
-                                palm_size = max(15.0, get_dist(wrist, mcp_mid))
-
-                                index_ext = get_dist(wrist, coords[8]) > (
-                                    palm_size * 1.15
-                                )
-                                middle_ext = get_dist(wrist, coords[12]) > (
-                                    palm_size * 1.15
-                                )
-                                ring_ext = get_dist(wrist, coords[16]) > (
-                                    palm_size * 1.15
-                                )
-                                pinky_ext = get_dist(wrist, coords[20]) > (
-                                    palm_size * 1.15
-                                )
-                                thumb_ext = get_dist(wrist, coords[4]) > (
-                                    palm_size * 1.05
-                                )
-
-                                thumb_dir_y = coords[4][1] - wrist[1]
-                                index_dir_x = coords[8][0] - wrist[0]
-                                index_dir_y = coords[8][1] - wrist[1]
-
-                                if (
-                                    index_ext
-                                    and not middle_ext
-                                    and not ring_ext
-                                    and not pinky_ext
-                                ):
-                                    if abs(index_dir_x) > abs(index_dir_y):
-                                        if index_dir_x < -20:
-                                            current_gesture = "POINTING LEFT 👈"
-                                        else:
-                                            current_gesture = "POINTING RIGHT 👉"
-                                    else:
-                                        if index_dir_y > 20:
-                                            current_gesture = "POINTING DOWN 👇"
-                                        else:
-                                            current_gesture = "POINTING UP ☝️"
-                                elif (
-                                    index_ext and middle_ext and ring_ext and pinky_ext
-                                ):
-                                    current_gesture = "OPEN PALM / HELLO ✋"
-                                elif (
-                                    index_ext
-                                    and middle_ext
-                                    and not ring_ext
-                                    and not pinky_ext
-                                ):
-                                    current_gesture = "PEACE / VICTORY SIGN ✌️"
-                                elif (
-                                    thumb_ext
-                                    and pinky_ext
-                                    and not index_ext
-                                    and not middle_ext
-                                    and not ring_ext
-                                ):
-                                    current_gesture = "HANG LOOSE / CALL 🤙"
-                                elif (
-                                    index_ext
-                                    and pinky_ext
-                                    and not middle_ext
-                                    and not ring_ext
-                                ):
-                                    current_gesture = "ROCK / METAL 🤘"
-                                elif (
-                                    index_ext
-                                    and middle_ext
-                                    and ring_ext
-                                    and not pinky_ext
-                                ):
-                                    current_gesture = "THREE FINGERS / OK 🤟"
-                                elif (
-                                    thumb_ext
-                                    and not index_ext
-                                    and not middle_ext
-                                    and not ring_ext
-                                    and not pinky_ext
-                                ):
-                                    if thumb_dir_y > 15:
-                                        current_gesture = "THUMBS DOWN 👎"
-                                    else:
-                                        current_gesture = "THUMBS UP 👍"
-                                elif (
-                                    not index_ext
-                                    and not middle_ext
-                                    and not ring_ext
-                                    and not pinky_ext
-                                ):
-                                    current_gesture = "CLOSED FIST ✊"
-                                elif mp_gesture:
-                                    current_gesture = mp_gesture
-                                else:
-                                    current_gesture = "ACTIVE HAND SIGN ✋"
-
-                                # Draw 3D Hand Skeletal Lines (Cyan)
-                                for start_idx, end_idx in HAND_CONNECTIONS:
-                                    if start_idx < len(coords) and end_idx < len(
-                                        coords
-                                    ):
-                                        cv2.line(
-                                            display_frame,
-                                            coords[start_idx],
-                                            coords[end_idx],
-                                            (255, 240, 0),
-                                            2,
-                                        )
-
-                                # Draw 21 Hand Landmark Joints (Neon Green)
-                                for lx, ly in coords:
-                                    cv2.circle(
-                                        display_frame, (lx, ly), 4, (0, 255, 136), -1
-                                    )
-
-                                # Draw Box around Hand (text_x aligned so it never gets cut off on frame edge!)
-                                text_x = max(10, min(min_x, w_img - 260))
-                                cv2.rectangle(
-                                    display_frame,
-                                    (min_x, min_y),
-                                    (max_x, max_y),
-                                    (0, 255, 255),
-                                    2,
-                                )
-                                cv2.putText(
-                                    display_frame,
-                                    f"HAND: {current_gesture}",
-                                    (text_x, max(25, min_y - 10)),
-                                    cv2.FONT_HERSHEY_SIMPLEX,
-                                    0.6,
-                                    (0, 255, 255),
-                                    2,
-                                )
+                                    if top_g.score > 0.3 and top_g.category_name not in ["None", "Unrecognized", ""]:
+                                        g_cand = top_g.category_name.upper().replace("_", " ")
+                                detected_hands.append((hand_idx, [(lm.x, lm.y) for lm in hand_landmarks], g_cand))
                     except Exception:
                         pass
+                elif self.mp_hands_solution is not None:
+                    rgb_frame = cv2.cvtColor(display_frame, cv2.COLOR_BGR2RGB)
+                    rgb_frame.flags.writeable = False
+                    try:
+                        res = self.mp_hands_solution.process(rgb_frame)
+                        if res and res.multi_hand_landmarks:
+                            for hand_idx, h_lm in enumerate(res.multi_hand_landmarks):
+                                detected_hands.append((hand_idx, [(lm.x, lm.y) for lm in h_lm.landmark], ""))
+                    except Exception:
+                        pass
+
+                if detected_hands:
+                    hands_found = len(detected_hands)
+                    try:
+                        for hand_idx, hand_landmarks_norm, mp_gesture in detected_hands:
+                            # Extract 21 hand joint coordinates for THIS hand
+                            coords = [
+                                (int(lm_x * w_img), int(lm_y * h_img))
+                                for lm_x, lm_y in hand_landmarks_norm
+                            ]
+                            x_coords = [c[0] for c in coords]
+                            y_coords = [c[1] for c in coords]
+
+                            # Calculate tight hand box
+                            min_x = max(0, min(x_coords) - 10)
+                            max_x = min(w_img, max(x_coords) + 10)
+                            min_y = max(0, min(y_coords) - 10)
+                            max_y = min(h_img, max(y_coords) + 10)
+
+                            wrist = coords[0]
+                            mcp_mid = coords[9]
+
+                            def get_dist(p1, p2):
+                                return math.hypot(p1[0] - p2[0], p1[1] - p2[1])
+
+                            palm_size = max(15.0, get_dist(wrist, mcp_mid))
+
+                            # Kinematic knuckle-relative finger extension analysis
+                            thumb_ext = get_dist(coords[4], coords[9]) > get_dist(coords[2], coords[9]) * 1.15
+                            index_ext = get_dist(coords[8], wrist) > get_dist(coords[6], wrist) * 1.12
+                            middle_ext = get_dist(coords[12], wrist) > get_dist(coords[10], wrist) * 1.12
+                            ring_ext = get_dist(coords[16], wrist) > get_dist(coords[14], wrist) * 1.12
+                            pinky_ext = get_dist(coords[20], wrist) > get_dist(coords[18], wrist) * 1.12
+
+                            index_dir_x = coords[8][0] - wrist[0]
+                            index_dir_y = coords[8][1] - wrist[1]
+
+                            if (
+                                index_ext
+                                and not middle_ext
+                                and not ring_ext
+                                and not pinky_ext
+                            ):
+                                if abs(index_dir_x) > abs(index_dir_y):
+                                    if index_dir_x < -20:
+                                        current_gesture = "POINTING LEFT 👈"
+                                    else:
+                                        current_gesture = "POINTING RIGHT 👉"
+                                else:
+                                    if index_dir_y > 20:
+                                        current_gesture = "POINTING DOWN 👇"
+                                    else:
+                                        current_gesture = "POINTING UP ☝️"
+                            elif (
+                                index_ext and middle_ext and ring_ext and pinky_ext
+                            ):
+                                current_gesture = "OPEN PALM / HELLO ✋"
+                            elif (
+                                index_ext
+                                and middle_ext
+                                and not ring_ext
+                                and not pinky_ext
+                            ):
+                                current_gesture = "PEACE / VICTORY SIGN ✌️"
+                            elif (
+                                thumb_ext
+                                and pinky_ext
+                                and not index_ext
+                                and not middle_ext
+                                and not ring_ext
+                            ):
+                                current_gesture = "HANG LOOSE / CALL 🤙"
+                            elif (
+                                index_ext
+                                and pinky_ext
+                                and not middle_ext
+                                and not ring_ext
+                            ):
+                                current_gesture = "ROCK / METAL 🤘"
+                            elif (
+                                thumb_ext
+                                and index_ext
+                                and pinky_ext
+                                and not middle_ext
+                                and not ring_ext
+                            ):
+                                current_gesture = "LOVE SIGN 🤟"
+                            elif (
+                                index_ext
+                                and middle_ext
+                                and ring_ext
+                                and not pinky_ext
+                            ):
+                                current_gesture = "THREE FINGERS / OK 🤟"
+                            elif (
+                                thumb_ext
+                                and not index_ext
+                                and not middle_ext
+                                and not ring_ext
+                                and not pinky_ext
+                            ):
+                                if coords[4][1] > wrist[1] + 15:
+                                    current_gesture = "THUMBS DOWN 👎"
+                                else:
+                                    current_gesture = "THUMBS UP 👍"
+                            elif (
+                                not index_ext
+                                and not middle_ext
+                                and not ring_ext
+                                and not pinky_ext
+                            ):
+                                current_gesture = "CLOSED FIST ✊"
+                            elif get_dist(coords[4], coords[8]) < palm_size * 0.45 and middle_ext and ring_ext:
+                                current_gesture = "OK SIGN 👌"
+                            elif mp_gesture:
+                                current_gesture = mp_gesture
+                            else:
+                                current_gesture = "ACTIVE HAND SIGN ✋"
+
+                            # Draw 3D Hand Skeletal Lines (Cyan)
+                            for start_idx, end_idx in HAND_CONNECTIONS:
+                                if start_idx < len(coords) and end_idx < len(
+                                    coords
+                                ):
+                                    cv2.line(
+                                        display_frame,
+                                        coords[start_idx],
+                                        coords[end_idx],
+                                        (255, 240, 0),
+                                        2,
+                                    )
+
+                            # Draw 21 Hand Landmark Joints (Neon Green)
+                            for lx, ly in coords:
+                                cv2.circle(
+                                    display_frame, (lx, ly), 4, (0, 255, 136), -1
+                                )
+
+                            # Draw Box around Hand (text_x aligned so it never gets cut off on frame edge!)
+                            text_x = max(10, min(min_x, w_img - 260))
+                            cv2.rectangle(
+                                display_frame,
+                                (min_x, min_y),
+                                (max_x, max_y),
+                                (0, 255, 255),
+                                2,
+                            )
+                            cv2.putText(
+                                display_frame,
+                                f"HAND: {current_gesture}",
+                                (text_x, max(25, min_y - 10)),
+                                cv2.FONT_HERSHEY_SIMPLEX,
+                                0.6,
+                                (0, 255, 255),
+                                2,
+                            )
                     except Exception:
                         pass
 
@@ -655,9 +680,17 @@ class LiveMJPEGStreamEngine:
                     }
 
                 time.sleep(0.015)
+        except Exception as worker_err:
+            print(f"⚠️ Webcam hardware capture worker encountered error: {worker_err}")
         finally:
             if cap is not None and cap.isOpened():
                 cap.release()
+            if shm_writer is not None:
+                try:
+                    shm_writer.close()
+                    shm_writer.unlink()
+                except Exception:
+                    pass
             with LiveMJPEGStreamEngine.lock:
                 LiveMJPEGStreamEngine.latest_raw_frame = None
                 LiveMJPEGStreamEngine.latest_jpeg_bytes = None
@@ -675,6 +708,13 @@ class LiveMJPEGStreamEngine:
         """Yields MJPEG stream bytes from shared RAM buffer continuously for the HTTP response."""
         self.start_worker_if_needed()
         try:
+            # Wait up to 1.5 seconds for first frame
+            for _ in range(40):
+                with LiveMJPEGStreamEngine.lock:
+                    if LiveMJPEGStreamEngine.latest_jpeg_bytes is not None:
+                        break
+                time.sleep(0.04)
+
             while LiveMJPEGStreamEngine.is_streaming:
                 with LiveMJPEGStreamEngine.lock:
                     frame_bytes = LiveMJPEGStreamEngine.latest_jpeg_bytes

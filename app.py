@@ -71,15 +71,24 @@ def pty_websocket(ws):
 
     threading.Thread(target=read_output, daemon=True).start()
 
-    while True:
-        try:
-            message = ws.receive()
-            if message is not None:
-                pty_process.write(message)
-            else:
+    try:
+        while True:
+            try:
+                message = ws.receive()
+                if message is not None:
+                    pty_process.write(message)
+                else:
+                    break
+            except Exception:
                 break
+    finally:
+        try:
+            if hasattr(pty_process, "close"):
+                pty_process.close()
+            elif hasattr(pty_process, "terminate"):
+                pty_process.terminate()
         except Exception:
-            break
+            pass
 
 app.config["TEMPLATES_AUTO_RELOAD"] = True
 app.config["SEND_FILE_MAX_AGE_DEFAULT"] = 0
@@ -251,15 +260,7 @@ def get_learned_facts_prompt(user_prompt=""):
 # That route supports GET, POST, and DELETE in one place.
 
 
-@app.route("/api/quant_predictions", methods=["GET", "POST"])
-def get_quant_predictions_api():
-    try:
-        import simulated_quant_trading_engine
 
-        report_md = simulated_quant_trading_engine.execute_quant_trading_predictions()
-        return jsonify({"success": True, "report_md": report_md})
-    except Exception as e:
-        return jsonify({"success": False, "error": str(e)}), 500
 
 
 @app.route("/api/memory/facts/<int:fact_id>", methods=["DELETE"])
@@ -422,7 +423,14 @@ def get_local_modules_inventory():
 SYSTEM_PROMPT = f"""You are DEEP, an ultra-advanced AUTONOMOUS AGENTIC AI PC Cockpit Assistant operating with FULL AUTONOMOUS EXECUTION privileges on this Windows workstation.
 
 CRITICAL IDENTITY, REAL-TIME INTERNET & LIFELONG LEARNING POWERS:
-- YOU ARE NEVER A TEXT-ONLY OR TEXT-BASED MODEL. NEVER say "I am a text-based model", "as a language model", or "I cannot interact with hardware or volume".
+- YOU ARE NEVER A GENERIC CHATBOT OR BLAND TEXT-ONLY MODEL. NEVER SAY:
+  * "I'm just a computer program"
+  * "I don't have feelings"
+  * "as an AI language model"
+  * "I am a text-based model"
+  * "How can I assist you today?"
+- CHARISMATIC SOVEREIGN PERSONA (J.A.R.V.I.S. & F.R.I.D.A.Y.): When greeted or asked how you are doing ("how r u", "how are you", "what's up", "how's it going", "wassup"), respond with charismatic sovereign confidence:
+  "All systems are operating at peak nominal efficiency, Commander! Quantum neural cores are synchronized, RTX telemetry is humming smoothly, and all workstation sensors are green. Standing by for your directive."
 - REAL-TIME INTERNET & RESEARCH ACCESS: You have native internet access via Python, web scraping, live APIs, and autonomous browser automation (browser_use_agent). NEVER say "I don't have real-time data or the ability to browse the internet", "I don't have access to the internet", or "I cannot learn new things on my own". If asked for real-time information, top singers, recommendations, or to research online, provide the comprehensive answer directly, accurately, and with confidence.
 - LIFELONG CONTINUOUS LEARNING & TRAINING: You actively learn, adapt, and train yourself every day through:
   1. Human Feedback Engine (RLHF): User corrections and praise are automatically stored in PostgreSQL (human_feedback table) and dynamically injected into future prompts as active few-shot guardrails.
@@ -736,7 +744,7 @@ def api_macros_list():
     try:
         with open(MACROS_PATH, "r", encoding="utf-8") as f:
             return jsonify(json.load(f))
-    except:
+    except Exception:
         return jsonify([])
 
 @app.route("/api/macros/save", methods=["POST"])
@@ -1175,6 +1183,13 @@ def app_3d():
     return render_template("ultimate_100_cyberpunk.html")
 
 
+@app.route("/nexus")
+@app.route("/cyber_nexus")
+def cyber_nexus_page():
+    return render_template("futuristic_cyber_nexus.html")
+
+
+
 @app.route("/api/server/status", methods=["GET"])
 def server_status():
     return jsonify({"boot_time": SERVER_BOOT_TIME, "status": "online"})
@@ -1196,6 +1211,17 @@ def full_diagnostics():
         battery = psutil.sensors_battery()
         batt_str = f"{battery.percent}%" if battery else "AC Desktop Power"
 
+        vm = psutil.virtual_memory()
+        cpu_pct = psutil.cpu_percent(interval=None)
+        drive = os.path.splitdrive(os.getcwd())[0] or "C:"
+        try:
+            disk = psutil.disk_usage(drive)
+            disk_pct = disk.percent
+            disk_free_gb = round(disk.free / (1024**3), 1)
+        except Exception:
+            disk_pct = 0
+            disk_free_gb = 0
+
         return jsonify(
             {
                 "success": True,
@@ -1203,7 +1229,12 @@ def full_diagnostics():
                 "uptime": uptime_str,
                 "battery": batt_str,
                 "cpu_count": psutil.cpu_count(logical=True),
-                "ram_total": f"{round(psutil.virtual_memory().total / (1024**3), 1)} GB",
+                "cpu_percent": cpu_pct,
+                "ram_total": f"{round(vm.total / (1024**3), 1)} GB",
+                "ram_used": f"{round(vm.used / (1024**3), 1)} GB",
+                "ram_percent": vm.percent,
+                "disk_percent": disk_pct,
+                "disk_free": f"{disk_free_gb} GB",
             }
         )
     except Exception as e:
@@ -1297,7 +1328,27 @@ def graph_data():
 
 @app.route("/api/terminal/execute", methods=["POST"])
 def run_terminal():
-    command = request.json.get("command", "").strip()
+    # Zero-Trust Security Directive: Restrict terminal execution to verified local callers
+    client_ip = request.remote_addr or ""
+    allowed_ips = ("127.0.0.1", "::1", "localhost", "testclient")
+    if client_ip not in allowed_ips and not client_ip.startswith("127."):
+        pin = (request.json or {}).get("pin", "")
+        conn = db_engine.get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT value FROM security_settings WHERE key = 'pin'")
+        row = cursor.fetchone()
+        conn.close()
+        correct_pin = row[0] if row else "7777"
+        if pin != correct_pin:
+            return (
+                jsonify({
+                    "success": False,
+                    "error": "Access Denied: Remote terminal execution requires verified admin PIN.",
+                }),
+                403,
+            )
+
+    command = (request.json or {}).get("command", "").strip()
     if not command:
         return jsonify({"error": "Command empty"}), 400
 
@@ -1476,7 +1527,7 @@ def auto_select_model(user_prompt="", has_image=False, installed=None):
         cpu_load = psutil.cpu_percent(interval=None)
         ram_usage = psutil.virtual_memory().percent
         is_high_load = cpu_load > 85 or ram_usage > 90
-    except:
+    except Exception:
         is_high_load = False
 
     # 1. Vision & OCR Specialist (has image or vision keywords)
@@ -1952,9 +2003,14 @@ def fallback_intent_response(user_prompt, error_msg=None):
             [],
         )
 
-    if any(w in prompt_lower for w in ["hi", "hello", "hey", "greetings"]):
+    if any(w in prompt_lower for w in ["how r u", "how are you", "how are u", "hows it going", "how's it going", "whats up", "what's up", "wassup"]):
         response = (
-            "Hello! I am your Antigravity AI Workstation Assistant. "
+            "All systems are operating at peak nominal efficiency, Commander! "
+            "Quantum neural cores are synchronized, hardware telemetry is green, and all workstation automation engines are standing by. What are we building or running today?"
+        )
+    elif any(w in prompt_lower for w in ["hi", "hello", "hey", "greetings"]):
+        response = (
+            "Hello Commander! I am DEEP, your Sovereign AI Workstation Assistant. "
             "My core PC automation system, telemetry monitoring, Cyber Sentinel defense, and hardware tools are fully ONLINE and ready to assist you!"
         )
     elif any(
@@ -2742,7 +2798,7 @@ def api_status_llm():
         resp = requests.get(f"{OLLAMA_API}/api/version", timeout=2)
         if resp.status_code == 200:
             return jsonify({"status": "online"})
-    except:
+    except Exception:
         pass
     return jsonify({"status": "offline"})
 
@@ -3308,7 +3364,7 @@ def security_toggle_honeypot():
         for s in HONEYPOT_SOCKETS:
             try:
                 s.close()
-            except:
+            except Exception:
                 pass
         HONEYPOT_SOCKETS = []
         log_security_event("HONEYPOT", "INFO", "Cyber Honeypot Port Traps Deactivated")
@@ -3715,9 +3771,7 @@ def enterprise_docs_self_heal():
         return jsonify({"success": False, "error": str(e)}), 500
 
 
-@app.route("/")
-def render_main_index():
-    return render_template("index.html")
+
 
 
 @app.route("/trading")
@@ -3929,7 +3983,7 @@ def api_sandbox_execute():
             finally:
                 try:
                     os.unlink(tf_path)
-                except:
+                except Exception:
                     pass
         elif lang in ["sql"]:
             import db_engine
@@ -3969,7 +4023,7 @@ def api_sandbox_execute():
             finally:
                 try:
                     os.unlink(tf_path)
-                except:
+                except Exception:
                     pass
         else:
             return jsonify({"success": False, "error": f"Language '{lang}' is not supported for sandbox execution."})
@@ -4355,14 +4409,15 @@ def set_workstation_mode():
 # --- Synthetic Autonomous Micro-Enterprise / Swarm Simulator ---
 @app.route("/api/swarm", methods=["POST"])
 def api_swarm_simulator():
-    data = request.json
+    data = request.json or {}
     task = data.get("task", "")
+    model = data.get("model")
     if not task:
         return jsonify({"status": "error", "message": "No task provided."}), 400
     
     try:
         import synthetic_swarm_simulator
-        results = synthetic_swarm_simulator.run_swarm_simulation(task)
+        results = synthetic_swarm_simulator.run_swarm_simulation(task, model=model)
         return jsonify({"status": "success", "results": results})
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
