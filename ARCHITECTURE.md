@@ -141,6 +141,13 @@ flowchart TD
 - **Sandboxed Verification & Self-Healing**: Automated execution in isolated subprocesses with timeout boundaries; failing test traces are fed back to the coder model for automatic patching.
 - **Hot-Registration**: Verified tools are dynamically registered into `dynamic_tools/manifest.json` and `master_skills_registry.json` without server restarts.
 - **Endpoints**: `/api/forge/tools`, `/api/forge/synthesize`, `/api/forge/verify`, `/api/forge/execute`.
+### Pillar 12: Continuous Meta-Learning & Autonomous Model Hot-Swapping
+- **Engine**: `nightly_meta_learner.py`, `sleep_phase_dream_engine.py`, `lora_self_learning.py`, and `routes/dream_bp.py`.
+- **DPO Preference Curation**: Extracts high-reward vs rejected interaction pairs from runtime corrections and logs them to `dpo_preference_pairs.jsonl`.
+- **GPU LoRA Training**: GPU-accelerated low-rank adaptation (Rank $r=16, \alpha=32.0$) with Cosine Annealing scheduler and gradient clipping on local NVIDIA RTX hardware.
+- **5-Point Readiness Audit**: Self-benchmarking evaluation battery scoring AST Guardrail Defense, Executive Voice Brevity, Embedded MCU Directives, Local Music Strict Matching, and Code Synthesis Integrity.
+- **Autonomous Hot-Swapping**: Compiles `Modelfile.deep_sovereign` and deploys `deep-sovereign:latest` directly into local Ollama via API without service downtime.
+- **Endpoints**: `/api/dream/telemetry`, `/api/dream/curate`, `/api/dream/train_lora`, `/api/dream/readiness_audit`, `/api/dream/hot_swap`, `/api/dream/full_nightly_cycle`.
 
 ---
 
