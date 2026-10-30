@@ -1,0 +1,8 @@
+{
+  "version": 2,
+  "tool_name": "adv_temp_evaluator",
+  "note": "Setup initial version",
+  "timestamp": "2026-10-29T22:28:54.625168",
+  "tool_code": "\ndef eval_temp(fahrenheit: float = 32.0) -> dict:\n    status = \"FREEZING\" if fahrenheit <= 32.0 else \"COMFORTABLE\" if fahrenheit < 85.0 else \"HOT\"\n    return {\"fahrenheit\": fahrenheit, \"classification\": status}\n",
+  "test_code": "\nimport unittest\nfrom dynamic_tools.adv_temp_evaluator import eval_temp\n\nclass TestEval(unittest.TestCase):\n    def test_eval(self):\n        res = eval_temp(32.0)\n        self.assertEqual(res[\"classification\"], \"FREEZING\")\n"
+}

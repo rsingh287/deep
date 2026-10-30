@@ -1,42 +1,51 @@
 """
-Machine Dreaming & Continuous Meta-Learning Blueprint for D.E.E.P. Cockpit
-==========================================================================
+Machine Dreaming & Continuous Meta-Learning Blueprint v2 for D.E.E.P. Cockpit
+=============================================================================
 Provides REST API endpoints for:
 - REM Machine Dreaming memory consolidation
 - DPO Preference curation
-- Local NVIDIA GPU LoRA training & convergence telemetry
+- Local NVIDIA GPU LoRA training & convergence telemetry (DPO + EWC)
 - 5-Point Self-Benchmarking Readiness Audit
+- Shadow Canary A/B Latency & Quality Benchmark
 - Autonomous Model Hot-Swapping into Ollama
+- Background Dream Daemon State & Control
 """
 
+import os
 from flask import Blueprint, jsonify, request
+import torch
+
 from nightly_meta_learner import (
     get_nightly_meta_learner,
     DPOPreferenceCurator,
     NightlyLoRATrainer,
     NightlyReadinessAudit,
+    CanaryHotSwapper,
     AutonomousModelHotSwapper,
+    NightlyDreamDaemon,
     CHECKPOINT_PATH,
 )
-import os
-import torch
 
 dream_bp = Blueprint("dream", __name__)
 
 
 @dream_bp.route("/api/dream/telemetry", methods=["GET"])
 def api_dream_telemetry():
-    """Returns current meta-learning telemetry, checkpoints, and readiness scores."""
+    """Returns current meta-learning telemetry, checkpoints, EWC metrics, and readiness scores."""
     try:
         has_checkpoint = os.path.exists(CHECKPOINT_PATH)
         checkpoint_meta = {}
         if has_checkpoint:
             try:
-                ckpt = torch.load(CHECKPOINT_PATH, map_location="cpu")
+                ckpt = torch.load(CHECKPOINT_PATH, map_location="cpu", weights_only=False)
                 checkpoint_meta = {
                     "rank": ckpt.get("rank", 16),
                     "epochs": ckpt.get("epochs", 5),
+                    "initial_loss": ckpt.get("initial_loss"),
                     "final_loss": ckpt.get("final_loss"),
+                    "final_reward_margin": ckpt.get("reward_margin_history", [-1])[-1] if ckpt.get("reward_margin_history") else None,
+                    "final_reward_accuracy_pct": ckpt.get("reward_acc_history", [-1])[-1] if ckpt.get("reward_acc_history") else None,
+                    "fisher_mass": ckpt.get("fisher_mass"),
                     "samples_trained": ckpt.get("samples_trained"),
                     "device": ckpt.get("device"),
                     "timestamp": ckpt.get("timestamp"),
@@ -44,10 +53,12 @@ def api_dream_telemetry():
             except Exception:
                 pass
 
+        daemon = NightlyDreamDaemon()
         return jsonify({
             "success": True,
             "has_checkpoint": has_checkpoint,
             "checkpoint_metadata": checkpoint_meta,
+            "daemon_status": daemon.get_status(),
             "cuda_available": torch.cuda.is_available(),
             "gpu_name": torch.cuda.get_device_name(0) if torch.cuda.is_available() else "None",
         })
@@ -67,14 +78,16 @@ def api_dream_curate():
 
 @dream_bp.route("/api/dream/train_lora", methods=["POST"])
 def api_dream_train_lora():
-    """Triggers local GPU LoRA optimization loop."""
+    """Triggers local GPU LoRA optimization loop with DPO and EWC."""
     try:
         data = request.json or {}
         epochs = int(data.get("epochs", 5))
         lr = float(data.get("lr", 1e-3))
         r = int(data.get("r", 16))
+        beta = float(data.get("beta", 0.1))
+        ewc_lambda = float(data.get("ewc_lambda", 50.0))
 
-        res = NightlyLoRATrainer.train(epochs=epochs, lr=lr, r=r)
+        res = NightlyLoRATrainer.train(epochs=epochs, lr=lr, r=r, beta=beta, ewc_lambda=ewc_lambda)
         return jsonify(res)
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
@@ -90,6 +103,18 @@ def api_dream_readiness_audit():
         return jsonify({"success": False, "error": str(e)}), 500
 
 
+@dream_bp.route("/api/dream/canary_benchmark", methods=["POST"])
+def api_dream_canary_benchmark():
+    """Runs shadow canary latency and compliance benchmark on candidate model."""
+    try:
+        data = request.json or {}
+        model = data.get("model", "deep-sovereign:latest")
+        res = CanaryHotSwapper.evaluate_canary(model)
+        return jsonify(res)
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
 @dream_bp.route("/api/dream/hot_swap", methods=["POST"])
 def api_dream_hot_swap():
     """Compiles Modelfile and hot-swaps deep-sovereign in Ollama."""
@@ -100,9 +125,41 @@ def api_dream_hot_swap():
         return jsonify({"success": False, "error": str(e)}), 500
 
 
+@dream_bp.route("/api/dream/daemon_status", methods=["GET"])
+def api_dream_daemon_status():
+    """Returns background dream daemon status and idle vitals."""
+    try:
+        daemon = NightlyDreamDaemon()
+        return jsonify(daemon.get_status())
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@dream_bp.route("/api/dream/daemon/start", methods=["POST"])
+def api_dream_daemon_start():
+    """Starts the background sleep-cycle dream daemon."""
+    try:
+        daemon = NightlyDreamDaemon()
+        daemon.start()
+        return jsonify({"success": True, "status": "STARTED", "daemon": daemon.get_status()})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@dream_bp.route("/api/dream/daemon/stop", methods=["POST"])
+def api_dream_daemon_stop():
+    """Stops the background sleep-cycle dream daemon."""
+    try:
+        daemon = NightlyDreamDaemon()
+        daemon.stop()
+        return jsonify({"success": True, "status": "STOPPED"})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
 @dream_bp.route("/api/dream/full_nightly_cycle", methods=["POST"])
 def api_dream_full_cycle():
-    """Executes all 4 stages of the Autonomous Evolution Loop in sequence."""
+    """Executes all stages of the Autonomous Evolution Loop in sequence."""
     try:
         learner = get_nightly_meta_learner()
         report = learner.run_full_nightly_cycle()

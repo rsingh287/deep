@@ -1,0 +1,8 @@
+{
+  "version": 6,
+  "tool_name": "adv_temp_c_to_f",
+  "note": "Upgraded precision to 4 decimals",
+  "timestamp": "2026-10-29T22:30:31.149244",
+  "tool_code": "\ndef c_to_f(celsius: float = 0.0) -> dict:\n    f = (celsius * 1.8) + 32.0\n    return {\"celsius\": celsius, \"fahrenheit\": round(f, 4), \"version\": 2}\n",
+  "test_code": "\nimport unittest\nfrom dynamic_tools.adv_temp_c_to_f import c_to_f\nclass TestCtoF(unittest.TestCase):\n    def test_v2(self):\n        self.assertEqual(c_to_f(0.0)[\"version\"], 2)\n"
+}

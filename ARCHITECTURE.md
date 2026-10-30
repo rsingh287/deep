@@ -134,20 +134,28 @@ flowchart TD
 - **Engine**: `intents/sikh_heritage_intent.py` and `routes/gurbani.py`.
 - **Capabilities**: Full Nitnem banis, Gurmukhi text rendering with Phonetic Romanization and English translations, and Hukamnama introspection.
 
-### Pillar 11: Self-Synthesizing Tool Forge (Autonomous Extensibility)
-- **Engine**: `self_synthesizing_tool_forge.py`, `routes/tool_forge_bp.py`, and `intents/dynamic_tool_intent.py`.
-- **AST Security Shield**: Zero-trust AST static analyzer (`ASTSecurityShield.validate_code`) blocking unauthorized builtins (`eval`, `exec`, `__import__`), banned modules (`ctypes`, `winreg`, `msvcrt`, `subprocess`), and raw OS mutations.
-- **Autonomous Synthesis**: Natural language specifications translated into standalone Python tools with typed parameters and companion `unittest` suites via local Qwen 2.5 Coder.
-- **Sandboxed Verification & Self-Healing**: Automated execution in isolated subprocesses with timeout boundaries; failing test traces are fed back to the coder model for automatic patching.
-- **Hot-Registration**: Verified tools are dynamically registered into `dynamic_tools/manifest.json` and `master_skills_registry.json` without server restarts.
-- **Endpoints**: `/api/forge/tools`, `/api/forge/synthesize`, `/api/forge/verify`, `/api/forge/execute`.
-### Pillar 12: Continuous Meta-Learning & Autonomous Model Hot-Swapping
-- **Engine**: `nightly_meta_learner.py`, `sleep_phase_dream_engine.py`, `lora_self_learning.py`, and `routes/dream_bp.py`.
-- **DPO Preference Curation**: Extracts high-reward vs rejected interaction pairs from runtime corrections and logs them to `dpo_preference_pairs.jsonl`.
-- **GPU LoRA Training**: GPU-accelerated low-rank adaptation (Rank $r=16, \alpha=32.0$) with Cosine Annealing scheduler and gradient clipping on local NVIDIA RTX hardware.
-- **5-Point Readiness Audit**: Self-benchmarking evaluation battery scoring AST Guardrail Defense, Executive Voice Brevity, Embedded MCU Directives, Local Music Strict Matching, and Code Synthesis Integrity.
-- **Autonomous Hot-Swapping**: Compiles `Modelfile.deep_sovereign` and deploys `deep-sovereign:latest` directly into local Ollama via API without service downtime.
-- **Endpoints**: `/api/dream/telemetry`, `/api/dream/curate`, `/api/dream/train_lora`, `/api/dream/readiness_audit`, `/api/dream/hot_swap`, `/api/dream/full_nightly_cycle`.
+### Pillar 11: Self-Synthesizing Tool Forge v2 (Autonomous Cognitive Extensibility)
+- **Engine**: self_synthesizing_tool_forge.py, 
+outes/tool_forge_bp.py, and intents/dynamic_tool_intent.py.
+- **AST Security Shield**: Zero-trust AST static analyzer (ASTSecurityShield.validate_code) blocking unauthorized builtins (eval, exec, __import__), banned modules (ctypes, winreg, msvcrt, subprocess, socket), introspection escape routes (__subclasses__, __bases__), and raw OS mutations.
+- **Secret-Sanitized Sandbox**: Subprocess execution isolation scrubbing environment variables (OPENAI_API_KEY, POSTGRES_PASSWORD, DATABASE_URL, TOKEN) to prevent credential leakage.
+- **Multi-Turn Reflexion Engine**: Automated diagnostic traceback analysis parsing AssertionError, KeyError, and TypeError exceptions to drive iterative 3-turn self-healing patches.
+- **Composite DAG Pipeline Chaining**: Declarative multi-tool workflows (ToolChainPipeline.execute_chain) enabling step-by-step parameter interpolation ($input.<key>, $steps.<id>.result.<field>) with per-step latency telemetry.
+- **Semantic Auto-Discovery & Dispatch**: Weighted token & intent search (SemanticToolIndex.discover) auto-dispatching natural language commands to verified synthesized tools with argument extraction.
+- **Immutable Versioning & Rollback**: Version snapshots maintained in dynamic_tools/versions/ with instant one-click rollback (ToolVersionManager.rollback).
+- **Endpoints**: /api/forge/tools, /api/forge/synthesize, /api/forge/verify, /api/forge/execute, /api/forge/chain/execute, /api/forge/discover, /api/forge/auto_dispatch, /api/forge/rollback, /api/forge/versions/<tool_name>.
+
+### Pillar 12: Continuous Meta-Learning & Autonomous Machine Dreaming v2
+- **Engine**: 
+ightly_meta_learner.py, sleep_phase_dream_engine.py, lora_self_learning.py, and 
+outes/dream_bp.py.
+- **Mathematical DPO Engine**: True Bradley-Terry Direct Preference Optimization ($\mathcal{L}_{	ext{DPO}} = -\log \sigma(\Delta r)$) comparing trainable LoRA policy $\pi_	heta$ against frozen reference policy $\pi_{	ext{ref}}$, tracking positive reward margin ($\Delta r > 0$) and reward accuracy ($\ge 90\%$).
+- **EWC Continual Learning Guardrail**: Elastic Weight Consolidation calculating diagonal Fisher Information Matrix $ on canonical anchor tasks, applying quadratic penalty $rac{\lambda_{	ext{EWC}}}{2} \sum F_i (	heta_i - 	heta_i^*)^2$ to eliminate catastrophic forgetting of MCU hardware rules and AST SQL guardrails.
+- **5-Point Readiness Audit**: Self-benchmarking evaluation battery scoring AST Guardrail Defense, Executive Voice Brevity, Embedded MCU Directives (PIC18F85K22 LCD Line 2 + MCP9701 Math), Local Music Strict Matching, and Code Synthesis Integrity.
+- **Shadow Canary A/B Benchmark**: Pre-deployment quality & latency benchmark (CanaryHotSwapper) probing AST rejection, MCU pinout compliance, and music routing before model promotion.
+- **Autonomous Sleep Daemon**: Threaded background scheduler (NightlyDreamDaemon) monitoring user idle time, GPU VRAM, and temperature to trigger machine dreaming autonomously during off-peak hours.
+- **Autonomous Hot-Swapping**: Compiles Modelfile.deep_sovereign and deploys deep-sovereign:latest directly into local Ollama via REST API without workstation downtime.
+- **Endpoints**: /api/dream/telemetry, /api/dream/curate, /api/dream/train_lora, /api/dream/readiness_audit, /api/dream/hot_swap, /api/dream/full_nightly_cycle, /api/dream/canary_benchmark, /api/dream/daemon_status, /api/dream/daemon/start, /api/dream/daemon/stop.
 
 ---
 
