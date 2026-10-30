@@ -41,52 +41,77 @@ CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 START_BAT = os.path.join(CURRENT_DIR, "start.bat")
 STOP_BAT = os.path.join(CURRENT_DIR, "stop.bat")
 
-START_WORDS = [
+START_EXACT_WORDS = {
     "wake up", "back to work", "time to work",
     "wake up deep", "start deep", "systems on", "power on",
     "good morning", "good morning deep", "morning deep"
-]
+}
 
-STOP_WORDS = [
+STOP_EXACT_WORDS = {
     "good night", "go to sleep", "sleep deep",
-    "stop agent", "turn off", "shut down", "goodnight"
-]
+    "stop agent", "turn off", "shut down", "goodnight",
+    "turn off deep", "shut down deep", "systems off"
+}
 
-INTERACT_WORDS = [
+INTERACT_EXACT_WORDS = {
     "hey deep", "hey jarvis", "hey friday", "jarvis", "friday", "deep"
-]
+}
 
-MEDIA_PLAY_PAUSE_PATTERNS = [
-    "play music", "played music", "pause music", "pause the music", "play the music",
-    "play pause", "play or pause", "pause or play", "toggle music", "resume music",
-    "play song", "pause song", "stop music", "stop the music", "stop song",
-    "unpause", "music play", "music pause"
-]
+def is_start_command(text):
+    t = text.strip().lower()
+    words = t.split()
+    if len(words) > 4:
+        return False
+    if t in START_EXACT_WORDS:
+        return True
+    return bool(re.match(r"^(?:(?:hey\s+)?deep\s+)?(wake\s+up(?:\s+deep)?|start\s+deep|systems\s+on|power\s+on|good\s+morning(?:\s+deep)?|time\s+to\s+work)$", t))
 
-MEDIA_NEXT_PATTERNS = [
-    "play next", "next song", "next track", "skip song", "skip track",
-    "the next", "play the next", "next music", "skip music",
-    "skip drag", "next drag", "skip trap", "skip drad", "skip check"
-]
+def is_stop_command(text):
+    t = text.strip().lower()
+    words = t.split()
+    if len(words) > 4:
+        return False
+    if t in STOP_EXACT_WORDS:
+        return True
+    return bool(re.match(r"^(?:(?:hey\s+)?deep\s+)?(good\s*night(?:\s+deep)?|go\s+to\s+sleep|sleep\s+deep|stop\s+agent|turn\s+off\s+deep|shut\s+down\s+deep|systems\s+off)$", t))
 
-MEDIA_PREV_PATTERNS = [
-    "play prev", "play previous", "previous song", "previous track",
-    "prev song", "prev track", "the previous", "in previous", "play the previous",
-    "rewind song", "previous music", "back song"
-]
+def is_interact_command(text):
+    t = text.strip().lower()
+    words = t.split()
+    if len(words) > 3:
+        return False
+    if t in INTERACT_EXACT_WORDS:
+        return True
+    return bool(re.match(r"^(?:hey\s+)?(deep|jarvis|friday)$", t))
 
 def trigger_media_key(action):
     """Placeholder for external key dispatch; media actions are already executed cleanly in check_media_intent."""
     return True
 
 def check_media_intent(text):
-    t = text.strip().lower()
-    for prefix in ["hey deep ", "hey jarvis ", "hey friday ", "deep ", "jarvis ", "friday ", "please ", "the "]:
-        if t.startswith(prefix):
-            t = t[len(prefix):].strip()
+    raw = text.strip().lower()
+    if not raw:
+        return None
 
-    # Direct separate speaker / headphone / volume controls
-    if any(k in t for k in ["volume", "speaker", "speakers", "headphone", "headphones", "headset", "sound", "louder", "quieter"]):
+    had_wake_word = False
+    t = raw
+    for prefix in ["hey deep ", "hey jarvis ", "hey friday ", "deep ", "jarvis ", "friday ", "please "]:
+        if t.startswith(prefix):
+            had_wake_word = True
+            t = t[len(prefix):].strip()
+            break
+
+    words = t.split()
+    word_count = len(words)
+
+    # Ambient Room Conversation Guard:
+    # If no wake word was used and the utterance has more than 4 words, it is ambient room conversation.
+    if not had_wake_word and word_count > 4:
+        return None
+
+    # 1. Volume Controls (Must match clear volume intent, not random conversational sentences with 'sound')
+    vol_regex = r"^(?:volume\s+(?:up|down|mute|max|\d{1,3})|turn\s+(?:it\s+)?(?:up|down)|louder|quieter|mute|unmute|(?:speaker|headphone|speakers|headphones)\s+(?:volume|louder|quieter|\d{1,3}))$"
+    if re.match(vol_regex, t):
         try:
             import everyday_pc_actions
             res = everyday_pc_actions.handle_everyday_command(t)
@@ -98,9 +123,9 @@ def check_media_intent(text):
         except Exception as e:
             log(f"[Sentinel Volume Error]: {e}")
 
-    # Direct shuffle music command (plays in standalone DJ & AutoMix engine on PC Speakers)
-    shuffle_synonyms = ["shuffle", "shovel", "shuffel", "shuffled", "shoffle", "shaffal", "shavel", "shuffler"]
-    if any(s in t for s in shuffle_synonyms):
+    # 2. Shuffle Music Command (Strict exact match, never substring 'shovel' in random sentences)
+    exact_shuffle = {"shuffle", "shuffle music", "play shuffle", "shuffle songs", "random song", "play random"}
+    if t in exact_shuffle or (had_wake_word and t.startswith("shuffle")):
         try:
             import local_music_engine
             res = local_music_engine.play_shuffle()
@@ -111,32 +136,16 @@ def check_media_intent(text):
         except Exception as e:
             log(f"[Sentinel Shuffle Error]: {e}")
 
-    # Direct song / YouTube command (voice dispatched to everyday_pc_actions)
-    if (t.startswith("play ") or "youtube" in t or t.startswith("open youtube")) and not any(s in t for s in shuffle_synonyms) and t not in [
-        "play", "play music", "play the music", "play song", "play or pause", "play pause"
-    ]:
-        try:
-            import everyday_pc_actions
-            res = everyday_pc_actions.handle_everyday_command(t)
-            if res:
-                markdown_msg = res[0]
-                clean_voice = re.sub(r"[*_#`▶️🎵⬇️🌐]", "", markdown_msg).split("\n")[0].strip()
-                if clean_voice:
-                    speak(clean_voice)
-                return "everyday_song_or_youtube"
-        except Exception as e:
-            log(f"[Sentinel Music/YT Error]: {e}")
-
-    # Dedicated PAUSE command & common Vosk phonetic homophones ('bars', 'both music', 'boss music', etc.)
-    pause_exact_phrases = [
+    # 3. Dedicated PAUSE Command (Exact phrases & close phonetics)
+    pause_exact_phrases = {
         "pause", "pause music", "pause the music", "pause song", "pause the song",
         "stop music", "stop the music", "stop song", "stop playback", "pause playback",
         "bars", "both music", "boss music", "bar music", "bars music",
         "buzz", "buzz music", "pass music", "paws", "paws music", "cause music",
         "parse", "parse music", "pos", "pose", "post music", "hold music",
         "rok do", "gana roko", "gana rok do", "gana band karo", "band karo"
-    ]
-    if t in pause_exact_phrases or any(t == p for p in pause_exact_phrases) or any(t.startswith(p) for p in ["pause ", "stop music", "stop song"]):
+    }
+    if t in pause_exact_phrases or (had_wake_word and (t.startswith("pause") or t.startswith("stop music"))):
         try:
             import local_music_engine
             local_music_engine.control_media("pause")
@@ -146,13 +155,15 @@ def check_media_intent(text):
             log(f"[Sentinel Pause Error]: {e}")
             return "pause"
 
-    # Dedicated PLAY / RESUME command
-    play_exact_phrases = [
-        "play", "resume", "unpause", "play music", "play the music", "resume music",
+    # 4. Dedicated PLAY / RESUME Command
+    # If no wake word was used, require at least 2 words (e.g. 'play music', 'resume music')
+    # to avoid ambient room murmurs/noise misrecognized by Vosk as a single 'play'.
+    play_exact_phrases = {
+        "resume", "unpause", "play music", "play the music", "resume music",
         "resume song", "play song", "unpause music", "continue music", "start music",
         "chalao", "gana chalao", "gana shuru karo"
-    ]
-    if t in play_exact_phrases or any(t == p for p in play_exact_phrases):
+    }
+    if (had_wake_word and t in ("play", "resume", "unpause")) or (t in play_exact_phrases):
         try:
             import local_music_engine
             local_music_engine.control_media("play")
@@ -162,6 +173,7 @@ def check_media_intent(text):
             log(f"[Sentinel Play Error]: {e}")
             return "play"
 
+    # 5. Play / Pause Toggle
     if t in ["play or pause", "pause or play", "toggle music", "play pause"]:
         try:
             import local_music_engine
@@ -170,49 +182,13 @@ def check_media_intent(text):
         except Exception:
             return "play_pause"
 
-    # DJ Crossfade toggle commands
-    if any(k in t for k in ["dj mode", "enable dj", "start dj", "dj mix", "crossfade mode", "turn on dj", "dj crossfade"]):
-        try:
-            import local_music_engine
-            local_music_engine.toggle_dj_mode(True)
-            speak("DJ Crossfade mode activated. Mixing tracks seamlessly.")
-            return "enable_dj"
-        except Exception as e:
-            log(f"[Sentinel DJ Error]: {e}")
-            return "enable_dj"
-
-    if any(k in t for k in ["disable dj", "turn off dj", "stop dj", "exit dj"]):
-        try:
-            import local_music_engine
-            local_music_engine.toggle_dj_mode(False)
-            speak("DJ mode turned off. Switched back to standard player.")
-            return "disable_dj"
-        except Exception as e:
-            log(f"[Sentinel DJ Error]: {e}")
-            return "disable_dj"
-
-    # Apple Music-style AutoMix toggle commands
-    if any(k in t for k in ["automix", "enable automix", "turn on automix", "start automix", "apple music mode"]):
-        try:
-            import local_music_engine
-            local_music_engine.send_standalone_dj_action("enable_automix")
-            speak("AutoMix mode activated. Beat matching, phrase syncing, and cue points enabled.")
-            return "enable_automix"
-        except Exception as e:
-            log(f"[Sentinel AutoMix Error]: {e}")
-            return "enable_automix"
-
-    if any(k in t for k in ["disable automix", "turn off automix", "stop automix"]):
-        try:
-            import local_music_engine
-            local_music_engine.send_standalone_dj_action("disable_automix")
-            speak("AutoMix mode disabled. Standard crossfade active.")
-            return "disable_automix"
-        except Exception as e:
-            log(f"[Sentinel AutoMix Error]: {e}")
-            return "disable_automix"
-
-    if t in ["next", "skip", "next song", "next track", "skip song", "skip track", "change song"] or any(p in t for p in MEDIA_NEXT_PATTERNS):
+    # 6. Dedicated NEXT Track Command (Strictly exact, NO loose 'the next' substring!)
+    exact_next = {
+        "next", "skip", "next song", "next track", "skip song", "skip track",
+        "change song", "play next", "play next song", "play next track", "next music",
+        "skip music", "skip drag", "next drag", "skip trap"
+    }
+    if t in exact_next or (had_wake_word and (t.startswith("next") or t.startswith("skip"))):
         try:
             import local_music_engine
             local_music_engine.control_media("next")
@@ -222,7 +198,13 @@ def check_media_intent(text):
             log(f"[Sentinel Next Error]: {e}")
             return "next"
 
-    if t in ["prev", "previous", "rewind", "previous song", "previous track"] or any(p in t for p in MEDIA_PREV_PATTERNS):
+    # 7. Dedicated PREVIOUS Track Command (Strictly exact, NO loose 'the previous' or 'in previous'!)
+    exact_prev = {
+        "prev", "previous", "rewind", "previous song", "previous track",
+        "prev song", "prev track", "play prev", "play previous", "play the previous song",
+        "rewind song", "previous music", "back song"
+    }
+    if t in exact_prev or (had_wake_word and (t.startswith("prev") or t.startswith("previous") or t.startswith("rewind"))):
         try:
             import local_music_engine
             local_music_engine.control_media("prev")
@@ -232,7 +214,8 @@ def check_media_intent(text):
             log(f"[Sentinel Prev Error]: {e}")
             return "prev"
 
-    if t in ["stop"]:
+    # 8. Stop Command
+    if t in ["stop", "stop playback", "stop track"]:
         try:
             import local_music_engine
             local_music_engine.control_media("stop")
@@ -244,11 +227,10 @@ def check_media_intent(text):
     if t in ["mute", "unmute"]:
         return "mute"
 
-
-    # Smart Playback Queue Voice Commands
-    if t.startswith("play ") and t.endswith(" next"):
+    # 9. Smart Queue Voice Commands ("play <song> next")
+    if t.startswith("play ") and t.endswith(" next") and (had_wake_word or word_count <= 5):
         q_target = t[5:-5].strip()
-        if q_target:
+        if q_target and q_target not in ("music", "song", "track", "the music", "the song"):
             try:
                 import music_queue_engine
                 res = music_queue_engine.QUEUE_ENGINE.enqueue(q_target, priority="next")
@@ -258,18 +240,75 @@ def check_media_intent(text):
             except Exception as e:
                 log(f"[Sentinel Queue Error]: {e}")
 
-    if any(p in t for p in MEDIA_PLAY_PAUSE_PATTERNS):
+    # 10. DJ Crossfade Toggle Commands
+    if t in ["dj mode", "enable dj", "start dj", "dj mix", "crossfade mode", "turn on dj", "dj crossfade", "dj on"]:
         try:
             import local_music_engine
-            local_music_engine.control_media("play_pause")
-            speak("Media toggled.")
-            return "play_pause"
-        except Exception:
-            return "play_pause"
-    if any(p in t for p in ["volume up", "turn it up", "turn up", "louder"]):
-        return "vol_up"
-    if any(p in t for p in ["volume down", "turn it down", "turn down", "lower volume"]):
-        return "vol_down"
+            local_music_engine.toggle_dj_mode(True)
+            speak("DJ Crossfade mode activated. Mixing tracks seamlessly.")
+            return "enable_dj"
+        except Exception as e:
+            log(f"[Sentinel DJ Error]: {e}")
+            return "enable_dj"
+
+    if t in ["disable dj", "turn off dj", "stop dj", "exit dj", "dj off"]:
+        try:
+            import local_music_engine
+            local_music_engine.toggle_dj_mode(False)
+            speak("DJ mode turned off. Switched back to standard player.")
+            return "disable_dj"
+        except Exception as e:
+            log(f"[Sentinel DJ Error]: {e}")
+            return "disable_dj"
+
+    # 11. AutoMix Toggle Commands
+    if t in ["automix", "enable automix", "turn on automix", "start automix", "apple music mode", "automix on"]:
+        try:
+            import local_music_engine
+            local_music_engine.send_standalone_dj_action("enable_automix")
+            speak("AutoMix mode activated. Beat matching, phrase syncing, and cue points enabled.")
+            return "enable_automix"
+        except Exception as e:
+            log(f"[Sentinel AutoMix Error]: {e}")
+            return "enable_automix"
+
+    if t in ["disable automix", "turn off automix", "stop automix", "automix off"]:
+        try:
+            import local_music_engine
+            local_music_engine.send_standalone_dj_action("disable_automix")
+            speak("AutoMix mode disabled. Standard crossfade active.")
+            return "disable_automix"
+        except Exception as e:
+            log(f"[Sentinel AutoMix Error]: {e}")
+            return "disable_automix"
+
+    # 12. Direct Song / YouTube Playback
+    # CRITICAL: If no wake word was spoken, ONLY trigger if the user explicitly says
+    # 'play song <title>', 'play track <title>', or 'open youtube <query>' with <= 6 words.
+    # Never allow generic 'play ...' or conversational mentions of 'youtube' without a wake word!
+    is_song_cmd = False
+    if had_wake_word:
+        if (t.startswith("play ") or "youtube" in t or t.startswith("open youtube")) and t not in [
+            "play", "play music", "play the music", "play song", "play or pause", "play pause"
+        ]:
+            is_song_cmd = True
+    else:
+        # Hands-free without wake word: require explicit musical keywords
+        if (t.startswith("play song ") or t.startswith("play track ") or t.startswith("open youtube ")) and word_count <= 6:
+            is_song_cmd = True
+
+    if is_song_cmd:
+        try:
+            import everyday_pc_actions
+            res = everyday_pc_actions.handle_everyday_command(t)
+            if res:
+                markdown_msg = res[0]
+                clean_voice = re.sub(r"[*_#`▶️🎵⬇️🌐]", "", markdown_msg).split("\n")[0].strip()
+                if clean_voice:
+                    speak(clean_voice)
+                return "everyday_song_or_youtube"
+        except Exception as e:
+            log(f"[Sentinel Music/YT Error]: {e}")
 
     return None
 
@@ -420,6 +459,16 @@ def stop_all_systems():
     subprocess.Popen([STOP_BAT], shell=True, cwd=CURRENT_DIR)
 
 def main():
+    # Enforce single-instance sentinel via dedicated localhost lock port
+    SENTINEL_LOCK_PORT = 49288
+    lock_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    try:
+        lock_socket.bind(('127.0.0.1', SENTINEL_LOCK_PORT))
+        lock_socket.listen(1)
+    except OSError:
+        log("[Sentinel] Another instance of Voice Master Sentinel is already running. Exiting cleanly.")
+        sys.exit(0)
+
     try:
         import sounddevice as sd
         import vosk
@@ -476,7 +525,7 @@ def main():
                             continue
 
                         # Check for START / WAKE command
-                        if any(w in text for w in START_WORDS):
+                        if is_start_command(text):
                             if not is_agent_online(5000):
                                 start_all_systems(text)
                             else:
@@ -485,11 +534,11 @@ def main():
                                 open_or_focus_ui()
 
                         # Check for STOP / SLEEP command
-                        elif any(w in text for w in STOP_WORDS):
+                        elif is_stop_command(text):
                             stop_all_systems()
 
                         # Check for INTERACT / FOCUS command
-                        elif any(w in text for w in INTERACT_WORDS):
+                        elif is_interact_command(text):
                             if is_agent_online(5000):
                                 play_tone("interact")
                                 open_or_focus_ui()
@@ -503,6 +552,8 @@ def main():
 if __name__ == "__main__":
     try:
         main()
-    except BaseException as e:
+    except SystemExit:
+        pass
+    except Exception as e:
         import traceback
         log(f"[Sentinel CRITICAL EXIT]: {e}\n{traceback.format_exc()}")

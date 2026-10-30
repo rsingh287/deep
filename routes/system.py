@@ -1057,3 +1057,71 @@ def api_reset_circuit_breaker():
 
 
 
+
+
+@system_bp.route("/api/voice/vad/status", methods=["GET"])
+def api_voice_vad_status():
+    """Returns sub-400ms voice pipeline and streaming Silero VAD telemetry."""
+    try:
+        from voice_vad_stream_engine import get_voice_vad_stream_engine
+        engine = get_voice_vad_stream_engine()
+        return jsonify({"success": True, "telemetry": engine.telemetry})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@system_bp.route("/api/voice/vad/toggle", methods=["POST"])
+def api_voice_vad_toggle():
+    """Controls the streaming VAD listener (start / stop / pause / resume)."""
+    try:
+        from flask import request
+        from voice_vad_stream_engine import get_voice_vad_stream_engine
+        data = request.json or {}
+        action = data.get("action", "toggle").lower()
+        engine = get_voice_vad_stream_engine()
+
+        if action == "start":
+            engine.start_pipeline()
+        elif action == "stop":
+            engine.stop_pipeline()
+        elif action == "pause":
+            engine.pause_pipeline()
+        elif action == "resume":
+            engine.resume_pipeline()
+        else:
+            if engine.running:
+                engine.stop_pipeline()
+            else:
+                engine.start_pipeline()
+
+        return jsonify({"success": True, "telemetry": engine.telemetry})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@system_bp.route("/api/voice/vad/transcribe", methods=["POST"])
+def api_voice_vad_transcribe():
+    """Benchmarking endpoint: transcribes synthetic or provided audio array with GPU Whisper."""
+    try:
+        from flask import request
+        import numpy as np
+        from voice_vad_stream_engine import get_voice_vad_stream_engine
+        data = request.json or {}
+        audio_samples = data.get("audio_samples")
+        engine = get_voice_vad_stream_engine()
+
+        if audio_samples and isinstance(audio_samples, list):
+            arr = np.array(audio_samples, dtype=np.float32)
+        else:
+            # Benchmark with 1-second synthetic sample
+            arr = np.zeros(16000, dtype=np.float32)
+
+        text, latency_ms = engine.transcribe_audio_chunk(arr)
+        return jsonify({
+            "success": True,
+            "text": text,
+            "stt_latency_ms": latency_ms,
+            "device": engine.telemetry.get("device", "cpu")
+        })
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500

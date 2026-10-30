@@ -152,3 +152,46 @@ def client_vision_telemetry():
 
 
 
+
+
+@vision_bp.route("/api/vision/ground_element", methods=["POST"])
+def vision_ground_element_api():
+    """Locates a UI element via Qwen 2.5-VL and returns screen coordinates without clicking."""
+    try:
+        from vlm_grounding_engine import get_vlm_grounding_engine
+
+        data = request.get_json(silent=True) or {}
+        target = data.get("target") or data.get("element") or "center"
+        engine = get_vlm_grounding_engine()
+        screen_w, screen_h = engine.get_screen_resolution()
+        cap = engine.capture_screen(max_dim=1280)
+        res = engine.query_vlm_grounding(target, cap["b64"], screen_w, screen_h)
+        return jsonify({"success": True, "result": res})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@vision_bp.route("/api/vision/ground_and_click", methods=["POST"])
+def vision_ground_and_click_api():
+    """Locates a UI element via local VLM and autonomously executes requested mouse/keyboard action."""
+    try:
+        from vlm_grounding_engine import get_vlm_grounding_engine
+
+        data = request.get_json(silent=True) or {}
+        target = data.get("target") or data.get("element") or "center"
+        action = data.get("action", "click")
+        clicks = int(data.get("clicks", 1))
+        button = data.get("button", "left")
+        text_to_type = data.get("text")
+
+        engine = get_vlm_grounding_engine()
+        res = engine.execute_grounded_action(
+            target_description=target,
+            action=action,
+            clicks=clicks,
+            button=button,
+            text_to_type=text_to_type,
+        )
+        return jsonify({"success": True, "result": res})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500

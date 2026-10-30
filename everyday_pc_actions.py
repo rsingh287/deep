@@ -684,7 +684,6 @@ def handle_everyday_command(user_prompt: str):
         "next",
         "skip",
         "play the next",
-        "the next",
         "forward track",
     ]:
         press_key(VK_MEDIA_NEXT_TRACK)
@@ -710,8 +709,6 @@ def handle_everyday_command(user_prompt: str):
         "previous",
         "prev",
         "play the previous",
-        "the previous",
-        "in previous",
         "rewind",
     ]:
         press_key(VK_MEDIA_PREV_TRACK)
