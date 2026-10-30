@@ -37,9 +37,9 @@
           "description": "Number of observations"
         }
       ],
-      "created_at": "2026-10-29 23:08:18",
+      "created_at": "2026-10-29 23:23:06",
       "test_pass_count": 1,
-      "verified_at": "2026-10-29 23:08:19",
+      "verified_at": "2026-10-29 23:23:06",
       "healing_history": [],
       "optimization_metrics": {
         "grade": "B",
@@ -58,9 +58,9 @@
       "test_path": "C:\\Users\\User\\.gemini\\antigravity\\scratch\\local_ai_gui\\dynamic_tools\\tests\\test_v4_fragile_calculator.py",
       "verification_status": "VERIFIED_OPERATIONAL",
       "parameters": [],
-      "created_at": "2026-10-29 23:08:19",
+      "created_at": "2026-10-29 23:23:06",
       "test_pass_count": 1,
-      "verified_at": "2026-10-29 23:08:19",
+      "verified_at": "2026-10-29 23:23:06",
       "healing_history": [],
       "optimization_metrics": {
         "grade": "A+",
@@ -70,6 +70,32 @@
         "halstead_volume": 46.51,
         "decision_count": 0
       }
+    },
+    "adv_temp_c_to_f": {
+      "id": "adv_temp_c_to_f",
+      "name": "Adv Temp C To F",
+      "description": "Temperature C to F converter",
+      "file_path": "C:\\Users\\User\\.gemini\\antigravity\\scratch\\local_ai_gui\\dynamic_tools\\adv_temp_c_to_f.py",
+      "test_path": "C:\\Users\\User\\.gemini\\antigravity\\scratch\\local_ai_gui\\dynamic_tools\\tests\\test_adv_temp_c_to_f.py",
+      "verification_status": "VERIFIED_OPERATIONAL",
+      "parameters": [],
+      "created_at": "2026-10-29 23:23:06",
+      "test_pass_count": 1,
+      "verified_at": "2026-10-29 23:23:06",
+      "healing_history": [],
+      "optimization_metrics": {
+        "grade": "A+",
+        "cyclomatic_complexity": 2,
+        "type_annotation_coverage_pct": 100.0,
+        "has_return_annotation": true,
+        "halstead_volume": 133.78,
+        "decision_count": 1
+      },
+      "fuzz_score": 100.0,
+      "last_fuzzed_at": "2026-10-29T23:23:06.167394",
+      "current_version": 24,
+      "last_mutated_at": "2026-10-29T23:23:06.259912",
+      "fitness_score": 92.5
     }
   }
 }

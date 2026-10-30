@@ -8,7 +8,7 @@ class TestFragile(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-    def test_regression_healed_1793329699(self):
+    def test_regression_healed_1793330586(self):
         res = run({'val_b': 5})
         self.assertIsNotNone(res)
 

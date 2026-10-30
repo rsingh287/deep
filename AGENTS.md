@@ -82,3 +82,41 @@
      `ipecmd.exe -P18F85K22 -TPPK3 -TSBUR181916585 -M -F"<path_to_hex>" -OL`
    - If `Device ID (00000000)` appears, alert the user to verify the 5V/9V DC adapter on the trainer board.
 
+---
+
+## Autonomous Tool Forge Directives (Phase 3 v4)
+
+1. **Zero-Trust AST Code Validation**:
+   - Every synthesized or mutated tool must pass `ASTSecurityShield.validate_code()`.
+   - Prohibited modules (`winreg`, `ctypes`, `msvcrt`, `subprocess`, `socket`, `pty`) and builtins (`eval`, `exec`, `__import__`) are strictly blocked.
+   - Sandbox escape introspections (`__subclasses__`, `__bases__`, `__globals__`) are unconditionally rejected.
+
+2. **Subprocess Secret Sanitization**:
+   - All dynamic unit test execution runs must execute within `SandboxedEnvironment.get_sanitized_env()`, which purges sensitive credentials (`TOKEN`, `KEY`, `SECRET`, `PASS`, `DATABASE_URL`).
+
+3. **Property-Based Fuzz Testing Requirement**:
+   - Synthesized tools must undergo 15 boundary fuzz evaluations (`FuzzForgeEngine.run_fuzz_audit()`) testing extreme numbers, empty strings, oversized strings, and NaN.
+   - Tools must exhibit 0 fatal crashes, a 100% invariant score, and average execution latency $\le 50\text{ms}$.
+
+4. **Deterministic Version Snapshots & Rollback**:
+   - Every modification must create an immutable version snapshot (`dynamic_tools/versions/<tool>/v<N>.json`) with integer-based version indexing.
+   - One-click rollback must be guaranteed via `ToolVersionManager.rollback()`.
+
+---
+
+## Continuous Meta-Learning & Dreaming Directives (Phase 4 v4)
+
+1. **Multi-Objective GPU Optimization (ORPO / SimPO / KTO / DPO)**:
+   - Run nightly preference optimization on the local NVIDIA RTX GPU (`cuda`).
+   - For rapid, memory-efficient alignment without a reference policy, use **ORPO** (Odds Ratio Preference Optimization).
+   - For length-normalized contrastive loss, use **SimPO** with target margin $\gamma = 0.5$.
+
+2. **Online EWC++ Lifelong Continual Learning**:
+   - Update running Fisher Information Matrix ($F_{\text{running}}$) across multi-night sleep cycles using momentum decay ($\gamma = 0.90$) to eliminate catastrophic forgetting of hardware rules and AST SQL guardrails without boundless memory growth.
+
+3. **Adversarial Counterfactual Sleep Hardening**:
+   - Before nightly fine-tuning, synthesize adversarial counterfactual pairs (`CounterfactualDreamSimulator`) that stress-test SQL injection defense, PIC18F85K22 LCD Line 1 defect avoidance, and unauthorized socket defense.
+
+4. **Shadow Canary A/B Benchmark & Model Fusion**:
+   - Candidate weights must pass the 5-point readiness audit and shadow canary benchmark ($> 80/100$) before hot-swapping into Ollama (`deep-sovereign:latest`).
+   - Merge LoRA adapter matrices ($\Delta W = \frac{\alpha}{r} B \cdot A$) into the base model representation and compile `Modelfile.deep_sovereign`.

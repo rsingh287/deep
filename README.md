@@ -1,166 +1,182 @@
 # 🌌 D.E.E.P — Dynamic Executive Edge Platform
 
-> **Sovereign Local AI Cockpit, Autonomous Voice Sentinel & Physical Hardware Controller**
+> **Sovereign Local AI Cockpit, Autonomous Cognitive OS, Hardware Controller & Meta-Learning Foundry**
 
 [![License: PolyForm Noncommercial 1.0.0](https://img.shields.io/badge/License-PolyForm%20Noncommercial-red.svg)](LICENSE)
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-brightgreen.svg)](https://www.python.org/)
 [![Security: Zero--Trust](https://img.shields.io/badge/Security-Zero--Trust%20AST-orange.svg)](SECURITY.md)
-[![Architecture: Event--Driven](https://img.shields.io/badge/Architecture-Event--Driven-purple.svg)](ARCHITECTURE.md)
-[![Diagnostics: 10/10 Pillars Passed](https://img.shields.io/badge/Pillars-10%2F10%20Verified-brightgreen.svg)](check_deep.py)
+[![Architecture: Sovereign 12--Pillar](https://img.shields.io/badge/Architecture-12--Pillar%20Cognitive%20OS-purple.svg)](ARCHITECTURE.md)
+[![Diagnostics: 10/10 Pillars Passed](https://img.shields.io/badge/Diagnostics-10%2F10%20Verified-brightgreen.svg)](check_deep.py)
+[![Meta-Learner: v4 Ultra-Evolution](https://img.shields.io/badge/Meta--Learner-v4%20ORPO%2FSimPO-blue.svg)](nightly_meta_learner.py)
+[![Tool Forge: v4 Genetic Mutator](https://img.shields.io/badge/Tool%20Forge-v4%20Self--Synthesizing-emerald.svg)](self_synthesizing_tool_forge.py)
 
 ---
 
 ## 📖 Overview
 
-**D.E.E.P (Dynamic Executive Edge Platform)** is an enterprise-grade, offline-capable local artificial intelligence workstation and autonomous executive cockpit. Designed for zero-cloud reliance, D.E.E.P unifies state-of-the-art local Large Language Models (LLMs), multi-modal computer vision, voice wake-word sentinels, smart home IoT, and autonomous OS desktop automation into a single cohesive control center.
+**D.E.E.P (Dynamic Executive Edge Platform)** is an enterprise-grade, offline-first autonomous artificial intelligence workstation and sovereign executive cockpit. Designed for zero-cloud reliance, D.E.E.P unifies state-of-the-art local Large Language Models (LLMs), multi-objective continuous preference alignment, autonomous self-synthesizing tool creation, physical microcontroller firmware orchestration, computer vision, neural voice sentinels, and AST-guarded OS automation into a single cohesive operating system.
 
-Whether managing low-latency audio playback, executing AST-guarded database queries, monitoring network threats with a cyber honeypot, or orchestrating local agentic workflows, D.E.E.P delivers executive-level sovereign computing on local hardware.
+Whether managing low-latency audio playback, executing AST-guarded database queries, evolving local model weights on an NVIDIA RTX GPU via **ORPO / SimPO / KTO / DPO**, or compiling firmware for a physical **PIC18F85K22** trainer, D.E.E.P delivers executive-level sovereign computing on local hardware.
 
-> 📖 **System Architecture & Deep Dive**: See **[ARCHITECTURE.md](ARCHITECTURE.md)** for exhaustive diagrams, the 10 Core Architectural Pillars, full REST and WebSocket API specifications, and database schema mappings.
+> 📖 **Deep System Architecture**: See **[ARCHITECTURE.md](ARCHITECTURE.md)** for exhaustive diagrams, the 12 Core Architectural Pillars, full REST and WebSocket API specifications, and database schema mappings.
 
 ---
 
-## ✨ Key Capabilities
+## 🏛️ The 12 Sovereign Architectural Pillars
 
 ```
-                      ┌─────────────────────────────────────────┐
-                      │        D.E.E.P Sovereign Cockpit        │
-                      │       (Flask + WebSockets + PTY)        │
-                      └────────────────────┬────────────────────┘
-                                           │
-                 ┌─────────────────────────┼─────────────────────────┐
-                 │                         │                         │
-     ┌───────────▼───────────┐ ┌───────────▼───────────┐ ┌───────────▼───────────┐
-     │ 🎙️ Voice & Co-Pilot   │ │ 👁️ Computer Vision   │ │ ⚙️ OS & Agent Pilot   │
-     │ • Wake-word Sentinel  │ │ • MediaPipe Gestures  │ │ • Autonomous Workflow │
-     │ • Dual AI Co-Pilots   │ │ • Desktop Screen OCR  │ │ • Native Shell / PTY  │
-     │ • Executive TTS Engine│ │ • Camera Inspection   │ │ • Everyday PC Actions │
-     └───────────────────────┘ └───────────────────────┘ └───────────────────────┘
-                 │                         │                         │
-     ┌───────────▼───────────┐ ┌───────────▼───────────┐ ┌───────────▼───────────┐
-     │ 🧠 Knowledge & Memory │ │ 🛡️ Zero-Trust Defense │ │ 🏡 IoT & Ambient Media│
-     │ • Qdrant Vector DB    │ │ • AST Query Guardrail │ │ • TP-Link Kasa Relays │
-     │ • Knowledge Graph     │ │ • Secret Sanitization │ │ • Local DJ Engine     │
-     │ • Episodic Recall     │ │ • Cyber Honeypot Sentry││ • Strict Title Match  │
-     └───────────────────────┘ └───────────────────────┘ └───────────────────────┘
+                      ┌─────────────────────────────────────────────────────────┐
+                      │              D.E.E.P Sovereign Cockpit                  │
+                      │             (Flask + WebSockets + PTY)                  │
+                      └────────────────────────────┬────────────────────────────┘
+                                                   │
+         ┌─────────────────────────┼─────────────────────────┼─────────────────────────┐
+         │                         │                         │                         │
+┌────────▼────────┐       ┌────────▼────────┐       ┌────────▼────────┐       ┌────────▼────────┐
+│ 🧠 Vector Core  │       │ 🤖 Local Models │       │ 🔬 Embedded MCU │       │ 🎙️ OmniVoice    │
+│ • pgvector 1536 │       │ • Ollama Models │       │ • PIC18F85K22   │       │ • Kokoro TTS    │
+│ • deep_db (32T) │       │ • Zero-Cloud    │       │ • LCD Line 2    │       │ • <15 Words     │
+└─────────────────┘       └─────────────────┘       └─────────────────┘       └─────────────────┘
+         │                         │                         │                         │
+┌────────▼────────┐       ┌────────▼────────┐       ┌────────▼────────┐       ┌────────▼────────┐
+│ 🎵 Local Music  │       │ ⚡ Hardware Vit. │       │ 🕸️ OS Graph GNN │       │ 🛡️ AST Shield   │
+│ • Title Exact   │       │ • RTX A2000 GPU │       │ • Knowledge Map │       │ • DDL Blocker   │
+│ • yt-dlp Cache  │       │ • CUDA Active   │       │ • Property Graph│       │ • LIMIT 100     │
+└─────────────────┘       └─────────────────┘       └─────────────────┘       └─────────────────┘
+         │                         │                         │                         │
+┌────────▼────────┐       ┌────────▼────────┐       ┌────────▼────────┐       ┌────────▼────────┐
+│ 🌐 Cyber Nexus  │       │ ੴ Sikh Heritage │       │ 🛠️ Tool Forge v4│       │ 🌙 Meta-Learn v4│
+│ • PentAGI DAST  │       │ • Nitnem & Bani │       │ • Genetic Mut.  │       │ • ORPO/SimPO/EWC│
+│ • Honeypot Sent.│       │ • Gurmukhi OCR  │       │ • Shadow Runner │       │ • LoRA Fusion   │
+└─────────────────┘       └─────────────────┘       └─────────────────┘       └─────────────────┘
 ```
 
-### 🎙️ 1. Voice Master Sentinel & Dual Co-Pilots
-- **Wake-Word Daemon**: Low-overhead continuous listener running on a dedicated thread for instant verbal activation.
-- **Dual Co-Pilot Core**: Real-time collaborative reasoning between **J.A.R.V.I.S.** (Executive Butler) and **F.R.I.D.A.Y.** (Tactical Operations).
-- **Executive Voice Brevity**: Automatic audio noise reduction delivering crisp, 1–2 sentence verbal responses without raw formatting noise.
+### 1. PostgreSQL & Vector Core (`deep_db`)
+Permanent cold storage across 32 relational tables with native `pgvector` embeddings (1536-dim) supporting hybrid episodic retrieval and semantic fact verification.
 
-### 👁️ 2. Multi-Modal Vision & Gesture Kinematics
-- **Desktop Pilot Vision**: Live screen capture and regional OCR analysis for hands-free computer control.
-- **MediaPipe Hand & Face Tracking**: Zero-latency physical gesture recognition for contactless system navigation.
-- **Hardware Inspection Stream**: MJPEG video feed for real-time circuit board, wire, and component diagnostics.
+### 2. Local AI Grid (Ollama)
+Zero-cloud local inference supporting Hermes 3, Qwen 2.5 Coder, Qwen 2.5-VL, and custom fine-tuned `deep-sovereign:latest` weights with sub-second execution.
 
-### ⚙️ 3. OS Automation & Autonomous Agent Pilot
-- **Everyday PC Operations**: Deep desktop automation supporting application launching, window management, audio controls, and workflow execution.
-- **PTY Terminal Bridge**: Interactive WebSocket-based terminal session with ANSI color rendering and zero-latency shell communication.
-- **Hardware Telemetry Sentinel**: Real-time monitoring of CPU, RAM, GPU metrics, disk health, and thermal levels.
+### 3. Physical Microcontroller Toolchain (PIC18F85K22 & PICkit 3)
+Complete embedded toolchain for the physical PIC18F Trainer board:
+- Discovers 36 MPLAB X projects on disk.
+- Compiles C firmware via Microchip XC8 compiler.
+- Flashes via headless `ipecmd.exe` with USB Mutex locking.
+- **Hardware Defect Guard**: Line 1 of the 16x2 LCD is broken on this trainer; all output is strictly routed to **Line 2** (`LCD_Set_Cursor(2, 1)`, addresses `0xC0..0xCF`).
+- **Precision Thermistor Math**: Computes Microchip MCP9701 active thermistor temperatures via $T_A = \frac{V_{\text{mV}} - 400.0}{19.5}$ (never LM35 math).
 
-### 🧠 4. Epistemic Vector Memory & RAG
-- **Qdrant Vector Engine**: Ultra-fast vector database storage for semantic memory and contextual document retrieval.
-- **Persistent Knowledge Graph**: Relational cross-referencing between user interactions, technical concepts, and operating context.
-- **Local LLM Integration**: Pluggable backend supporting Ollama (Llama 3.2, Qwen 2.5, DeepSeek) with zero external API dependencies.
+### 4. Autonomous Voice Engine (Kokoro-ONNX & pyttsx3)
+Dual co-pilot voice pipeline (Jarvis & Friday) enforcing the **Executive Voice Brevity Directive** (under 15 words spoken, zero raw markdown in audio streams).
 
-### 🛡️ 5. Enterprise Zero-Trust & Cyber Defense
-- **Pre-Flight Sanitization**: Inbound and outbound streams are scrubbed of credentials, private tokens, and PII prior to logging.
-- **AST-Enforced Safe Execution**: AI-generated SQL queries are parsed through Python AST trees—blocking destructive mutations (`DROP`, `DELETE`, `TRUNCATE`) and enforcing read ceilings (`LIMIT 100`).
-- **Network Sentinel & Honeypot**: Embedded decoy endpoints to monitor unauthorized LAN scanning or lateral network intrusion.
+### 5. Local Music Engine & Audio Router
+Strict title-exact searching against `C:\Users\User\Music`. Automatically downloads missing songs via `yt-dlp` to local storage for offline playback. Opens YouTube strictly in **Google Chrome** via native `os.startfile()` only when explicitly asked.
 
-### 🎵 6. Local Music Engine & DJ
-- **Local Library Strict Matching**: Scans and indexes local audio (`C:\Users\User\Music`) with strict song title verification.
-- **Autonomous Download Fallback**: If a requested song is missing, `yt-dlp` automatically downloads the track directly to local storage for offline playback.
-- **Hardware Speaker Routing**: Direct playback to primary PC speakers without browser hijacking.
+### 6. Hardware Vitals & GPU VRAM Sentinel
+Monitors CPU, RAM, disk, thermal limits, and NVIDIA RTX A2000 GPU VRAM to ensure safe operating conditions before initiating background training loops.
 
-### 🔌 7. Embedded Microcontroller Toolchain (PIC18F85K22 & PICkit 3)
-- **Physical Trainer Integration**: Dedicated driver `embedded_mcu_engine.py` communicating with PIC18F85K22 (4.9152 MHz external crystal, HS2 mode).
-- **Automated Hex Compilation & Flashing**: Native headless invocation of Microchip `ipecmd.exe` with PICkit 3 USB hardware lock handling.
-- **Hardware Defect Workaround**: Automatic enforcement of LCD Line 2 cursor rendering (`0xC0..0xCF`), bypassing defective Line 1 hardware on the trainer.
-- **High-Precision Sensor Math**: Implements exact MCP9701-E/TO linear transfer formula ($T_A = \frac{V_{\text{mV}} - 400.0}{19.5}$) with 16-sample rolling ADC noise filtering.
+### 7. Hyper-Relational OS & GNN Knowledge Graph
+Dynamic entity-relation property graph interconnecting user tasks, code files, hardware components, and operating context.
 
-### ⚡ 8. Enterprise Resilience & Hystrix Circuit Breakers
-- **Stateful Fail-Fast Protection**: `hystrix_circuit_breaker.py` protects critical endpoints (`ollama_inference`, `iot_smart_home`, `screen_vision`, `mcu_flasher`).
-- **Dynamic State Transitions**: Automatically transitions between `CLOSED`, `OPEN` ($\le 1.5\text{s}$ timeout), and `HALF-OPEN` recovery probes.
-- **Telemetry Exposure**: Real-time circuit breaker metrics exposed via `GET /api/system/circuit_breakers`.
+### 8. Enterprise AI Guardrails & AST Validation
+Zero-trust AST static analyzer inspecting every AI query. Mutating queries (`DROP`, `DELETE`, `TRUNCATE`, `ALTER`) are blocked with `SECURITY_VIOLATION`. Read-only queries default to `LIMIT 100`.
 
-### 🛡️ 9. PentAGI Autonomous DAST Penetration Testing
-- **Agentic Vulnerability Assessment**: Integrated bridge `pentagi_bridge_engine.py` connecting D.E.E.P to Dockerized PentAGI workflows.
-- **Controlled DAST Scans**: REST endpoints (`/api/cyber/pentagi/status`, `/api/cyber/pentagi/start`, `/api/cyber/pentagi/stop`) for local network security auditing and compliance verification.
+### 9. Autonomous PentAGI Security Testing & Honeypot
+Integrated DAST security scanner scoped strictly to local RFC 1918 subnets (`127.0.0.1`, `192.168.x.x`), backed by silent decoy listeners on ports 2222 and 33060.
 
-### 💤 10. Multi-Tier Cognitive Memory & REM Machine Dreaming
-- **Tier 1 (Qdrant Hot Session Cache)**: Low-latency in-memory session cache via `qdrant_session_cache.py` for immediate conversational context.
-- **Tier 2 (PostgreSQL pgvector Deep DB)**: Permanent cold storage across 32 relational tables with vector similarity search.
-- **REM Dreaming Consolidation**: `sleep_phase_dream_engine.py` runs during system idle to distill session logs into factual triples and DPO training pairs in `dataset_fine_tune.jsonl`.
-- **Zero-Copy Frame Buffer**: `shared_memory_frame_buffer.py` provides a 12MB shared-memory IPC buffer between vision engines and Flask.
+### 10. Sovereign Sikh Heritage & Gurbani Multimodal Gateway
+Offline-first devotional portal (`/gurbani`) featuring Nitnem banis, phonetic Romanization, Gurmukhi text search, and audio recitation.
 
-### 🌌 11. Holographic Cyber Nexus & Sikh Heritage Portals
-- **Holographic Cyber Nexus (`/nexus`)**: Real-time visual network matrix, cyber telemetry HUD, and packet flow monitors.
-- **Sikh Heritage Portal (`/gurbani`)**: Offline-first devotional repository, phonetically accurate Romanized and Gurmukhi search with audio recitation.
+### 11. Self-Synthesizing Tool Forge v4 (Autonomous Cognitive Extensibility)
+- **Natural Language Tool Synthesis**: The agent writes, tests, and verifies new Python tools dynamically without restarting.
+- **Genetic Mutation & Pareto Optimization**: Evaluates mutations (`memoize`, `guard_fastpath`, `doc_type_hints`) against multi-objective fitness functions.
+- **Differential Shadow Execution**: Runs adjacent versions side-by-side to ensure zero semantic regression divergence.
+- **OpenAPI & MCP Dynamic API Synthesizer**: Transforms REST endpoints and MCP schemas into typed client tools.
+- **Runtime Self-Healing Sentinel**: Intercepts runtime exceptions, diagnoses root causes via Reflexion, patches AST, adds regression tests, and hot-swaps live.
+- **Property-Based Fuzz Testing**: 15 boundary cases asserting invariants and bounded latency (< 50ms).
+
+### 12. Continuous Meta-Learning & Autonomous Machine Dreaming v4
+- **Multi-Objective GPU LoRA Alignment**: Supports **ORPO** (monolithic SFT + odds-ratio loss), **SimPO** (target margin $\gamma = 0.5$), **KTO** (prospect value loss), and **DPO** on local NVIDIA RTX hardware.
+- **Online EWC++ Lifelong Learning**: Running Fisher Information Matrix accumulation ($\\gamma = 0.90$) preventing catastrophic forgetting across multiple nights.
+- **Adversarial Counterfactual Dreaming**: Generates adversarial failure scenarios during sleep phases to harden model defenses.
+- **LoRA Weight Fusion**: Merges adapter weights ($\\Delta W = \frac{\alpha}{r} B \cdot A$) into base representations and compiles `Modelfile.deep_sovereign`.
+- **Shadow Canary Benchmark**: Pre-deployment quality & latency validation before automatic Ollama hot-swap.
+
+---
+
+## 🖥️ Interactive Cockpit UI & Studio
+
+Access the cockpit at **`http://localhost:5000`** in your browser.
+
+- **Main Cockpit (`/`)**: Multi-turn chat, system vitals, MCP server status, hardware status, and live log stream.
+- **Cognitive Foundry Modal (`⚡ Cognitive Foundry`)**:
+  1. *Tool Forge Studio*: Dynamic tool catalog, 1-click fuzz test runner, AST complexity scorecards, genetic mutation optimizer, differential shadow comparator, and version rollback.
+  2. *Machine Dreaming HUD*: Alignment objective selector (`ORPO`, `SimPO`, `KTO`, `DPO`), GPU VRAM and Online EWC++ gauges, adversarial counterfactual dream simulator, and LoRA fusion compiler.
+- **Holographic Cyber Nexus (`/nexus`)**: Cyber telemetry HUD and network packet monitors.
+- **Sikh Heritage Portal (`/gurbani`)**: Offline devotional gateway with audio recitation.
 
 ---
 
 ## 🚀 Quick Start Guide
 
 ### Prerequisites
-- **Python**: 3.10, 3.11, or 3.12 (64-bit recommended)
-- **Node.js**: v18+ (for optional MCP servers)
+- **OS**: Windows 10/11 64-bit
+- **Python**: 3.10, 3.11, or 3.12 (64-bit)
 - **Ollama**: Installed and running locally (`ollama serve`)
-- **Docker** *(Optional)*: For Redis, Qdrant, and n8n container stack
+- **NVIDIA GPU** *(Recommended)*: RTX A2000 or higher for local LoRA meta-learning
 
-### 1. Clone the Repository
+### 1. Clone & Setup Environment
 ```bash
-git clone https://github.com/<your-username>/deep.git
+git clone https://github.com/rsingh287/deep.git
 cd deep
-```
 
-### 2. Create a Virtual Environment
-```bash
-# Windows
+# Create and activate virtual environment
 python -m venv .venv
 .venv\Scripts\activate
 
-# Linux / macOS
-python3 -m venv .venv
-source .venv/bin/activate
-```
-
-### 3. Install Dependencies
-```bash
+# Install dependencies
 pip install -r requirements.txt
 ```
 
-### 4. Configure Environment
-Copy the example environment template:
+### 2. Configure Environment
 ```bash
 cp .env.example .env
 ```
-Edit `.env` to customize your local ports, database credentials, or optional messaging tokens.
+Edit `.env` to set your PostgreSQL credentials and local configuration.
 
-### 5. Launch the Cockpit
+### 3. Launch the Cockpit
 ```bash
-# Direct Python launch
+# Launch Flask server & background sentinels
 python app.py
-
-# Or via Windows launch batch script
-.\start.bat
 ```
-Navigate to **`http://localhost:5000`** in your browser to enter the DEEP sovereign cockpit.
+Open **`http://127.0.0.1:5000`** in your browser.
 
 ---
 
-## 🐳 Docker Infrastructure (Optional)
+## 🧪 Comprehensive Diagnostic & Test Matrix
 
-To launch the integrated vector storage, task queue, and workflow orchestrator:
+Execute the automated test suites to verify all 12 pillars:
+
 ```bash
-docker-compose up -d
+# Sovereign Cockpit 10-Pillar Diagnostic Audit (Master Health Check)
+python check_deep.py
+
+# Phase 3 & 4 v4 Autonomous Evolutionary Test Suite (Mutator, Shadow, OpenAPI, ORPO, EWC++)
+python test_phase3_and_4_v4_evolution.py
+
+# Phase 3 & 4 v3 Sovereign Cognitive Test Suite (Fuzz, AST, DAG, SimPO, Self-Play)
+python test_phase3_and_4_v3_sovereign.py
+python test_advanced_phases_3_and_4.py
+
+# Tool Forge & Meta-Learning Base Unit Suites
+python test_phase3_tool_forge.py
+python test_phase4_meta_learning.py
+
+# Subsystem & Hardware Test Suites
+python test_circuit_ui_and_embedded_mcu.py
+python test_user_intents_and_skills.py
+python test_pillars_1_and_2.py
+python test_pentagi_integration.py
 ```
-This spins up:
-- **Qdrant Vector Database**: `http://localhost:6333`
-- **Redis Cache & Queue**: `localhost:6379`
-- **n8n Workflow Automation**: `http://localhost:5678`
 
 ---
 
@@ -168,90 +184,49 @@ This spins up:
 
 ```
 deep/
-├── app.py                         # Primary Flask application & WebSocket PTY router
-├── ARCHITECTURE.md                # Authoritative 10-pillar architecture, schema & API spec
-├── check_deep.py                  # Comprehensive 10-pillar diagnostic suite (10/10 green)
-├── requirements.txt               # Python package dependencies
-├── docker-compose.yml             # Docker stack for Redis, Qdrant, and n8n
-├── .env.example                   # Sanitized environment configuration template
-├── embedded_mcu_engine.py         # Microchip PIC18F85K22 & PICkit 3 flashing toolchain
-├── hystrix_circuit_breaker.py     # Enterprise fail-fast circuit breakers
-├── pentagi_bridge_engine.py       # Autonomous PentAGI DAST testing bridge
-├── qdrant_session_cache.py        # Tier 1 in-memory hot session vector cache
-├── sleep_phase_dream_engine.py    # Autonomous REM machine dreaming memory consolidation
-├── shared_memory_frame_buffer.py  # 12MB zero-copy camera frame buffer IPC
-├── routes/                        # Modular Flask Blueprints
-│   ├── chat.py                    # Multi-turn dual co-pilot conversational routes & SSE stream
-│   ├── hardware.py                # System hardware telemetry, battery & MCU status APIs
-│   ├── vision.py                  # Computer vision and screen inspection APIs
-│   ├── cyber.py                   # Cyber defense, honeypot & PentAGI DAST routes
-│   ├── system.py                  # Process monitoring, health & circuit breaker metrics
-│   ├── gurbani.py                 # Sikh Heritage portal routes & search endpoints
-│   └── ingestion.py               # Document parsing & knowledge base intake
-├── intents/                       # Autonomous intent engines (registry, pentest, os, etc.)
-├── static/                        # CSS, Vanilla JS, and Cockpit UI assets
-├── templates/                     # Jinja2 cockpit UI dashboards and partials
-├── tests/                         # Comprehensive system and security test suites
-├── CONTRIBUTING.md                # Contribution guidelines and coding conventions
-├── SECURITY.md                    # Zero-trust security policy & vulnerability reporting
-└── LICENSE                        # PolyForm Noncommercial 1.0.0 License
-```
-
----
-
-## 🧪 Diagnostics & System Verification
-
-D.E.E.P includes a built-in automated test and diagnostic harness to verify all system components, hardware interfaces, database engines, and resilience breakers.
-
-### Running the Master 10-Pillar Diagnostic Suite
-```bash
-python check_deep.py
-```
-This runs automated health checks across all 10 core pillars:
-1. **PostgreSQL & pgvector** (`deep_db` 32-table relational schema + vectors)
-2. **Local Ollama LLM Inference** (Qwen 2.5, Hermes 3, DeepSeek models)
-3. **Embedded MCU Engine** (PIC18F85K22 board pinouts, LCD Line 2 defect workaround, MCP9701 sensor math)
-4. **OmniVoice & Audio Subsystem** (Voice sentinels and TTS engine)
-5. **Local DJ & Strict Song Matcher** (`C:\Users\User\Music` indexer and yt-dlp fallback)
-6. **Hardware Telemetry & GPU Acceleration** (NVIDIA CUDA / GPU status)
-7. **PC Brain GNN Hyper-Graph** (Knowledge graph relations)
-8. **AST Query Security Guardrails** (DDL/DML blocker and read ceiling enforcement)
-9. **Cyber Nexus & Honeypot Engine** (Decoy sentinels and threat scoring)
-10. **Public APIs & Offline Resilience** (Weather, finance, fallback services)
-
-### Running Targeted Test Suites
-```bash
-# Verify Circuit Breakers and PIC18F85K22 Embedded MCU
-python test_circuit_ui_and_embedded_mcu.py
-
-# Verify Multi-Tier Memory (Qdrant Hot Cache & REM Dreaming)
-python test_pillars_1_and_2.py
-
-# Verify PentAGI DAST Bridge & Dynamic Testing Endpoints
-python test_pentagi_integration.py
-
-# Verify Autonomous User Intents and Tool Registry
-python test_user_intents_and_skills.py
+├── app.py                             # Master Flask application, WebSocket router & hotkey sentinel
+├── ARCHITECTURE.md                    # 12-pillar architectural specification, schemas & API reference
+├── check_deep.py                      # 10-pillar master diagnostic audit (10/10 passed)
+├── self_synthesizing_tool_forge.py    # Tool Forge v4 (Genetic Mutator, Shadow Runner, OpenAPI, Self-Healing)
+├── nightly_meta_learner.py            # Meta-Learner v4 (ORPO/KTO/SimPO, Online EWC++, Counterfactuals)
+├── sleep_phase_dream_engine.py        # REM machine dreaming memory consolidation
+├── embedded_mcu_engine.py             # PIC18F85K22 toolchain, LCD Line 2 defect guard, XC8 flasher
+├── local_music_engine.py              # Strict title matching, yt-dlp auto-download, Chrome exclusive route
+├── enterprise_ai_guardrails.py        # AST SQL mutation blocker & secret scrubber
+├── omni_voice_engine.py               # Kokoro-ONNX neural TTS with Executive Brevity directive
+├── pentagi_bridge_engine.py           # PentAGI autonomous DAST security testing bridge
+├── dynamic_tools/                     # Verified dynamically synthesized Python tools & version history
+│   ├── manifest.json                  # Active tool manifest with fuzz scores and complexity grades
+│   ├── tests/                         # Auto-generated unit test suites for synthesized tools
+│   └── versions/                      # Immutable historical snapshots for 1-click rollback
+├── checkpoints/                       # LoRA adapter weights, Online EWC Fisher matrices
+├── routes/                            # Modular REST Blueprints
+│   ├── tool_forge_bp.py               # Tool Forge v4 endpoints (mutate, shadow_compare, synthesize_openapi)
+│   ├── dream_bp.py                    # Meta-Learning v4 endpoints (train_lora, counterfactual, fuse_lora)
+│   ├── chat.py                        # Conversational streaming & dual co-pilot reasoning
+│   ├── hardware.py                    # MCU status, firmware compilation, and vitals APIs
+│   ├── cyber.py                       # Cyber defense, honeypot & PentAGI DAST routes
+│   └── gurbani.py                     # Sikh Heritage devotional portal routes
+├── templates/                         # Jinja2 Cockpit UI dashboards & modals
+│   ├── index.html                     # Primary Cockpit interface
+│   ├── modals/toolForgeAndDreamModal.html # Cognitive Foundry v4 Studio modal
+│   └── partials/top_bar.html          # Cockpit top navigation bar
+└── test_phase3_and_4_v4_evolution.py  # v4 Autonomous Evolutionary test suite
 ```
 
 ---
 
 ## 🔒 Security & Privacy
 
-DEEP is built from the ground up for **sovereign computing**:
-- **Offline First**: All core processing (inference, vector search, voice, vision, hardware control) runs on your local machine.
-- **No Telemetry Leaks**: System metrics, prompts, and database records remain strictly within your local environment.
-- **Pre-Flight Scrubber**: Sensitive credentials, passwords, and private tokens are automatically scrubbed via `sanitize_secrets.py`.
+DEEP is built for **absolute data sovereignty**:
+- **Zero-Cloud Dependency**: LLM inference, vector searches, voice synthesis, tool synthesis, and hardware controls execute 100% locally on your machine.
+- **AST Security Shield**: Synthesized code cannot access network sockets, process spawns, winreg, or Python introspection escape vectors.
+- **Secret Sanitization**: All tokens, credentials, and PII are scrubbed prior to logging or storage.
 
-See [SECURITY.md](SECURITY.md) for full details on our zero-trust architecture.
+See [SECURITY.md](SECURITY.md) for complete details.
 
 ---
 
 ## 📜 License
 
-This project is licensed under the **PolyForm Noncommercial License 1.0.0**. 
-
-- ✅ **Free & Permitted**: Personal use, academic study, research, hobbyist tinkering, and noncommercial evaluation.
-- 🚫 **Prohibited**: Any commercial deployment, SaaS monetization, paid distribution, or commercial integration without a separate commercial license from the author.
-
-See the [LICENSE](LICENSE) file for complete legal terms. For commercial licensing inquiries, contact [deep@local.ai](mailto:deep@local.ai).
+Licensed under the **PolyForm Noncommercial License 1.0.0**. Free for personal use, academic study, research, and noncommercial evaluation. Commercial licensing inquiries: [deep@local.ai](mailto:deep@local.ai).

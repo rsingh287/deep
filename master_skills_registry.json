@@ -3486,5 +3486,13 @@
     "plugin": "tool-forge",
     "category": "\ud83d\udee0\ufe0f Synthesized Tool",
     "description": "Test calculator"
+  },
+  {
+    "id": "synthesized-adv_temp_c_to_f",
+    "name": "Adv Temp C To F",
+    "scope": "Synthesized",
+    "plugin": "tool-forge",
+    "category": "\ud83d\udee0\ufe0f Synthesized Tool",
+    "description": "Temperature C to F converter"
   }
 ]

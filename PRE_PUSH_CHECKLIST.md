@@ -1,95 +1,114 @@
-# 🚀 DEEP Pre-Push & GitHub Publishing Guide
+# 🚀 D.E.E.P. Pre-Push & Release Verification Checklist
 
-This guide ensures that your **D.E.E.P** repository is completely sanitized, safe, and ready to be pushed to GitHub without leaking credentials, personal databases, or browser history.
+> **Authoritative Pre-Flight Verification Guide for GitHub Pushing, Zero-Trust Sanitization, and Master Test Suites**
 
 ---
 
-## 🛡️ Step 1: Pre-Push Security Verification (Zero-Trust)
+## 🛡️ Step 1: Zero-Trust Pre-Push Security Verification
 
-Before pushing, verify that sensitive files are ignored by git:
+Before pushing to any remote repository, verify that zero secrets or untracked local databases are committed:
 
 1. **Verify `.env` is NOT tracked in Git**:
    ```powershell
-   git status --short
+   git status --short | Select-String "\.env"
    ```
-   *Ensure `.env` does NOT show up as staged (`A`, `M`) or committed.*
+   *Expected: Zero output (only `.env.example` should ever be tracked).*
 
-2. **Verify no personal SQLite or Vector databases are tracked**:
+2. **Verify no local database files or vectors are tracked**:
    ```powershell
-   git status --short | Select-String "\.db"
+   git status --short | Select-String "\.(db|sqlite|pt)$"
    ```
-   *Expected: Zero output. All databases (`database.db`, `local_ai.db`, `deep_knowledge_graph.db`, `qdrant_db/`) are now in `.gitignore`.*
+   *Expected: Zero output. All local checkpoints, SQLite databases, and vector stores are ignored via `.gitignore`.*
 
-3. **Verify browser cache profile is untracked**:
+3. **Verify browser profiles and credentials remain untracked**:
    ```powershell
    git status --short | Select-String "pc_app_profile"
    ```
-   *Expected: Marked as deleted `D pc_app_profile/...` in git index so it won't be pushed to GitHub, while remaining intact on your local drive.*
+   *Expected: Zero output.*
 
 ---
 
-## 📦 Step 2: Clean Release Status (COMPLETED)
+## 🧪 Step 2: Master Test Matrix Verification
 
-Your `main` branch has been created as a clean orphan release with zero historical secret leaks:
+Every release must pass all test suites with 100% green status before pushing:
+
+### 1. Sovereign Cockpit Master Diagnostic Audit
+```bash
+python check_deep.py
+```
+*Expected Result: `DIAGNOSTIC SUMMARY: 10/10 PASSED | 0 ADVISORIES | 0 CRITICAL`.*
+
+### 2. Phase 3 & 4 v4 Autonomous Evolutionary Test Suite
+```bash
+python test_phase3_and_4_v4_evolution.py
+```
+*Expected Result: `Ran 8 tests ... OK` (verifies Genetic Mutator, Differential Shadow, OpenAPI Synthesizer, Self-Healing Sentinel, ORPO, Online EWC++, Counterfactuals, and LoRA Fusion).*
+
+### 3. Phase 3 & 4 v3 Sovereign Cognitive Test Suite
+```bash
+python test_phase3_and_4_v3_sovereign.py
+python test_advanced_phases_3_and_4.py
+```
+*Expected Result: `Ran 6 tests ... OK` and `Ran 11 tests ... OK` (verifies 15-case FuzzForge, McCabe AST Complexity, SimPO, DPO, and Canary HotSwapper).*
+
+### 4. Tool Forge & Meta-Learning Unit Suites
+```bash
+python test_phase3_tool_forge.py
+python test_phase4_meta_learning.py
+```
+*Expected Result: `Ran 10 tests ... OK` and `Ran 5 tests ... OK`.*
+
+### 5. Core Hardware & Subsystem Suites
+```bash
+python test_circuit_ui_and_embedded_mcu.py
+python test_user_intents_and_skills.py
+python test_pillars_1_and_2.py
+python test_pentagi_integration.py
+```
+*Expected Result: All subtests pass.*
+
+---
+
+## 🌐 Step 3: Live Cockpit Server Verification
+
+Confirm that the live local server is running and responding to health probes:
 
 ```powershell
-# Verified Status:
-# - Branch: main
-# - Clean Commit: feat: initial open-source release of D.E.E.P Sovereign AI Cockpit
-# - Sensitive files in history: ZERO (.env, resumes, tokens, browser caches are non-existent)
-# - Working tree: Clean and operational (12/12 test suites passing)
+# Probe core UI and v4 API endpoints
+python -c "
+import urllib.request
+for ep in ['/', '/api/forge/tools', '/api/dream/telemetry', '/api/dream/online_ewc']:
+    r = urllib.request.urlopen('http://127.0.0.1:5000' + ep, timeout=5)
+    print(f'{ep} -> HTTP {r.status}')
+"
+```
+*Expected: All endpoints return `HTTP 200`.*
+
+---
+
+## 📦 Step 4: Staging, Committing & Pushing
+
+Once all checks pass:
+
+```powershell
+# 1. Review status
+git status
+
+# 2. Stage all modifications
+git add -A
+
+# 3. Create semantic commit
+git commit -m "feat: upgrade all system documentation and test matrices"
+
+# 4. Push to remote origin
+git push origin main
 ```
 
 ---
 
-## 🌐 Step 3: Create Your GitHub Repository
-
-You can create your repository using either **Option A (GitHub Web UI)** or **Option B (GitHub CLI)**:
-
-### Option A: Via GitHub Web Browser
-1. Open your browser and go to: **[github.com/new](https://github.com/new)**
-2. Enter **Repository name**: `deep` (or `deep-sovereign-cockpit`)
-3. Choose Visibility:
-   - **Public**: Anyone on the internet can see your code (ideal for open-source portfolios).
-   - **Private**: Only you can see your code (recommended if you still have proprietary modules).
-4. **DO NOT** check "Add a README file", "Add .gitignore", or "Choose a license" (we already created all of these!).
-5. Click **Create repository**.
-6. Copy the repository URL (e.g., `https://github.com/<your-username>/deep.git`).
-
-### Option B: Via GitHub CLI (`gh`)
-If you have the `gh` tool installed and authenticated:
-```powershell
-# For a Public repository:
-gh repo create deep --public --source=. --remote=origin
-
-# For a Private repository:
-gh repo create deep --private --source=. --remote=origin
-```
-
----
-
-## 🔗 Step 4: Link Your Remote and Push
-
-If you used Option A (web browser), link the remote origin and push your code:
-
-```powershell
-# 1. Add your GitHub remote (replace with your actual GitHub username):
-git remote add origin https://github.com/<your-username>/deep.git
-
-# 2. Rename or ensure your primary branch is main or master:
-git branch -M main
-
-# 3. Push to GitHub:
-git push -u origin main
-```
-
----
-
-## 🎯 Verification After Pushing
-
-Once pushed, visit `https://github.com/<your-username>/deep`:
-- [x] **README.md** renders beautifully on the front page with badges and architecture diagrams.
-- [x] **LICENSE** displays as MIT.
-- [x] **No `.env` file** exists on GitHub (only `.env.example`).
-- [x] **No `pc_app_profile`** folder or `.db` files exist on GitHub.
-- [x] **Requirements and setup instructions** are clear for visitors.
+## 🎯 Final Release Sign-Off
+- [x] All 12 Architectural Pillars documented in `ARCHITECTURE.md` and `README.md`.
+- [x] Pre-flight secret sanitization verified (`sanitize_secrets.py`).
+- [x] Zero-trust AST static analyzer active for SQL queries and dynamic tool code.
+- [x] All 7 test suites passing with 100% green status.
+- [x] Live Flask daemon running and serving on port 5000.

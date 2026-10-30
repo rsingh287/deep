@@ -1,0 +1,8 @@
+{
+  "version": 6,
+  "tool_name": "v4_fragile_calculator",
+  "note": "Initial synthesis",
+  "timestamp": "2026-10-29T23:23:06.563080",
+  "tool_code": "\ndef run(args: dict) -> dict:\n    # Intentionally fragile without .get()\n    a = args[\"val_a\"]\n    b = args[\"val_b\"]\n    return {\"result\": a + b, \"success\": True}\n",
+  "test_code": "\nimport unittest\nfrom dynamic_tools.v4_fragile_calculator import run\n\nclass TestFragile(unittest.TestCase):\n    def test_add(self):\n        res = run({\"val_a\": 1, \"val_b\": 2})\n        self.assertEqual(res.get(\"result\"), 3)\n\nif __name__ == \"__main__\":\n    unittest.main()\n"
+}
