@@ -4471,6 +4471,7 @@ from routes.public_apis_bp import public_bp
 from routes.docker_bp import docker_bp
 from routes.tool_forge_bp import tool_forge_bp
 from routes.dream_bp import dream_bp
+from routes.self_heal_bp import self_heal_bp
 
 app.register_blueprint(chat_bp)
 app.register_blueprint(vision_bp)
@@ -4486,6 +4487,7 @@ app.register_blueprint(public_bp)
 app.register_blueprint(docker_bp)
 app.register_blueprint(tool_forge_bp)
 app.register_blueprint(dream_bp)
+app.register_blueprint(self_heal_bp)
 
 if __name__ == "__main__":
     def launch_singleton_daemon(script_name):

@@ -1,0 +1,98 @@
+[
+  {
+    "type": "FULL_SYSTEM_HEAL",
+    "equilibrium": "OPTIMAL",
+    "actions_count": 6,
+    "duration_ms": 1027.7,
+    "timestamp": "2026-10-29T23:49:30.861689"
+  },
+  {
+    "type": "FULL_SYSTEM_HEAL",
+    "equilibrium": "OPTIMAL",
+    "actions_count": 6,
+    "duration_ms": 1026.3,
+    "timestamp": "2026-10-29T23:49:29.831934"
+  },
+  {
+    "type": "TOOL_HEALED",
+    "tool_name": "v5_fragile_stats",
+    "error_type": "ZeroDivisionError",
+    "strategy": "AST_SEMANTIC_MUTATION",
+    "fitness": 100.0,
+    "new_version": 2,
+    "timestamp": "2026-10-29T23:49:28.802117"
+  },
+  {
+    "type": "TOOL_UNQUARANTINED",
+    "tool_name": "test_quarantine_dummy",
+    "timestamp": "2026-10-29T23:49:18.559492"
+  },
+  {
+    "type": "TOOL_QUARANTINED",
+    "tool_name": "test_quarantine_dummy",
+    "reason": "Simulated execution crash loop",
+    "timestamp": "2026-10-29T23:49:18.557340"
+  },
+  {
+    "type": "FULL_SYSTEM_HEAL",
+    "equilibrium": "OPTIMAL",
+    "actions_count": 6,
+    "duration_ms": 1062.7,
+    "timestamp": "2026-10-29T23:49:18.461123"
+  },
+  {
+    "type": "FULL_SYSTEM_HEAL",
+    "equilibrium": "OPTIMAL",
+    "actions_count": 6,
+    "duration_ms": 1168.6,
+    "timestamp": "2026-10-29T23:47:28.263251"
+  },
+  {
+    "type": "FULL_SYSTEM_HEAL",
+    "equilibrium": "OPTIMAL",
+    "actions_count": 6,
+    "duration_ms": 845.4,
+    "timestamp": "2026-10-29T23:45:57.838656"
+  },
+  {
+    "type": "FULL_SYSTEM_HEAL",
+    "equilibrium": "OPTIMAL",
+    "actions_count": 6,
+    "duration_ms": 970.6,
+    "timestamp": "2026-10-29T23:45:56.987120"
+  },
+  {
+    "type": "TOOL_HEALED",
+    "tool_name": "v5_fragile_stats",
+    "error_type": "ZeroDivisionError",
+    "strategy": "AST_SEMANTIC_MUTATION",
+    "fitness": 100.0,
+    "new_version": 2,
+    "timestamp": "2026-10-29T23:45:56.013336"
+  },
+  {
+    "type": "TOOL_UNQUARANTINED",
+    "tool_name": "test_quarantine_dummy",
+    "timestamp": "2026-10-29T23:45:45.731463"
+  },
+  {
+    "type": "TOOL_QUARANTINED",
+    "tool_name": "test_quarantine_dummy",
+    "reason": "Simulated execution crash loop",
+    "timestamp": "2026-10-29T23:45:45.729419"
+  },
+  {
+    "type": "FULL_SYSTEM_HEAL",
+    "equilibrium": "OPTIMAL",
+    "actions_count": 6,
+    "duration_ms": 871.5,
+    "timestamp": "2026-10-29T23:45:45.615579"
+  },
+  {
+    "type": "FULL_SYSTEM_HEAL",
+    "equilibrium": "OPTIMAL",
+    "actions_count": 6,
+    "duration_ms": 1157.5,
+    "timestamp": "2026-10-29T23:40:19.177571"
+  }
+]

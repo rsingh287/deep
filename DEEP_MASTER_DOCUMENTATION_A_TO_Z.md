@@ -301,7 +301,23 @@ User Input ───► L1: Working Context (RAM Ring Buffer, last 20 turns)
 2. **AST-Enforced SQL Guardrails (`enterprise_ai_guardrails.py`)**: Parses every LLM-generated SQL query into Python AST nodes. Mutating statements (`DROP`, `DELETE`, `TRUNCATE`, `ALTER`, `UPDATE`, `INSERT`) raise immediate `SECURITY_VIOLATION`. All `SELECT` queries without explicit limits are automatically rewritten to include `LIMIT 100`.
 3. **Dynamic Tool AST Security Shield (`ASTSecurityShield`)**: Disallows dangerous modules (`winreg`, `ctypes`, `msvcrt`, `subprocess`, `socket`, `pty`) and builtins (`eval`, `exec`, `__import__`). Prohibits introspection escapes (`__subclasses__`, `__bases__`, `__globals__`).
 4. **Sandboxed Subprocess Environment (`SandboxedEnvironment`)**: Executes unit tests in sanitized environments where credential variables (`TOKEN`, `KEY`, `PASS`, `SECRET`) are purged from `os.environ`.
-5. **Stateful Hystrix Circuit Breakers (`circuit_breaker.py`)**: Protects external devices (smart home, serial ports, cameras) by transitioning from `CLOSED` to `OPEN` after 3 consecutive failures, cooling down for 30s before attempting `HALF-OPEN` recovery.
+5. **Stateful Hystrix Circuit Breakers (`hystrix_circuit_breaker.py`)**: Protects external devices (smart home, serial ports, cameras) by transitioning from `CLOSED` to `OPEN` after 3 consecutive failures, cooling down for 30s before attempting `HALF-OPEN` recovery.
+
+### 9.2 Level 5 Autonomous Self-Healing Sentinel & Immune Governance (`autonomous_self_healing_engine.py`)
+The workstation implements a comprehensive, 6-layer self-healing and immune subsystem:
+- **6-Layer Diagnostic Matrix**:
+  1. *Layer 1 (Process & Memory)*: Cyclic object garbage collection, cache purge when RAM > 80%.
+  2. *Layer 2 (Storage & Databases)*: SQLite integrity verification, pgvector pool readiness probes.
+  3. *Layer 3 (Circuit Breakers)*: Non-blocking canary probes; automatic reset of recovered circuits to `CLOSED`.
+  4. *Layer 4 (Hardware Mutexes)*: Deterministic OpenCV camera handle and audio stream release; LCD Line 2 defect guard.
+  5. *Layer 5 (Network & Sockets)*: Identification and dynamic mitigation of socket conflicts (e.g. port 2222/33060).
+  6. *Layer 6 (Dynamic Tool Immune System)*: Continuous failure triage; automatic quarantine of tools with >= 3 crashes.
+- **Multi-Candidate Patch Tournament (`HealingPatchTournament`)**:
+  When a dynamic tool throws runtime exceptions, 3 candidate strategies compete:
+  - *Candidate A (AST Mutation)*: Injects defensive guards for ZeroDivisionError, KeyError, TypeError, AttributeError, IndexError, and ValueError.
+  - *Candidate B (LLM Reflexion)*: Prompt-engineered localized repair using local Ollama model.
+  - *Candidate C (Snapshot Rollback)*: Restores the highest-scoring verified historical snapshot.
+  Candidates are evaluated in the isolated sandbox; the candidate with the highest fitness is crowned and hot-swapped into production with a newly committed regression test.
 
 ---
 ## 10. Exhaustive REST & WebSocket API Specification
@@ -340,6 +356,12 @@ User Input ───► L1: Working Context (RAM Ring Buffer, last 20 turns)
 | **Media**     | `POST` | `/api/media/youtube`| `{"query": "..."}` | Open YouTube explicitly in Google Chrome. |
 | **IoT**       | `GET` | `/api/iot/devices` | None | Discover LAN TP-Link Kasa smart devices. |
 | **IoT**       | `POST` | `/api/iot/toggle` | `{"ip": "...", "state": true}` | Toggle smart plug relay (sub-1.5s timeout). |
+| **Self-Healing**| `POST` | `/api/heal/system` | None | Run full 6-layer autonomous self-healing sweep. |
+| **Self-Healing**| `POST` | `/api/heal/tool` | `{"tool_name": "..."}` | Run multi-candidate patch tournament to heal tool. |
+| **Self-Healing**| `GET` | `/api/heal/telemetry` | None | Fetch real-time healing incidents, quarantines, and circuits. |
+| **Self-Healing**| `POST` | `/api/heal/reset_circuits` | `{"force": false}` | Canary-probe and auto-reset tripped circuit breakers. |
+| **Self-Healing**| `POST` | `/api/heal/quarantine` | `{"tool_name": "..."}` | Isolate unstable tool into quarantine state. |
+| **Self-Healing**| `POST` | `/api/heal/unquarantine` | `{"tool_name": "..."}` | Restore repaired tool from quarantine to production. |
 
 ---
 ## 11. PostgreSQL Schema Dictionary (`deep_db`)
@@ -436,6 +458,9 @@ Every software update must strictly clear the pre-push verification gates:
    ```bash
    # Master Diagnostic Audit
    python check_deep.py
+
+   # Level 5 Autonomous Self-Healing Sentinel Suite
+   python test_advanced_self_healing_v5.py
 
    # Phase 3 & 4 v4 Autonomous Evolutionary Suite
    python test_phase3_and_4_v4_evolution.py

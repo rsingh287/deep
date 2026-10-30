@@ -23,6 +23,7 @@
     <div style="display:flex; gap:8px; padding:10px 24px; background:rgba(15,23,42,0.8); border-bottom:1px solid rgba(255,255,255,0.06);">
       <button id="tabBtnToolForge" onclick="switchForgeTab('forge')" style="background:rgba(168,85,247,0.2); border:1px solid rgba(168,85,247,0.4); color:#c084fc; border-radius:8px; padding:6px 14px; font-size:0.8rem; font-weight:700; cursor:pointer; transition:all 0.2s;">🛠️ Tool Forge Studio (v4)</button>
       <button id="tabBtnDreaming" onclick="switchForgeTab('dream')" style="background:transparent; border:1px solid rgba(255,255,255,0.1); color:#94a3b8; border-radius:8px; padding:6px 14px; font-size:0.8rem; font-weight:700; cursor:pointer; transition:all 0.2s;">🌙 Machine Dreaming & Meta-Learning (v4)</button>
+      <button id="tabBtnSelfHealing" onclick="switchForgeTab('healing')" style="background:transparent; border:1px solid rgba(255,255,255,0.1); color:#94a3b8; border-radius:8px; padding:6px 14px; font-size:0.8rem; font-weight:700; cursor:pointer; transition:all 0.2s;">🩺 Self-Healing Sentinel (v5)</button>
     </div>
 
     <!-- Modal Body -->
@@ -195,6 +196,93 @@
         </div>
         <pre id="dreamCycleLog" style="display:none; background:rgba(0,0,0,0.5); border:1px solid rgba(14,165,233,0.3); border-radius:8px; padding:12px; color:#93c5fd; font-family:monospace; font-size:0.75rem; max-height:160px; overflow-y:auto; margin:0;"></pre>
 
+
+      <!-- ==========================================
+           TAB 3: AUTONOMOUS SELF-HEALING SENTINEL (v5)
+           ========================================== -->
+      <div id="healingTabContent" style="display:none; flex-direction:column; gap:18px;">
+        
+        <!-- Metrics & Status Header Row -->
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:12px;">
+          <div style="background:rgba(16,185,129,0.06); border:1px solid rgba(16,185,129,0.2); border-radius:10px; padding:14px;">
+            <div style="font-size:0.75rem; color:#94a3b8; text-transform:uppercase; letter-spacing:0.05em;">System Equilibrium</div>
+            <div id="healEquilibriumBadge" style="font-size:1.3rem; font-weight:800; color:#34d399; margin-top:4px;">OPTIMAL</div>
+            <div style="font-size:0.75rem; color:#6ee7b7; margin-top:4px;">All 6 Diagnostic Layers Nominal</div>
+          </div>
+
+          <div style="background:rgba(14,165,233,0.06); border:1px solid rgba(14,165,233,0.2); border-radius:10px; padding:14px;">
+            <div style="font-size:0.75rem; color:#94a3b8; text-transform:uppercase; letter-spacing:0.05em;">Circuit Breakers</div>
+            <div id="healCircuitStatus" style="font-size:1.3rem; font-weight:800; color:#38bdf8; margin-top:4px;">ALL NOMINAL</div>
+            <div style="font-size:0.75rem; color:#7dd3fc; margin-top:4px;">Canary Auto-Probes Active</div>
+          </div>
+
+          <div style="background:rgba(239,68,68,0.06); border:1px solid rgba(239,68,68,0.2); border-radius:10px; padding:14px;">
+            <div style="font-size:0.75rem; color:#94a3b8; text-transform:uppercase; letter-spacing:0.05em;">Quarantined Tools</div>
+            <div id="healQuarantineCount" style="font-size:1.3rem; font-weight:800; color:#f87171; margin-top:4px;">0 Isolated</div>
+            <div style="font-size:0.75rem; color:#fca5a5; margin-top:4px;">Immune Governance Active</div>
+          </div>
+
+          <div style="background:rgba(168,85,247,0.06); border:1px solid rgba(168,85,247,0.2); border-radius:10px; padding:14px;">
+            <div style="font-size:0.75rem; color:#94a3b8; text-transform:uppercase; letter-spacing:0.05em;">Healed Incidents</div>
+            <div id="healIncidentCount" style="font-size:1.3rem; font-weight:800; color:#c084fc; margin-top:4px;">0 Recorded</div>
+            <div style="font-size:0.75rem; color:#d8b4fe; margin-top:4px;">Multi-Candidate Tournament</div>
+          </div>
+        </div>
+
+        <!-- Action Control Bar -->
+        <div style="display:flex; gap:10px; flex-wrap:wrap; background:rgba(30,41,59,0.5); padding:12px; border-radius:10px; border:1px solid rgba(255,255,255,0.06); align-items:center;">
+          <button onclick="triggerFullSystemHeal()" style="background:linear-gradient(135deg, #059669, #10b981); color:#fff; border:none; border-radius:8px; padding:8px 16px; font-weight:700; font-size:0.8rem; cursor:pointer;">⚡ Trigger Full-Spectrum Self-Heal</button>
+          <button onclick="resetAllCircuitsWithCanary()" style="background:rgba(14,165,233,0.15); border:1px solid rgba(14,165,233,0.3); color:#38bdf8; border-radius:8px; padding:8px 16px; font-weight:700; font-size:0.8rem; cursor:pointer;">🔄 Canary-Reset Circuit Breakers</button>
+          <button onclick="loadHealingTelemetry()" style="background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); color:#e2e8f0; border-radius:8px; padding:8px 14px; font-size:0.8rem; cursor:pointer;">🛡️ Refresh Telemetry</button>
+          <span id="healActionStatus" style="font-size:0.78rem; color:#94a3b8; margin-left:auto;"></span>
+        </div>
+
+        <!-- 6-Layer Diagnostic Matrix Grid -->
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:12px;">
+          <div style="background:rgba(15,23,42,0.6); border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:14px;">
+            <div style="font-weight:700; font-size:0.85rem; color:#e2e8f0; margin-bottom:8px;">⚙️ Layer 1 & 2: Processes & Data</div>
+            <div style="font-size:0.75rem; color:#94a3b8; line-height:1.6;">
+              <div>• RAM / GC: <span id="diagRamStatus" style="color:#38bdf8;">Inspecting...</span></div>
+              <div>• SQLite Integrity: <span id="diagSqliteStatus" style="color:#34d399;">HEALTHY</span></div>
+              <div>• pgvector Core: <span id="diagPgvectorStatus" style="color:#c084fc;">Ready</span></div>
+            </div>
+          </div>
+
+          <div style="background:rgba(15,23,42,0.6); border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:14px;">
+            <div style="font-weight:700; font-size:0.85rem; color:#e2e8f0; margin-bottom:8px;">🔌 Layer 3 & 4: Circuits & Hardware</div>
+            <div style="font-size:0.75rem; color:#94a3b8; line-height:1.6;">
+              <div>• Circuits Monitored: <span id="diagCircuitsCount" style="color:#38bdf8;">Nominal</span></div>
+              <div>• Camera / Audio Mutex: <span id="diagMutexStatus" style="color:#34d399;">Clean</span></div>
+              <div>• PIC18F LCD Defect Guard: <span style="color:#fbbf24;">Enforced Line 2 Only</span></div>
+            </div>
+          </div>
+
+          <div style="background:rgba(15,23,42,0.6); border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:14px;">
+            <div style="font-weight:700; font-size:0.85rem; color:#e2e8f0; margin-bottom:8px;">🛡️ Layer 5 & 6: Sockets & Immune</div>
+            <div style="font-size:0.75rem; color:#94a3b8; line-height:1.6;">
+              <div>• Sockets / Ports: <span id="diagSocketsStatus" style="color:#34d399;">No Collisions</span></div>
+              <div>• Dynamic Tools Total: <span id="diagToolsCount" style="color:#c084fc;">Inspecting...</span></div>
+              <div>• Quarantined / At Risk: <span id="diagQuarantineSummary" style="color:#34d399;">0</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quarantined Tools Table -->
+        <div style="background:rgba(15,23,42,0.6); border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:14px;">
+          <div style="font-weight:700; font-size:0.85rem; color:#e2e8f0; margin-bottom:8px;">☣️ Tool Immune Quarantine Table</div>
+          <div id="quarantineTableContainer" style="font-size:0.78rem; color:#94a3b8;">
+            <div style="padding:12px; text-align:center; color:#64748b;">Zero tools in quarantine. All dynamic tools operational.</div>
+          </div>
+        </div>
+
+        <!-- Live Incident & Tournament Log -->
+        <div style="background:rgba(15,23,42,0.6); border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:14px;">
+          <div style="font-weight:700; font-size:0.85rem; color:#e2e8f0; margin-bottom:8px;">📜 Real-Time Self-Healing Incident Terminal</div>
+          <pre id="healIncidentLog" style="background:rgba(0,0,0,0.5); border:1px solid rgba(16,185,129,0.3); border-radius:8px; padding:12px; color:#6ee7b7; font-family:monospace; font-size:0.75rem; max-height:160px; overflow-y:auto; margin:0;">[Self-Healing Sentinel] Online. Multi-candidate tournament ready.</pre>
+        </div>
+
+      </div>
+
       </div>
 
     </div>
@@ -215,25 +303,39 @@ function closeToolForgeAndDreamModal() {
 
 function switchForgeTab(tab) {
   const isForge = tab === 'forge';
+  const isDream = tab === 'dream';
+  const isHealing = tab === 'healing';
+
   document.getElementById('forgeTabContent').style.display = isForge ? 'flex' : 'none';
-  document.getElementById('dreamTabContent').style.display = isForge ? 'none' : 'flex';
+  document.getElementById('dreamTabContent').style.display = isDream ? 'flex' : 'none';
+  const hTab = document.getElementById('healingTabContent');
+  if (hTab) hTab.style.display = isHealing ? 'flex' : 'none';
   
   const b1 = document.getElementById('tabBtnToolForge');
   const b2 = document.getElementById('tabBtnDreaming');
-  if (isForge) {
+  const b3 = document.getElementById('tabBtnSelfHealing');
+
+  [b1, b2, b3].forEach(b => {
+    if (b) {
+      b.style.background = 'transparent';
+      b.style.borderColor = 'rgba(255,255,255,0.1)';
+      b.style.color = '#94a3b8';
+    }
+  });
+
+  if (isForge && b1) {
     b1.style.background = 'rgba(168,85,247,0.2)';
     b1.style.borderColor = 'rgba(168,85,247,0.4)';
     b1.style.color = '#c084fc';
-    b2.style.background = 'transparent';
-    b2.style.borderColor = 'rgba(255,255,255,0.1)';
-    b2.style.color = '#94a3b8';
-  } else {
+  } else if (isDream && b2) {
     b2.style.background = 'rgba(14,165,233,0.2)';
     b2.style.borderColor = 'rgba(14,165,233,0.4)';
     b2.style.color = '#38bdf8';
-    b1.style.background = 'transparent';
-    b1.style.borderColor = 'rgba(255,255,255,0.1)';
-    b1.style.color = '#94a3b8';
+  } else if (isHealing && b3) {
+    b3.style.background = 'rgba(16,185,129,0.2)';
+    b3.style.borderColor = 'rgba(16,185,129,0.4)';
+    b3.style.color = '#34d399';
+    loadHealingTelemetry();
   }
 }
 
@@ -389,4 +491,103 @@ async function triggerFullDreamCycleLive() {
     btn.innerText = '🌙 Trigger Nightly Dream';
   }
 }
+
+// ==========================================
+// AUTONOMOUS SELF-HEALING SENTINEL JS (v5)
+// ==========================================
+async function triggerFullSystemHeal() {
+  const statusEl = document.getElementById('healActionStatus');
+  const logEl = document.getElementById('healIncidentLog');
+  if (statusEl) statusEl.innerText = '⚡ Running 6-layer self-healing sweep...';
+  try {
+    const res = await fetch('/api/heal/system', { method: 'POST' });
+    const data = await res.json();
+    if (data.status === 'success') {
+      if (statusEl) statusEl.innerText = `✅ Completed (${data.duration_ms}ms) - Equilibrium: ${data.system_equilibrium}`;
+      const eqBadge = document.getElementById('healEquilibriumBadge');
+      if (eqBadge) eqBadge.innerText = data.system_equilibrium;
+      if (logEl) logEl.innerText = data.actions_executed.map(a => `[HEAL] ${a}`).join('\n') + '\n' + logEl.innerText;
+      loadHealingTelemetry();
+    } else {
+      if (statusEl) statusEl.innerText = '❌ Failed: ' + (data.error || 'Unknown error');
+    }
+  } catch (e) {
+    if (statusEl) statusEl.innerText = '❌ Request exception: ' + e.message;
+  }
+}
+
+async function resetAllCircuitsWithCanary() {
+  const statusEl = document.getElementById('healActionStatus');
+  if (statusEl) statusEl.innerText = '🔄 Canary-probing circuits...';
+  try {
+    const res = await fetch('/api/heal/reset_circuits', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ force: false })
+    });
+    const data = await res.json();
+    if (data.success) {
+      const count = data.result.resets_performed.length;
+      if (statusEl) statusEl.innerText = `✅ Checked ${data.result.total_checked} circuits. Resets: ${count}`;
+      loadHealingTelemetry();
+    }
+  } catch (e) {
+    if (statusEl) statusEl.innerText = '❌ Circuit reset error: ' + e.message;
+  }
+}
+
+async function loadHealingTelemetry() {
+  try {
+    const res = await fetch('/api/heal/telemetry');
+    const data = await res.json();
+    if (data.success && data.telemetry) {
+      const t = data.telemetry;
+      const incEl = document.getElementById('healIncidentCount');
+      if (incEl) incEl.innerText = `${t.total_incidents_recorded} Recorded`;
+      const qEl = document.getElementById('healQuarantineCount');
+      if (qEl) qEl.innerText = `${t.quarantined_tools_count} Isolated`;
+      
+      const qContainer = document.getElementById('quarantineTableContainer');
+      if (qContainer) {
+        if (t.quarantined_tools && t.quarantined_tools.length > 0) {
+          qContainer.innerHTML = t.quarantined_tools.map(q => `
+            <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(239,68,68,0.08); border:1px solid rgba(239,68,68,0.2); padding:8px 12px; border-radius:6px; margin-bottom:6px;">
+              <div>
+                <strong style="color:#f87171;">${q.name}</strong>
+                <div style="font-size:0.7rem; color:#cbd5e1;">Reason: ${q.reason || 'Execution instability'}</div>
+              </div>
+              <button onclick="autoHealSpecificTool('${q.name}')" style="background:#059669; color:#fff; border:none; padding:4px 10px; border-radius:4px; cursor:pointer;">Repair & Restore</button>
+            </div>
+          `).join('');
+        } else {
+          qContainer.innerHTML = '<div style="padding:8px; text-align:center; color:#64748b;">Zero tools in quarantine. All dynamic tools operational.</div>';
+        }
+      }
+    }
+  } catch (e) {
+    console.error('Failed to load healing telemetry:', e);
+  }
+}
+
+async function autoHealSpecificTool(toolName) {
+  const statusEl = document.getElementById('healActionStatus');
+  if (statusEl) statusEl.innerText = `🩺 Initiating patch tournament for ${toolName}...`;
+  try {
+    const res = await fetch('/api/heal/tool', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ tool_name: toolName, error_message: 'Manual unquarantine repair trigger' })
+    });
+    const data = await res.json();
+    if (data.success) {
+      if (statusEl) statusEl.innerText = `✅ Tool ${toolName} healed via ${data.winning_strategy} (v${data.new_version})!`;
+      loadHealingTelemetry();
+    } else {
+      if (statusEl) statusEl.innerText = `❌ Patch tournament failed: ${data.error}`;
+    }
+  } catch (e) {
+    if (statusEl) statusEl.innerText = `❌ Error healing tool: ${e.message}`;
+  }
+}
+
 </script>

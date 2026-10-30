@@ -482,10 +482,23 @@ class ReflexionEngine:
         if m_err and not m_assert:
             diagnosis["error_type"] = m_err.group(1)
             diagnosis["details"] = m_err.group(2).strip()
-            if diagnosis["error_type"] == "KeyError":
+            err_t = diagnosis["error_type"]
+            if err_t == "KeyError":
                 diagnosis["diagnostic_hint"] = f"Dictionary key {m_err.group(2)} missing from returned dict."
-            elif diagnosis["error_type"] == "TypeError":
+            elif err_t == "TypeError":
                 diagnosis["diagnostic_hint"] = "Argument type or count mismatch in function call."
+            elif err_t == "ZeroDivisionError":
+                diagnosis["diagnostic_hint"] = "Division by zero detected. Guard denominator: (a / b if b != 0 else 0.0)."
+            elif err_t == "AttributeError":
+                diagnosis["diagnostic_hint"] = f"Attribute access failed: {m_err.group(2)}. Ensure target object is not None."
+            elif err_t == "IndexError":
+                diagnosis["diagnostic_hint"] = "List index out of range. Check sequence length before accessing."
+            elif err_t == "ValueError":
+                diagnosis["diagnostic_hint"] = f"Invalid value conversion: {m_err.group(2)}. Wrap in defensive check or fallback."
+            elif err_t == "FileNotFoundError":
+                diagnosis["diagnostic_hint"] = "Target file path does not exist. Ensure os.path.exists() check before open."
+            elif err_t == "TimeoutError":
+                diagnosis["diagnostic_hint"] = "Execution latency exceeded SLA threshold. Add caching or optimize complexity."
 
         lines = re.findall(r'File ".*?[\\/](test_[a-zA-Z0-9_]+\.py|[a-zA-Z0-9_]+\.py)", line (\d+)', stderr_output)
         if lines:
@@ -1118,24 +1131,48 @@ class ToolSelfHealingSentinel:
         diagnosis = ReflexionEngine.diagnose_failure(error_message)
 
         patched_code = code
-        if "ZeroDivisionError" in error_message or diagnosis["error_type"] == "ZeroDivisionError":
+        err_type = diagnosis.get("error_type", "")
+        if "ZeroDivisionError" in error_message or err_type == "ZeroDivisionError":
             patched_code = re.sub(
                 r"(\w+)\s*/\s*(\w+)",
                 r"(\1 / \2 if \2 != 0 else 0.0)",
                 code,
             )
-        elif "KeyError" in error_message or diagnosis["error_type"] == "KeyError":
+        elif "KeyError" in error_message or err_type == "KeyError":
             patched_code = re.sub(
                 r'args\["([^"]+)"\]',
                 r'args.get("\1", 0)',
                 code,
             )
-        elif "TypeError" in error_message or diagnosis["error_type"] == "TypeError":
+            patched_code = re.sub(
+                r"args\['([^']+)'\]",
+                r"args.get('\1', 0)",
+                patched_code,
+            )
+        elif "TypeError" in error_message or err_type == "TypeError":
             if "def run(" in code:
                 patched_code = code.replace(
                     "def run(args:",
                     "def run(args:\n    if not isinstance(args, dict):\n        return {'success': False, 'error': 'Invalid arguments type'}\n",
                 )
+        elif "AttributeError" in error_message or err_type == "AttributeError":
+            if "def run(" in code:
+                patched_code = code.replace(
+                    "def run(args:",
+                    "def run(args:\n    if args is None:\n        return {'success': False, 'error': 'Args cannot be None'}\n",
+                )
+        elif "IndexError" in error_message or err_type == "IndexError":
+            patched_code = re.sub(
+                r"(\w+)\[0\]",
+                r"(\1[0] if len(\1) > 0 else None)",
+                code,
+            )
+        elif "ValueError" in error_message or err_type == "ValueError":
+            patched_code = re.sub(
+                r"float\(([^)]+)\)",
+                r"(float(\1) if str(\1).replace('.','',1).isdigit() else 0.0)",
+                code,
+            )
 
         is_safe, msg = ASTSecurityShield.validate_code(patched_code)
         if not is_safe:

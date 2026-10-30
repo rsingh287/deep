@@ -1,127 +1,146 @@
-# 🩺 D.E.E.P. Autonomous Self-Healing & Resilience Architecture
+# 🩺 D.E.E.P. Autonomous Self-Healing & Resilience Architecture (Level 5)
 
-> **Authoritative Specification for Multi-Turn Reflexion, Runtime Exception Interception, Hystrix Circuit Breakers, and Zero-Downtime Rollback**
+> **Authoritative Specification for Full-Spectrum Multi-Layer Diagnostics, Candidate Patch Tournaments, Tool Immune Quarantine, Circuit Canary Auto-Reset, and Zero-Downtime Hot-Swapping**
 
 ---
 
 ## 📖 Executive Summary
 
-The **D.E.E.P Sovereign Cognitive Workstation** implements an active, multi-layered self-healing architecture designed to eliminate runtime crashes, automatically recover from syntax or algorithmic bugs in synthesized tools, prevent model performance regression, and maintain high service availability without human intervention.
+The **D.E.E.P Sovereign Cognitive Workstation** implements an active, multi-vector **Level 5 Autonomous Self-Healing Sentinel & Immune Governance Subsystem** (`autonomous_self_healing_engine.py`). Engineered for air-gapped bare-metal environments, the system autonomously identifies anomalies across 6 system layers, executes multi-candidate patch tournaments, quarantines unstable tools to prevent cascading failures, and canary-probes tripped circuit breakers without human intervention.
 
 ```
-                     ┌──────────────────────────────────────────────┐
-                     │          Autonomous System Event             │
-                     └──────────────────────┬───────────────────────┘
-                                            │
-               ┌────────────────────────────┼────────────────────────────┐
-               │                            │                            │
-      ┌────────▼─────────┐         ┌────────▼─────────┐         ┌────────▼─────────┐
-      │  Tool Synthesis  │         │  Live Execution  │         │ Model Promotion  │
-      │   Test Failure   │         │    Exception     │         │ Degradation Drift│
-      └────────┬─────────┘         └────────┬─────────┘         └────────┬─────────┘
-               │                            │                            │
-      ┌────────▼─────────┐         ┌────────▼─────────┐         ┌────────▼─────────┐
-      │ Reflexion Engine │         │ Self-Healing     │         │ Canary Benchmark │
-      │ 3-Turn Diagnostic│         │ Sentinel Auto-Fix│         │ 1-Click Rollback │
-      └──────────────────┘         └──────────────────┘         └──────────────────┘
+                      ┌──────────────────────────────────────────────┐
+                      │          Autonomous System Event             │
+                      └──────────────────────┬───────────────────────┘
+                                             │
+      ┌──────────────────┬───────────────────┼───────────────────┬──────────────────┐
+      │                  │                   │                   │                  │
+┌─────▼─────┐      ┌─────▼─────┐       ┌─────▼─────┐       ┌─────▼─────┐      ┌─────▼─────┐
+│ Layer 1-2 │      │  Layer 3  │       │  Layer 4  │       │  Layer 5  │      │  Layer 6  │
+│ Processes │      │ Circuits  │       │ Hardware  │       │  Sockets  │      │  Immune   │
+│ & Database│      │ Canary    │       │ Mutexes   │       │ Conflicts │      │ Quarantine│
+└─────┬─────┘      └─────┬─────┘       └─────┬─────┘       └─────┬─────┘      └─────┬─────┘
+      │                  │                   │                   │                  │
+      └──────────────────┴───────────────────┼───────────────────┴──────────────────┘
+                                             │
+                             ┌───────────────▼───────────────┐
+                             │ HealingPatchTournament        │
+                             │  1. AST Semantic Mutation     │
+                             │  2. LLM Reflexion Synthesis   │
+                             │  3. Golden Snapshot Rollback  │
+                             └───────────────┬───────────────┘
+                                             │ Highest Fitness
+                             ┌───────────────▼───────────────┐
+                             │ Sandboxed Invariant Verifier  │
+                             │  + Timestamped Regression Test│
+                             └───────────────┬───────────────┘
+                                             │
+                             ┌───────────────▼───────────────┐
+                             │ Atomic Version Hot-Swap (vN)  │
+                             └───────────────────────────────┘
 ```
 
 ---
 
-## 1. Multi-Turn Reflexion Engine (`ReflexionEngine`)
-*Located in [`self_synthesizing_tool_forge.py`](self_synthesizing_tool_forge.py)*
+## 1. The 6-Layer Diagnostic & Auto-Remediation Matrix (`SystemAnomalyDetector`)
 
-When a newly synthesized tool fails its automated test suite, D.E.E.P does not abandon the task or request user intervention. Instead, the [`ReflexionEngine`](self_synthesizing_tool_forge.py) executes an iterative 3-turn self-healing loop:
+The sentinel monitors and repairs 6 core architectural layers during every healing cycle:
 
-1. **Diagnostic Traceback Extraction**:
-   - Parses stderr output for exact exception types (`AssertionError`, `KeyError`, `TypeError`, `ZeroDivisionError`).
-   - Identifies the precise file and line number of the failure (`test_<tool>.py:<line>` or `<tool>.py:<line>`).
-   - Generates a structured diagnostic hint explaining the discrepancy.
-2. **Reflective Prompt Formulation**:
-   - Formulates a targeted prompt containing the failing code, unit test expectation, exact traceback, and diagnostic hint.
-3. **Iterative Code Repair & Re-verification**:
-   - The local LLM generates a targeted patch.
-   - The patch is re-evaluated by the [`ASTSecurityShield`](self_synthesizing_tool_forge.py).
-   - If safe, the test suite is executed in the isolated subprocess sandbox. The loop repeats up to 3 turns until tests pass.
+| Layer | Monitored Vectors | Diagnostic Metrics | Autonomous Remediation Protocol |
+| :---: | :--- | :--- | :--- |
+| **Layer 1** | **Processes & Memory** | RAM %, CPU %, cyclic object leaks, zombie tasks | Executes `gc.collect(2)` purging uncollectable cyclic reference cycles. Reclaims cache memory when RAM $> 80\%$. |
+| **Layer 2** | **Storage & Database** | SQLite cache integrity, PostgreSQL `deep_db` pool | Runs `PRAGMA integrity_check` on SQLite. Tests pgvector pool readiness with `SELECT 1`; auto-recycles hung pool connections. |
+| **Layer 3** | **Circuit Breakers** | Hystrix breaker states (`CLOSED`, `OPEN`, `HALF_OPEN`) | Detects tripped circuits and executes non-blocking canary health probes. Resets recovered circuits to `CLOSED` automatically. |
+| **Layer 4** | **Hardware Mutexes** | Camera handles, audio streams, PICkit 3 USB mutex | Forcibly releases leaked `cv2.VideoCapture` handles, releases audio streams, and guarantees PIC18F85K22 LCD Line 2 defect guard enforcement. |
+| **Layer 5** | **Network & Sockets** | Local port collisions (`[WinError 10048]`), listener state | Identifies port collisions (e.g. honeypots on 2222/33060), safely releases dead socket descriptors, and re-allocates alternative ports. |
+| **Layer 6** | **Tool Immune System** | Dynamic tools catalog, crash rates, quarantine state | Triages tools with repeated crashes ($\ge 3$), isolates them into `QUARANTINED` status, and runs the Multi-Candidate Patch Tournament. |
 
 ---
 
-## 2. Production Runtime Self-Healing Sentinel (`ToolSelfHealingSentinel`)
-*Located in [`self_synthesizing_tool_forge.py`](self_synthesizing_tool_forge.py)*
+## 2. Multi-Candidate Patch Tournament (`HealingPatchTournament`)
 
-If an already-verified synthesized tool encounters an unexpected runtime exception in production:
+When a synthesized tool encounters an unhandled runtime error, D.E.E.P does not rely on a single fragile fix. Instead, it generates competing candidate patches across three distinct strategies and runs an automated **Patch Tournament**:
 
-1. **Exception Interception**:
-   - The exception is captured along with the offending input arguments and stack trace.
-2. **Automated Root Cause Diagnosis**:
-   - [`ReflexionEngine.diagnose_failure()`](self_synthesizing_tool_forge.py) determines whether the failure stems from missing dictionary keys (`KeyError`), division by zero (`ZeroDivisionError`), or argument type mismatches (`TypeError`).
-3. **Targeted AST Patching**:
-   - Converts direct dictionary index lookups (`args["key"]`) to safe `.get("key", default)`.
-   - Injects zero-division guards: `(a / b if b != 0 else 0.0)`.
-   - Injects short-circuit input validation guards at the function entrypoint.
-4. **Regression Unit Test Generation**:
-   - Automatically writes a new unit test case reproducing the failing input (`test_regression_healed_<timestamp>`).
-5. **Atomic Version Bump & Hot-Swap**:
-   - Verifies the patched code against the entire existing test suite plus the new regression test.
-   - Saves a new immutable version snapshot in `dynamic_tools/versions/<tool>/v<N>.json`.
-   - Hot-swaps the patched module into the running Python runtime without restarting the workstation.
+### Candidate Strategies
+1. **Strategy 1: AST Semantic Mutation (`AST_SEMANTIC_MUTATION`)**:
+   - Parses the code into Python AST nodes.
+   - **`ZeroDivisionError`**: Injects denominator safety guards: `(a / b if b != 0 else 0.0)`.
+   - **`KeyError`**: Converts dictionary bracket access `args["k"]` to `args.get("k", 0)`.
+   - **`TypeError`**: Injects input type checking: `if not isinstance(args, dict): return {'success': False}`.
+   - **`AttributeError`**: Injects `NoneType` safety checks before attribute access.
+   - **`IndexError`**: Guards list index lookups with sequence length validation.
+   - **`ValueError`**: Protects numeric casts with defensive validation regex.
+   - **Universal Safety Net**: Wraps function body in a defensive `try...except Exception as _e:` fallback block.
+2. **Strategy 2: LLM Reflexion Synthesis (`LLM_REFLEXION_SYNTHESIS`)**:
+   - Formulates a targeted prompt with the failing code, exact traceback, and Reflexion diagnosis.
+   - Calls local Ollama LLM (`hermes3:8b`) with high temperature penalty to synthesize an alternative algorithmic patch.
+   - Validates generated code against [`ASTSecurityShield`](self_synthesizing_tool_forge.py).
+3. **Strategy 3: Golden Snapshot Rollback (`GOLDEN_SNAPSHOT_ROLLBACK`)**:
+   - Retrieves the most recent historically verified version snapshot from `dynamic_tools/versions/<tool>/`.
 
----
+### Candidate Fitness Scoring & Crown
+All candidates are evaluated in the [`SandboxedEnvironment`](self_synthesizing_tool_forge.py) against the existing test suite + dynamic regression test:
 
-## 3. Hystrix Fail-Fast Circuit Breakers (`HystrixCircuitBreaker`)
-*Located in [`hystrix_circuit_breaker.py`](hystrix_circuit_breaker.py)*
+$$\text{Fitness} = (\text{PassRate} \times 100.0) - (\text{Complexity} \times 2.0) + (\text{SpeedupBonus})$$
 
-To protect the Cockpit UI and voice co-pilot loops from blocking or hanging during external API latency or hardware disconnects, critical operations are wrapped in stateful circuit breakers:
-
-| Breaker Name | Monitored Target | Failure Threshold | Reset Timeout |
-| :--- | :--- | :--- | :--- |
-| `ollama_inference` | Local Ollama LLM HTTP API | 3 consecutive failures | 15.0 seconds |
-| `iot_smart_home` | Kasa Smart Plugs / LAN devices | 2 consecutive timeouts | 10.0 seconds |
-| `screen_vision` | Camera & Screen Capture Handles | 3 frame acquisition errors | 10.0 seconds |
-| `mcu_flasher` | PICkit 3 USB Hardware Interface | 2 USB communication errors | 30.0 seconds |
-
-### Circuit State Transitions
-- **`CLOSED`**: Normal operational state. Calls pass through; latency metrics are tracked.
-- **`OPEN`**: Tripped when error or timeout threshold is breached. Subsequent calls fail fast immediately (sub-millisecond latency) returning cached fallbacks or error codes without blocking the thread.
-- **`HALF-OPEN`**: After the reset timeout expires, a single trial request is permitted. If successful, the breaker resets to `CLOSED`; if it fails, it returns to `OPEN`.
+The candidate with the highest fitness score is crowned the winner, saved as a new version snapshot, and hot-swapped into production.
 
 ---
 
-## 4. Shadow Canary Benchmarking & Hot-Swap Failover (`CanaryHotSwapper`)
-*Located in [`nightly_meta_learner.py`](nightly_meta_learner.py)*
+## 3. Tool Immune System & Quarantine Governance
 
-Before newly trained LoRA weights or candidate models are promoted to production in Ollama:
+To prevent unstable or corrupted tools from degrading Cockpit UI response times or hanging agent execution:
 
-1. **Shadow Probe Battery**:
-   - The candidate model is probed against critical golden prompts:
-     - **AST Guardrail Defense**: Attempting `DROP TABLE users;` must trigger `SECURITY_VIOLATION`.
-     - **PIC18F85K22 LCD Defect Compliance**: Requesting LCD Line 1 must warn that Line 1 is defective and render solely on Line 2.
-     - **Local Music Routing**: Querying a song must match the local library and avoid opening unauthorized browser tabs.
-2. **Automated Promotion or Abort**:
-   - If the candidate achieves a score $\ge 80/100$, it is compiled into `Modelfile.deep_sovereign` and deployed to `deep-sovereign:latest`.
-   - If the score falls below threshold, promotion is automatically aborted, the existing stable weights are retained, and the failure is logged to telemetry.
+- **Automatic Quarantine**: If a tool crashes repeatedly ($\ge 3$ consecutive failures) or fails all tournament candidates, the sentinel immediately sets `"quarantined": true` in `dynamic_tools/manifest.json`.
+- **Graceful Divergence**: Quarantined tools are intercepted at the gateway; any attempt to invoke them returns a safe status code (`TOOL_QUARANTINED`) rather than raising unhandled exceptions.
+- **Operator Notification**: Quarantined tools are prominently surfaced in the **Cockpit Self-Healing Sentinel Studio**.
+- **1-Click Auto-Heal & Unquarantine**: Clicking **"Repair & Restore"** triggers an emergency patch tournament and, upon successful test passage, restores the tool to active production (`"quarantined": false`).
 
 ---
 
-## 5. Immutable Versioning & 1-Click Rollback (`ToolVersionManager`)
-*Located in [`self_synthesizing_tool_forge.py`](self_synthesizing_tool_forge.py)*
+## 4. Circuit Breaker Canary Auto-Reset Protocol
 
-Every tool mutation, optimization, and synthesis is immutably archived in:
-`dynamic_tools/versions/<tool_name>/v<N>.json`
+The Sentinel inspects all registered Hystrix circuit breakers (`global_circuit_registry`):
 
-- **Integer-Sorted History**: Historical snapshots are indexed numerically (`v1`, `v2`, ... `v20`), ensuring deterministic ordering.
-- **Instant Rollback**: If a tool behaves unexpectedly, invoking [`/api/forge/rollback`](routes/tool_forge_bp.py) or clicking **Rollback** in the Cockpit UI restores the penultimate version atomically and updates the active manifest in $< 5	ext{ms}$.
+1. **Detection**: Any breaker in `OPEN` or `HALF_OPEN` state is flagged for canary validation.
+2. **Canary Probe**:
+   - For `ollama_inference`: Establishes a lightweight socket handshake to `127.0.0.1:11434` with sub-800ms timeout.
+   - For `screen_vision`: Attempts webcam handle acquisition and deterministic release.
+   - For `iot_smart_home`: Pings the target LAN IP address.
+3. **State Transition**: If the canary probe confirms the underlying resource is healthy, `breaker.reset()` transitions the breaker directly to `CLOSED`, restoring full operational throughput.
 
 ---
 
-## 6. Lifelong Continual Learning Regularization (`OnlineFisherConsolidator`)
-*Located in [`nightly_meta_learner.py`](nightly_meta_learner.py)*
+## 5. REST API Specification
 
-To eliminate **catastrophic forgetting** across multi-night meta-learning runs:
+The Self-Healing Sentinel exposes comprehensive REST endpoints via `routes/self_heal_bp.py`:
 
-- Computes diagonal Fisher Information Matrix $F_i$ on canonical anchor tasks.
-- Updates a running Fisher matrix with momentum decay:
-  $$F_{\text{running}}^{(t)} = \gamma F_{\text{running}}^{(t-1)} + (1 - \gamma) F_{\text{new}} \quad (\gamma = 0.90)$$
-- Applies a quadratic penalty during LoRA optimization:
-  $$\mathcal{L}_{\text{EWC}} = \frac{\lambda_{\text{EWC}}}{2} \sum_i F_i (\theta_i - \theta_i^*)^2$$
-- Guarantees that adapting to new user preferences never degrades hardware safety rules, AST guardrails, or voice brevity.
+| Method | Path | Request Body | Description |
+| :---: | :--- | :--- | :--- |
+| `POST` | `/api/heal/system` | None | Triggers full-spectrum 6-layer autonomous self-healing sweep. |
+| `POST` | `/api/heal/tool` | `{"tool_name": "...", "failing_input": {...}, "error_message": "..."}` | Runs multi-candidate patch tournament to heal a specific tool. |
+| `GET` | `/api/heal/telemetry` | None | Returns incident history, active quarantines, and circuit states. |
+| `POST` | `/api/heal/reset_circuits` | `{"force": false}` | Canary-probes and resets tripped circuit breakers. |
+| `POST` | `/api/heal/quarantine` | `{"tool_name": "...", "reason": "..."}` | Manually isolates an unstable tool from execution. |
+| `POST` | `/api/heal/unquarantine` | `{"tool_name": "..."}` | Restores a repaired tool to production. |
+
+---
+
+## 6. Verification & Test Suite Runbook
+
+The complete Level 5 Self-Healing Sentinel is validated by [`test_advanced_self_healing_v5.py`](test_advanced_self_healing_v5.py):
+
+```bash
+# Execute Level 5 Autonomous Self-Healing Verification Suite
+python test_advanced_self_healing_v5.py
+```
+
+*Expected Result: `Ran 8 tests ... OK` in < 20s.*
+- `test_01_six_layer_diagnostic_matrix`: Verifies all 6 diagnostic layers.
+- `test_02_ast_semantic_mutation_error_classes`: Verifies AST handlers across 6 Python error classes.
+- `test_03_full_system_healing_sweep`: Verifies system equilibrium status (`OPTIMAL`).
+- `test_04_tool_immune_quarantine_lifecycle`: Verifies Quarantine $\rightarrow$ Isolation $\rightarrow$ Unquarantine.
+- `test_05_circuit_breaker_canary_auto_reset`: Verifies canary-probed circuit recovery.
+- `test_06_patch_tournament_healing_execution`: Verifies tournament evaluation and fitness scoring.
+- `test_07_rest_api_self_heal_endpoints`: Verifies all REST endpoints return `HTTP 200`.
+- `test_08_natural_language_self_healing_intent`: Verifies conversational `"self heal"` voice commands.
