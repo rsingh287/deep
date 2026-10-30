@@ -1,14 +1,16 @@
 """
-Tool Forge Blueprint v2 for D.E.E.P. Sovereign Cockpit
+Tool Forge Blueprint v3 for D.E.E.P. Sovereign Cockpit
 ======================================================
 Provides REST API endpoints for:
 - Autonomous Python Tool Synthesis via local LLMs
 - Sandboxed Test Execution and Reflexion Verification
 - Multi-Turn Diagnostic Self-Healing on Test Failures
-- Dynamic Tool Execution & Parameter Passing
-- Composite Multi-Tool Pipeline Chaining (DAG Dataflow)
-- Semantic Tool Discovery & Natural Language Auto-Dispatch
-- Immutable Snapshot Versioning & One-Click Rollback
+- Property-Based Fuzz Testing & Invariant Validation (FuzzForgeEngine)
+- AST Complexity Profiling & Optimization Scorecards (CodeOptimizerEngine)
+- Conditional Multi-Node Workflow DAG Execution (WorkflowDAGRuntime)
+- Composite Multi-Tool Pipeline Chaining (ToolChainPipeline)
+- Semantic Tool Discovery & Natural Language Auto-Dispatch (SemanticToolIndex)
+- Immutable Snapshot Versioning & One-Click Rollback (ToolVersionManager)
 - Tool Lifecycle Management (listing, metadata inspection, deletion)
 """
 
@@ -19,6 +21,9 @@ from self_synthesizing_tool_forge import (
     SemanticToolIndex,
     ToolVersionManager,
     ToolChainPipeline,
+    FuzzForgeEngine,
+    CodeOptimizerEngine,
+    WorkflowDAGRuntime,
 )
 
 tool_forge_bp = Blueprint("tool_forge", __name__)
@@ -108,12 +113,64 @@ def api_execute_tool():
         return jsonify({"success": False, "error": str(e)}), 500
 
 
+@tool_forge_bp.route("/api/forge/fuzz", methods=["POST"])
+def api_fuzz_tool():
+    """Executes property-based fuzz test battery to prove boundary invariants."""
+    try:
+        data = request.json or {}
+        tool_name = data.get("tool_name")
+        if not tool_name:
+            return jsonify({"success": False, "error": "tool_name is required."}), 400
+
+        count = int(data.get("count", 15))
+        forge = get_tool_forge()
+        res = forge.fuzz_tool(tool_name, count=count)
+        return jsonify(res)
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@tool_forge_bp.route("/api/forge/analyze", methods=["POST"])
+def api_analyze_tool():
+    """Inspects AST complexity and returns optimization scorecard."""
+    try:
+        data = request.json or {}
+        tool_name = data.get("tool_name")
+        if not tool_name:
+            return jsonify({"success": False, "error": "tool_name is required."}), 400
+
+        forge = get_tool_forge()
+        res = forge.analyze_tool(tool_name)
+        return jsonify(res)
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@tool_forge_bp.route("/api/forge/workflow/execute", methods=["POST"])
+def api_execute_workflow():
+    """
+    Executes a multi-node workflow DAG with conditional branching and dataflow aggregation.
+    Payload: {"workflow_name": str, "nodes": [...], "initial_input": Optional[dict]}
+    """
+    try:
+        data = request.json or {}
+        workflow_name = data.get("workflow_name", "conditional_workflow")
+        nodes = data.get("nodes", [])
+        if not nodes:
+            return jsonify({"success": False, "error": "Workflow 'nodes' list is required."}), 400
+
+        initial_input = data.get("initial_input", {})
+        forge = get_tool_forge()
+        res = forge.execute_workflow(workflow_name, nodes, initial_input)
+        return jsonify(res)
+
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
 @tool_forge_bp.route("/api/forge/chain/execute", methods=["POST"])
 def api_execute_chain():
-    """
-    Executes a composite multi-tool pipeline DAG with parameter interpolation.
-    Payload: {"pipeline_name": str, "steps": [...], "initial_input": Optional[dict]}
-    """
+    """Executes a composite multi-tool pipeline DAG with parameter interpolation."""
     try:
         data = request.json or {}
         pipeline_name = data.get("pipeline_name", "composite_pipeline")

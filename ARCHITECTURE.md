@@ -134,28 +134,29 @@ flowchart TD
 - **Engine**: `intents/sikh_heritage_intent.py` and `routes/gurbani.py`.
 - **Capabilities**: Full Nitnem banis, Gurmukhi text rendering with Phonetic Romanization and English translations, and Hukamnama introspection.
 
-### Pillar 11: Self-Synthesizing Tool Forge v2 (Autonomous Cognitive Extensibility)
-- **Engine**: self_synthesizing_tool_forge.py, 
-outes/tool_forge_bp.py, and intents/dynamic_tool_intent.py.
-- **AST Security Shield**: Zero-trust AST static analyzer (ASTSecurityShield.validate_code) blocking unauthorized builtins (eval, exec, __import__), banned modules (ctypes, winreg, msvcrt, subprocess, socket), introspection escape routes (__subclasses__, __bases__), and raw OS mutations.
-- **Secret-Sanitized Sandbox**: Subprocess execution isolation scrubbing environment variables (OPENAI_API_KEY, POSTGRES_PASSWORD, DATABASE_URL, TOKEN) to prevent credential leakage.
-- **Multi-Turn Reflexion Engine**: Automated diagnostic traceback analysis parsing AssertionError, KeyError, and TypeError exceptions to drive iterative 3-turn self-healing patches.
-- **Composite DAG Pipeline Chaining**: Declarative multi-tool workflows (ToolChainPipeline.execute_chain) enabling step-by-step parameter interpolation ($input.<key>, $steps.<id>.result.<field>) with per-step latency telemetry.
-- **Semantic Auto-Discovery & Dispatch**: Weighted token & intent search (SemanticToolIndex.discover) auto-dispatching natural language commands to verified synthesized tools with argument extraction.
-- **Immutable Versioning & Rollback**: Version snapshots maintained in dynamic_tools/versions/ with instant one-click rollback (ToolVersionManager.rollback).
-- **Endpoints**: /api/forge/tools, /api/forge/synthesize, /api/forge/verify, /api/forge/execute, /api/forge/chain/execute, /api/forge/discover, /api/forge/auto_dispatch, /api/forge/rollback, /api/forge/versions/<tool_name>.
+### Pillar 11: Self-Synthesizing Tool Forge v3 (Autonomous Cognitive Extensibility)
+- **Engine**: `self_synthesizing_tool_forge.py`, `routes/tool_forge_bp.py`, and `intents/dynamic_tool_intent.py`.
+- **AST Security Shield**: Zero-trust AST static analyzer (`ASTSecurityShield.validate_code`) blocking unauthorized builtins (`eval`, `exec`, `__import__`), banned modules (`ctypes`, `winreg`, `msvcrt`, `subprocess`, `socket`), introspection escape routes (`__subclasses__`, `__bases__`, `__globals__`), and raw OS mutations.
+- **Secret-Sanitized Sandbox**: Subprocess execution isolation scrubbing environment variables (`OPENAI_API_KEY`, `POSTGRES_PASSWORD`, `DATABASE_URL`, `TOKEN`) to prevent credential leakage.
+- **Property-Based FuzzForge Engine**: Autonomous black-box and boundary fuzz testing running 15 edge cases (empty strings, extreme floats, NaN, oversized inputs, None types) to guarantee runtime invariants, crash resistance, and bounded execution latency (< 50ms).
+- **McCabe AST Complexity & Code Quality Optimizer**: Computes McCabe cyclomatic complexity, Halstead volume, and PEP 484 type annotation coverage, generating optimization scorecards with letter grades (`A+`, `A`, `B`, `C`).
+- **Multi-Node Conditional DAG Workflow Runtime**: Advanced directed acyclic graph runtime (`WorkflowDAGRuntime`) supporting sequential and conditional branching (`if_true` / `if_false`), tool execution nodes, dynamic parameter interpolation (`$input.<key>`, `$steps.<id>.result.<field>`), and branch telemetry.
+- **Multi-Turn Reflexion Engine**: Automated diagnostic traceback analysis parsing `AssertionError`, `KeyError`, and `TypeError` exceptions to drive iterative 3-turn self-healing patches.
+- **Semantic Auto-Discovery & Dispatch**: Weighted token & intent search (`SemanticToolIndex.discover`) auto-dispatching natural language commands to verified synthesized tools with argument extraction.
+- **Immutable Versioning & Rollback**: Version snapshots maintained in `dynamic_tools/versions/` with integer-sorted history and instant one-click rollback (`ToolVersionManager.rollback`).
+- **Endpoints**: `/api/forge/tools`, `/api/forge/synthesize`, `/api/forge/verify`, `/api/forge/fuzz`, `/api/forge/analyze`, `/api/forge/execute`, `/api/forge/chain/execute`, `/api/forge/workflow/execute`, `/api/forge/discover`, `/api/forge/auto_dispatch`, `/api/forge/rollback`, `/api/forge/versions/<tool_name>`.
 
-### Pillar 12: Continuous Meta-Learning & Autonomous Machine Dreaming v2
-- **Engine**: 
-ightly_meta_learner.py, sleep_phase_dream_engine.py, lora_self_learning.py, and 
-outes/dream_bp.py.
-- **Mathematical DPO Engine**: True Bradley-Terry Direct Preference Optimization ($\mathcal{L}_{	ext{DPO}} = -\log \sigma(\Delta r)$) comparing trainable LoRA policy $\pi_	heta$ against frozen reference policy $\pi_{	ext{ref}}$, tracking positive reward margin ($\Delta r > 0$) and reward accuracy ($\ge 90\%$).
-- **EWC Continual Learning Guardrail**: Elastic Weight Consolidation calculating diagonal Fisher Information Matrix $ on canonical anchor tasks, applying quadratic penalty $rac{\lambda_{	ext{EWC}}}{2} \sum F_i (	heta_i - 	heta_i^*)^2$ to eliminate catastrophic forgetting of MCU hardware rules and AST SQL guardrails.
+### Pillar 12: Continuous Meta-Learning & Autonomous Machine Dreaming v3
+- **Engine**: `nightly_meta_learner.py`, `sleep_phase_dream_engine.py`, `lora_self_learning.py`, and `routes/dream_bp.py`.
+- **SimPO & DPO Dual Optimization Engine**: Length-normalized Simple Preference Optimization (SimPO) with target reward margin $\gamma = 0.5$ and Bradley-Terry Direct Preference Optimization ($\mathcal{L}_{\text{DPO}}$) training on NVIDIA RTX A2000 GPU (`cuda`), tracking margin progression ($\Delta r > 0$) and reward accuracy ($\ge 90\%$).
+- **EWC Continual Learning Guardrail**: Elastic Weight Consolidation calculating diagonal Fisher Information Matrix $F_i$ on canonical anchor tasks, applying quadratic penalty $\frac{\lambda_{\text{EWC}}}{2} \sum F_i (\theta_i - \theta_i^*)^2$ to eliminate catastrophic forgetting of MCU hardware rules and AST SQL guardrails.
+- **Bi-Temporal Synthetic Self-Play Distillation**: Autonomously distills ground-truth facts from the Hyper-Relational Knowledge Graph into contrastive positive and negative preference pairs (`SelfPlayDistiller`) for offline alignment.
 - **5-Point Readiness Audit**: Self-benchmarking evaluation battery scoring AST Guardrail Defense, Executive Voice Brevity, Embedded MCU Directives (PIC18F85K22 LCD Line 2 + MCP9701 Math), Local Music Strict Matching, and Code Synthesis Integrity.
-- **Shadow Canary A/B Benchmark**: Pre-deployment quality & latency benchmark (CanaryHotSwapper) probing AST rejection, MCU pinout compliance, and music routing before model promotion.
-- **Autonomous Sleep Daemon**: Threaded background scheduler (NightlyDreamDaemon) monitoring user idle time, GPU VRAM, and temperature to trigger machine dreaming autonomously during off-peak hours.
-- **Autonomous Hot-Swapping**: Compiles Modelfile.deep_sovereign and deploys deep-sovereign:latest directly into local Ollama via REST API without workstation downtime.
-- **Endpoints**: /api/dream/telemetry, /api/dream/curate, /api/dream/train_lora, /api/dream/readiness_audit, /api/dream/hot_swap, /api/dream/full_nightly_cycle, /api/dream/canary_benchmark, /api/dream/daemon_status, /api/dream/daemon/start, /api/dream/daemon/stop.
+- **Shadow Canary A/B Benchmark**: Pre-deployment quality & latency benchmark (`CanaryHotSwapper`) probing AST rejection, MCU pinout compliance, and music routing before model promotion.
+- **Autonomous Sleep Daemon**: Threaded background scheduler (`NightlyDreamDaemon`) monitoring user idle time, GPU VRAM, and temperature to trigger machine dreaming autonomously during off-peak hours.
+- **Autonomous Hot-Swapping**: Compiles `Modelfile.deep_sovereign` and deploys `deep-sovereign:latest` directly into local Ollama via REST API without workstation downtime.
+- **Cockpit UI Cognitive Foundry**: Integrated cyberpunk HUD modal (`toolForgeAndDreamModal.html`) with dual-tab interface for dynamic tool synthesis, real-time fuzz testing, EWC telemetry, and one-click nightly dream execution.
+- **Endpoints**: `/api/dream/telemetry`, `/api/dream/curate`, `/api/dream/distill_synthetic`, `/api/dream/train_lora`, `/api/dream/readiness_audit`, `/api/dream/hot_swap`, `/api/dream/full_nightly_cycle`, `/api/dream/canary_benchmark`, `/api/dream/daemon_status`, `/api/dream/daemon/start`, `/api/dream/daemon/stop`.
 
 ---
 
@@ -171,6 +172,13 @@ outes/dream_bp.py.
 | `GET` | `/api/history` | List Recent Chat Sessions | `200 JSON` |
 | `GET` | `/api/chats/<id>` | Retrieve Full Message History for a Session | `200 JSON` |
 | `DELETE` | `/api/chats/<id>` | Delete a Conversation Session | `200 JSON` |
+| `GET` | `/api/forge/tools` | List verified synthesized dynamic tools | `200 JSON` |
+| `POST` | `/api/forge/fuzz` | Run 15-case property-based fuzz tests on tool | `200 JSON` |
+| `POST` | `/api/forge/analyze` | McCabe cyclomatic complexity & AST audit | `200 JSON` |
+| `POST` | `/api/forge/workflow/execute` | Execute conditional branching DAG workflow | `200 JSON` |
+| `POST` | `/api/dream/distill_synthetic` | Generate synthetic self-play contrastive pairs | `200 JSON` |
+| `POST` | `/api/dream/train_lora` | Trigger DPO/SimPO GPU LoRA training run | `200 JSON` |
+| `GET` | `/api/dream/telemetry` | Machine dreaming VRAM, EWC & loss telemetry | `200 JSON` |
 | `GET` | `/api/system/info` | Host Vitals, OS Version, and Uptime | `200 JSON` |
 | `GET` | `/api/system/version` | Active Build Hash & Boot Timestamp | `200 JSON` |
 | `GET` | `/api/system/circuit_breakers` | Resilience Matrix & Breaker Health Ratios | `200 JSON` |
@@ -208,16 +216,23 @@ The primary persistence engine is PostgreSQL 16+ on port `5432` with the `vector
 
 ## 6. Verification & Health Audit Runbook
 
-To execute the authoritative 10-pillar automated diagnostic suite:
+To execute the authoritative diagnostic and test suites:
 
 ```bash
-# Full 10-Pillar Cockpit Audit
+# Sovereign Cockpit 10-Pillar Comprehensive Audit
 python check_deep.py
 
-# Unit & Intent Test Suites
+# Advanced Phase 3 & 4 v3 Sovereign Cognitive Test Suite
+python test_phase3_and_4_v3_sovereign.py
+python test_advanced_phases_3_and_4.py
+
+# Tool Forge & Meta-Learning Unit Suites
+python test_phase3_tool_forge.py
+python test_phase4_meta_learning.py
+
+# Core Intent & Subsystem Suites
 python test_user_intents_and_skills.py
 python test_pillars_1_and_2.py
-python test_phase3_phase4.py
 python test_circuit_ui_and_embedded_mcu.py
 python test_hystrix_and_infer_scanner.py
 python test_pentagi_integration.py

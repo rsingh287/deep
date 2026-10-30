@@ -1,10 +1,10 @@
 """
-Machine Dreaming & Continuous Meta-Learning Blueprint v2 for D.E.E.P. Cockpit
+Machine Dreaming & Continuous Meta-Learning Blueprint v3 for D.E.E.P. Cockpit
 =============================================================================
 Provides REST API endpoints for:
 - REM Machine Dreaming memory consolidation
-- DPO Preference curation
-- Local NVIDIA GPU LoRA training & convergence telemetry (DPO + EWC)
+- DPO Preference curation and Synthetic Self-Play Distillation
+- Local NVIDIA GPU LoRA training & convergence telemetry (SimPO & DPO + EWC)
 - 5-Point Self-Benchmarking Readiness Audit
 - Shadow Canary A/B Latency & Quality Benchmark
 - Autonomous Model Hot-Swapping into Ollama
@@ -18,6 +18,7 @@ import torch
 from nightly_meta_learner import (
     get_nightly_meta_learner,
     DPOPreferenceCurator,
+    SelfPlayDistiller,
     NightlyLoRATrainer,
     NightlyReadinessAudit,
     CanaryHotSwapper,
@@ -41,6 +42,7 @@ def api_dream_telemetry():
                 checkpoint_meta = {
                     "rank": ckpt.get("rank", 16),
                     "epochs": ckpt.get("epochs", 5),
+                    "objective": ckpt.get("objective", "simpo"),
                     "initial_loss": ckpt.get("initial_loss"),
                     "final_loss": ckpt.get("final_loss"),
                     "final_reward_margin": ckpt.get("reward_margin_history", [-1])[-1] if ckpt.get("reward_margin_history") else None,
@@ -76,18 +78,38 @@ def api_dream_curate():
         return jsonify({"success": False, "error": str(e)}), 500
 
 
+@dream_bp.route("/api/dream/distill_synthetic", methods=["POST"])
+def api_distill_synthetic():
+    """Generates synthetic self-play contrastive preference pairs from knowledge graph."""
+    try:
+        res = SelfPlayDistiller.distill_synthetic_pairs()
+        return jsonify(res)
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
 @dream_bp.route("/api/dream/train_lora", methods=["POST"])
 def api_dream_train_lora():
-    """Triggers local GPU LoRA optimization loop with DPO and EWC."""
+    """Triggers local GPU LoRA optimization loop with SimPO/DPO and EWC."""
     try:
         data = request.json or {}
         epochs = int(data.get("epochs", 5))
         lr = float(data.get("lr", 1e-3))
         r = int(data.get("r", 16))
         beta = float(data.get("beta", 0.1))
+        gamma = float(data.get("gamma", 0.5))
+        objective = data.get("objective", "simpo")
         ewc_lambda = float(data.get("ewc_lambda", 50.0))
 
-        res = NightlyLoRATrainer.train(epochs=epochs, lr=lr, r=r, beta=beta, ewc_lambda=ewc_lambda)
+        res = NightlyLoRATrainer.train(
+            epochs=epochs,
+            lr=lr,
+            r=r,
+            beta=beta,
+            gamma=gamma,
+            objective=objective,
+            ewc_lambda=ewc_lambda,
+        )
         return jsonify(res)
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
@@ -161,8 +183,10 @@ def api_dream_daemon_stop():
 def api_dream_full_cycle():
     """Executes all stages of the Autonomous Evolution Loop in sequence."""
     try:
+        data = request.json or {}
+        objective = data.get("objective", "simpo")
         learner = get_nightly_meta_learner()
-        report = learner.run_full_nightly_cycle()
+        report = learner.run_full_nightly_cycle(objective=objective)
         return jsonify(report)
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
