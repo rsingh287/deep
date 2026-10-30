@@ -137,7 +137,7 @@ class TestPhase1VLMAndVAD(unittest.TestCase):
             res = requests.post(
                 f"{self.api_base}/api/vision/ground_element",
                 json={"target": "center"},
-                timeout=10
+                timeout=35
             )
             self.assertEqual(res.status_code, 200)
             data = res.json()

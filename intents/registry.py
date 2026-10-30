@@ -12,9 +12,11 @@ from .background_research_intent import BackgroundResearchIntent
 from .website_builder_intent import WebsiteBuilderIntent
 from .code_scanner_intent import CodeScannerIntent
 from .pentest_intent import PentestIntent
+from .dynamic_tool_intent import DynamicToolIntent
 
 # In the future, this can auto-discover intents in this folder.
 REGISTERED_INTENTS = [
+    DynamicToolIntent,
     SikhHeritageIntent,
     GitAutopilotIntent,
     BrowserPilotIntent,

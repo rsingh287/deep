@@ -134,6 +134,14 @@ flowchart TD
 - **Engine**: `intents/sikh_heritage_intent.py` and `routes/gurbani.py`.
 - **Capabilities**: Full Nitnem banis, Gurmukhi text rendering with Phonetic Romanization and English translations, and Hukamnama introspection.
 
+### Pillar 11: Self-Synthesizing Tool Forge (Autonomous Extensibility)
+- **Engine**: `self_synthesizing_tool_forge.py`, `routes/tool_forge_bp.py`, and `intents/dynamic_tool_intent.py`.
+- **AST Security Shield**: Zero-trust AST static analyzer (`ASTSecurityShield.validate_code`) blocking unauthorized builtins (`eval`, `exec`, `__import__`), banned modules (`ctypes`, `winreg`, `msvcrt`, `subprocess`), and raw OS mutations.
+- **Autonomous Synthesis**: Natural language specifications translated into standalone Python tools with typed parameters and companion `unittest` suites via local Qwen 2.5 Coder.
+- **Sandboxed Verification & Self-Healing**: Automated execution in isolated subprocesses with timeout boundaries; failing test traces are fed back to the coder model for automatic patching.
+- **Hot-Registration**: Verified tools are dynamically registered into `dynamic_tools/manifest.json` and `master_skills_registry.json` without server restarts.
+- **Endpoints**: `/api/forge/tools`, `/api/forge/synthesize`, `/api/forge/verify`, `/api/forge/execute`.
+
 ---
 
 ## 4. REST & WebSocket API Specification

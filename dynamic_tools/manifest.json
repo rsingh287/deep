@@ -1,0 +1,27 @@
+{
+  "version": "1.0",
+  "tools": {
+    "slug_generator": {
+      "id": "slug_generator",
+      "name": "Slug Generator",
+      "description": "Converts a text string to a lowercase URL-friendly slug, replacing spaces and non-alphanumerics with hyphens.",
+      "parameters": [
+        {
+          "name": "text",
+          "type": "str",
+          "default": ""
+        }
+      ],
+      "file_path": "C:\\Users\\User\\.gemini\\antigravity\\scratch\\local_ai_gui\\dynamic_tools\\slug_generator.py",
+      "test_path": "C:\\Users\\User\\.gemini\\antigravity\\scratch\\local_ai_gui\\dynamic_tools\\tests\\test_slug_generator.py",
+      "code_hash": "6e4c163c9596c59c",
+      "verification_status": "VERIFIED_OPERATIONAL",
+      "test_pass_count": 1,
+      "execution_count": 3,
+      "author": "D.E.E.P. Tool Forge (qwen2.5-coder:7b)",
+      "created_at": "2026-10-29 21:56:12",
+      "last_executed": "2026-10-29 21:57:18",
+      "verified_at": "2026-10-29 21:57:03"
+    }
+  }
+}

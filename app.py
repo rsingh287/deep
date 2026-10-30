@@ -4469,6 +4469,7 @@ from routes.gurbani import gurbani_bp
 from routes.enhanced_tools_bp import enhanced_bp
 from routes.public_apis_bp import public_bp
 from routes.docker_bp import docker_bp
+from routes.tool_forge_bp import tool_forge_bp
 
 app.register_blueprint(chat_bp)
 app.register_blueprint(vision_bp)
@@ -4482,6 +4483,7 @@ app.register_blueprint(gurbani_bp)
 app.register_blueprint(enhanced_bp)
 app.register_blueprint(public_bp)
 app.register_blueprint(docker_bp)
+app.register_blueprint(tool_forge_bp)
 
 if __name__ == "__main__":
     def launch_singleton_daemon(script_name):
