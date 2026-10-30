@@ -3470,5 +3470,21 @@
     "plugin": "tool-forge",
     "category": "\ud83d\udee0\ufe0f Synthesized Tool",
     "description": "Converts a text string to a lowercase URL-friendly slug, replacing spaces and non-alphanumerics with hyphens."
+  },
+  {
+    "id": "synthesized-v4_test_fx_client",
+    "name": "V4 Test Fx Client",
+    "scope": "Synthesized",
+    "plugin": "tool-forge",
+    "category": "\ud83d\udee0\ufe0f Synthesized Tool",
+    "description": "Dynamic Forex rate fetcher tool"
+  },
+  {
+    "id": "synthesized-v4_fragile_calculator",
+    "name": "V4 Fragile Calculator",
+    "scope": "Synthesized",
+    "plugin": "tool-forge",
+    "category": "\ud83d\udee0\ufe0f Synthesized Tool",
+    "description": "Test calculator"
   }
 ]

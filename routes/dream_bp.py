@@ -24,6 +24,9 @@ from nightly_meta_learner import (
     CanaryHotSwapper,
     AutonomousModelHotSwapper,
     NightlyDreamDaemon,
+    CounterfactualDreamSimulator,
+    LoRAFusionCompiler,
+    ONLINE_FISHER_FILE,
     CHECKPOINT_PATH,
 )
 
@@ -188,5 +191,54 @@ def api_dream_full_cycle():
         learner = get_nightly_meta_learner()
         report = learner.run_full_nightly_cycle(objective=objective)
         return jsonify(report)
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@dream_bp.route("/api/dream/counterfactual", methods=["POST"])
+def api_dream_counterfactual():
+    """Generates synthetic adversarial counterfactual scenarios to harden the model."""
+    try:
+        res = CounterfactualDreamSimulator.simulate_counterfactual_scenarios()
+        return jsonify(res)
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@dream_bp.route("/api/dream/fuse_lora", methods=["POST"])
+def api_dream_fuse_lora():
+    """Merges trained LoRA weights into base model representations and updates Modelfile."""
+    try:
+        data = request.json or {}
+        base_model = data.get("base_model", "hermes3:8b")
+        res = LoRAFusionCompiler.compile_fusion_modelfile(base_model=base_model)
+        return jsonify(res)
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@dream_bp.route("/api/dream/online_ewc", methods=["GET"])
+def api_dream_online_ewc():
+    """Returns status and metrics of Online EWC++ lifelong Fisher consolidation."""
+    try:
+        has_file = os.path.exists(ONLINE_FISHER_FILE)
+        stats = {}
+        if has_file:
+            try:
+                saved = torch.load(ONLINE_FISHER_FILE, map_location="cpu")
+                fisher = saved.get("fisher", {})
+                total_mass = sum(f.sum().item() for f in fisher.values())
+                stats = {
+                    "total_anchors": len(fisher),
+                    "running_fisher_mass": round(total_mass, 4),
+                    "last_updated": saved.get("last_updated"),
+                }
+            except Exception:
+                pass
+        return jsonify({
+            "success": True,
+            "has_online_ewc": has_file,
+            "stats": stats,
+        })
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500

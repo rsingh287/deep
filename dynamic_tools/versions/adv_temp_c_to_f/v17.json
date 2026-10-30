@@ -1,0 +1,8 @@
+{
+  "version": 17,
+  "tool_name": "adv_temp_c_to_f",
+  "note": "Initial synthesis",
+  "timestamp": "2026-10-29T23:08:18.742269",
+  "tool_code": "\ndef run(args: dict) -> dict:\n    if not isinstance(args, dict):\n        return {\"error\": \"Invalid args\", \"success\": False}\n    c = float(args.get(\"celsius\", 0.0))\n    f = (c * 9.0 / 5.0) + 32.0\n    return {\"celsius\": c, \"fahrenheit\": round(f, 2), \"success\": True}\n",
+  "test_code": "\nimport unittest\nfrom dynamic_tools.adv_temp_c_to_f import run\n\nclass TestTemp(unittest.TestCase):\n    def test_boil(self):\n        res = run({\"celsius\": 100})\n        self.assertEqual(res.get(\"fahrenheit\"), 212.0)\n\n    def test_freeze(self):\n        res = run({\"celsius\": 0})\n        self.assertEqual(res.get(\"fahrenheit\"), 32.0)\n\nif __name__ == \"__main__\":\n    unittest.main()\n"
+}

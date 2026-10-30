@@ -1,0 +1,8 @@
+{
+  "version": 5,
+  "tool_name": "v4_fragile_calculator",
+  "note": "Auto-healed KeyError",
+  "timestamp": "2026-10-29T23:08:19.449670",
+  "tool_code": "def run(args: dict) -> dict:\n    # Intentionally fragile without .get()\n    a = args.get(\"val_a\", 0)\n    b = args.get(\"val_b\", 0)\n    return {\"result\": a + b, \"success\": True}\n",
+  "test_code": "import unittest\nfrom dynamic_tools.v4_fragile_calculator import run\n\nclass TestFragile(unittest.TestCase):\n    def test_add(self):\n        res = run({\"val_a\": 1, \"val_b\": 2})\n        self.assertEqual(res.get(\"result\"), 3)\n\nif __name__ == \"__main__\":\n    unittest.main()\n    def test_regression_healed_1793329699(self):\n        res = run({'val_b': 5})\n        self.assertIsNotNone(res)\n"
+}

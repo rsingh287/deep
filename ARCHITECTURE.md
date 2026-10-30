@@ -134,29 +134,29 @@ flowchart TD
 - **Engine**: `intents/sikh_heritage_intent.py` and `routes/gurbani.py`.
 - **Capabilities**: Full Nitnem banis, Gurmukhi text rendering with Phonetic Romanization and English translations, and Hukamnama introspection.
 
-### Pillar 11: Self-Synthesizing Tool Forge v3 (Autonomous Cognitive Extensibility)
+### Pillar 11: Self-Synthesizing Tool Forge v4 (Autonomous Evolutionary Tool Forge)
 - **Engine**: `self_synthesizing_tool_forge.py`, `routes/tool_forge_bp.py`, and `intents/dynamic_tool_intent.py`.
-- **AST Security Shield**: Zero-trust AST static analyzer (`ASTSecurityShield.validate_code`) blocking unauthorized builtins (`eval`, `exec`, `__import__`), banned modules (`ctypes`, `winreg`, `msvcrt`, `subprocess`, `socket`), introspection escape routes (`__subclasses__`, `__bases__`, `__globals__`), and raw OS mutations.
-- **Secret-Sanitized Sandbox**: Subprocess execution isolation scrubbing environment variables (`OPENAI_API_KEY`, `POSTGRES_PASSWORD`, `DATABASE_URL`, `TOKEN`) to prevent credential leakage.
-- **Property-Based FuzzForge Engine**: Autonomous black-box and boundary fuzz testing running 15 edge cases (empty strings, extreme floats, NaN, oversized inputs, None types) to guarantee runtime invariants, crash resistance, and bounded execution latency (< 50ms).
-- **McCabe AST Complexity & Code Quality Optimizer**: Computes McCabe cyclomatic complexity, Halstead volume, and PEP 484 type annotation coverage, generating optimization scorecards with letter grades (`A+`, `A`, `B`, `C`).
-- **Multi-Node Conditional DAG Workflow Runtime**: Advanced directed acyclic graph runtime (`WorkflowDAGRuntime`) supporting sequential and conditional branching (`if_true` / `if_false`), tool execution nodes, dynamic parameter interpolation (`$input.<key>`, `$steps.<id>.result.<field>`), and branch telemetry.
-- **Multi-Turn Reflexion Engine**: Automated diagnostic traceback analysis parsing `AssertionError`, `KeyError`, and `TypeError` exceptions to drive iterative 3-turn self-healing patches.
-- **Semantic Auto-Discovery & Dispatch**: Weighted token & intent search (`SemanticToolIndex.discover`) auto-dispatching natural language commands to verified synthesized tools with argument extraction.
-- **Immutable Versioning & Rollback**: Version snapshots maintained in `dynamic_tools/versions/` with integer-sorted history and instant one-click rollback (`ToolVersionManager.rollback`).
-- **Endpoints**: `/api/forge/tools`, `/api/forge/synthesize`, `/api/forge/verify`, `/api/forge/fuzz`, `/api/forge/analyze`, `/api/forge/execute`, `/api/forge/chain/execute`, `/api/forge/workflow/execute`, `/api/forge/discover`, `/api/forge/auto_dispatch`, `/api/forge/rollback`, `/api/forge/versions/<tool_name>`.
+- **AST Security Shield & Sanitized Sandbox**: Zero-trust AST static analyzer (`ASTSecurityShield.validate_code`) blocking unauthorized builtins (`eval`, `exec`, `__import__`), banned modules (`ctypes`, `winreg`, `msvcrt`, `subprocess`, `socket`), and introspection escape routes (`__subclasses__`, `__bases__`, `__globals__`). Sandboxed execution strips all environment secrets (`OPENAI_API_KEY`, `POSTGRES_PASSWORD`, `DATABASE_URL`).
+- **Genetic Mutation & Pareto Optimization Engine (`ToolGeneticMutator`)**: Autonomously evolves synthesized tools across mutation strategies (`memoize`, `guard_fastpath`, `doc_type_hints`), evaluating multi-objective fitness across unit test pass rate, 15-case boundary fuzz scores, McCabe cyclomatic complexity, and sub-millisecond execution latency.
+- **Differential Shadow Execution & Equivalence Engine (`DifferentialShadowRunner`)**: Executes adjacent versions side-by-side in isolated sandboxes across production test vectors to guarantee zero semantic regression ($0\%$ output divergence) and quantify latency speedups.
+- **OpenAPI & MCP Dynamic API Synthesizer (`OpenAPIToolSynthesizer`)**: Transforms raw REST / OpenAPI 3.x specifications or MCP schemas into typed, AST-validated, fuzz-tested Python dynamic client tools registered directly in the workstation manifest.
+- **Production Runtime Self-Healing Sentinel (`ToolSelfHealingSentinel`)**: Intercepts runtime exceptions in production, diagnoses root cause via `ReflexionEngine`, automatically generates targeted AST code patches, injects regression unit tests, and hot-swaps the healed tool live without workstation restart.
+- **Multi-Node Conditional DAG Workflow Runtime (`WorkflowDAGRuntime`)**: Executes directed acyclic graphs with conditional branching nodes (`if_true` / `if_false`), dynamic parameter interpolation (`$input.<key>`, `$steps.<id>.result.<field>`), and branch telemetry.
+- **Endpoints**: `/api/forge/tools`, `/api/forge/synthesize`, `/api/forge/verify`, `/api/forge/fuzz`, `/api/forge/analyze`, `/api/forge/mutate`, `/api/forge/shadow_compare`, `/api/forge/synthesize_openapi`, `/api/forge/self_heal`, `/api/forge/execute`, `/api/forge/chain/execute`, `/api/forge/workflow/execute`, `/api/forge/discover`, `/api/forge/auto_dispatch`, `/api/forge/rollback`, `/api/forge/versions/<tool_name>`.
 
-### Pillar 12: Continuous Meta-Learning & Autonomous Machine Dreaming v3
+### Pillar 12: Continuous Meta-Learning & Autonomous Machine Dreaming v4 (Cognitive Hyper-Evolution)
 - **Engine**: `nightly_meta_learner.py`, `sleep_phase_dream_engine.py`, `lora_self_learning.py`, and `routes/dream_bp.py`.
-- **SimPO & DPO Dual Optimization Engine**: Length-normalized Simple Preference Optimization (SimPO) with target reward margin $\gamma = 0.5$ and Bradley-Terry Direct Preference Optimization ($\mathcal{L}_{\text{DPO}}$) training on NVIDIA RTX A2000 GPU (`cuda`), tracking margin progression ($\Delta r > 0$) and reward accuracy ($\ge 90\%$).
-- **EWC Continual Learning Guardrail**: Elastic Weight Consolidation calculating diagonal Fisher Information Matrix $F_i$ on canonical anchor tasks, applying quadratic penalty $\frac{\lambda_{\text{EWC}}}{2} \sum F_i (\theta_i - \theta_i^*)^2$ to eliminate catastrophic forgetting of MCU hardware rules and AST SQL guardrails.
-- **Bi-Temporal Synthetic Self-Play Distillation**: Autonomously distills ground-truth facts from the Hyper-Relational Knowledge Graph into contrastive positive and negative preference pairs (`SelfPlayDistiller`) for offline alignment.
-- **5-Point Readiness Audit**: Self-benchmarking evaluation battery scoring AST Guardrail Defense, Executive Voice Brevity, Embedded MCU Directives (PIC18F85K22 LCD Line 2 + MCP9701 Math), Local Music Strict Matching, and Code Synthesis Integrity.
-- **Shadow Canary A/B Benchmark**: Pre-deployment quality & latency benchmark (`CanaryHotSwapper`) probing AST rejection, MCU pinout compliance, and music routing before model promotion.
-- **Autonomous Sleep Daemon**: Threaded background scheduler (`NightlyDreamDaemon`) monitoring user idle time, GPU VRAM, and temperature to trigger machine dreaming autonomously during off-peak hours.
-- **Autonomous Hot-Swapping**: Compiles `Modelfile.deep_sovereign` and deploys `deep-sovereign:latest` directly into local Ollama via REST API without workstation downtime.
-- **Cockpit UI Cognitive Foundry**: Integrated cyberpunk HUD modal (`toolForgeAndDreamModal.html`) with dual-tab interface for dynamic tool synthesis, real-time fuzz testing, EWC telemetry, and one-click nightly dream execution.
-- **Endpoints**: `/api/dream/telemetry`, `/api/dream/curate`, `/api/dream/distill_synthetic`, `/api/dream/train_lora`, `/api/dream/readiness_audit`, `/api/dream/hot_swap`, `/api/dream/full_nightly_cycle`, `/api/dream/canary_benchmark`, `/api/dream/daemon_status`, `/api/dream/daemon/start`, `/api/dream/daemon/stop`.
+- **Multi-Objective Alignment Core (ORPO, KTO, SimPO, DPO)**:
+  - **ORPO (Odds Ratio Preference Optimization)**: Monolithic SFT cross-entropy + odds-ratio penalty without reference model overhead, achieving rapid GPU convergence on local NVIDIA RTX hardware.
+  - **KTO (Kahneman-Tversky Optimization)**: Prospect theory value-loss alignment directly optimizing from unpaired desirable/undesirable feedback.
+  - **SimPO**: Length-normalized contrastive preference optimization with target reward margin $\gamma = 0.5$.
+  - **DPO**: Mathematical Bradley-Terry preference optimization with frozen reference policy tracking positive reward margins ($\Delta r > 0$).
+- **Online EWC++ Lifelong Continual Learning (`OnlineFisherConsolidator`)**: Implements running Fisher Information Matrix accumulation with exponential decay ($\gamma = 0.90$), enabling lifelong continual multi-night learning without memory growth or catastrophic forgetting of MCU hardware rules and AST SQL guardrails.
+- **Adversarial Counterfactual Dream Simulator (`CounterfactualDreamSimulator`)**: Synthesizes adversarial stress scenarios (SQL DDL injections, PIC18F85K22 LCD Line 1 defect violations, unauthorized socket operations) during sleep phases, generating hard-negative contrastive pairs to harden the model.
+- **LoRA Weight Fusion & Dynamic Modelfile Compiler (`LoRAFusionCompiler`)**: Calculates Frobenius norm deltas ($\Delta W = rac{lpha}{r} B \cdot A$), merges LoRA adapter matrices directly into base model representations, and compiles hardware-optimized `Modelfile.deep_sovereign` for Ollama.
+- **Shadow Canary Benchmark (`CanaryHotSwapper`) & Autonomous Sleep Daemon (`NightlyDreamDaemon`)**: Validates candidate models against golden probes before promotion; background thread monitors user idle time (>300s) and GPU thermal limits to trigger machine dreaming automatically.
+- **Cockpit UI Cognitive Foundry v4**: Dual-tab HUD modal (`toolForgeAndDreamModal.html`) featuring real-time genetic mutation controls, differential shadow equivalence inspector, multi-objective alignment selector, and adversarial counterfactual trigger.
+- **Endpoints**: `/api/dream/telemetry`, `/api/dream/curate`, `/api/dream/distill_synthetic`, `/api/dream/counterfactual`, `/api/dream/train_lora`, `/api/dream/fuse_lora`, `/api/dream/online_ewc`, `/api/dream/readiness_audit`, `/api/dream/hot_swap`, `/api/dream/full_nightly_cycle`, `/api/dream/canary_benchmark`, `/api/dream/daemon_status`, `/api/dream/daemon/start`, `/api/dream/daemon/stop`.
 
 ---
 
@@ -175,9 +175,16 @@ flowchart TD
 | `GET` | `/api/forge/tools` | List verified synthesized dynamic tools | `200 JSON` |
 | `POST` | `/api/forge/fuzz` | Run 15-case property-based fuzz tests on tool | `200 JSON` |
 | `POST` | `/api/forge/analyze` | McCabe cyclomatic complexity & AST audit | `200 JSON` |
+| `POST` | `/api/forge/mutate` | Autonomous genetic mutation & Pareto fitness optimization | `200 JSON` |
+| `POST` | `/api/forge/shadow_compare` | Differential shadow execution & semantic equivalence | `200 JSON` |
+| `POST` | `/api/forge/synthesize_openapi` | Synthesize dynamic API client tool from schema | `200 JSON` |
+| `POST` | `/api/forge/self_heal` | Emergency runtime self-healing and regression patch | `200 JSON` |
 | `POST` | `/api/forge/workflow/execute` | Execute conditional branching DAG workflow | `200 JSON` |
 | `POST` | `/api/dream/distill_synthetic` | Generate synthetic self-play contrastive pairs | `200 JSON` |
-| `POST` | `/api/dream/train_lora` | Trigger DPO/SimPO GPU LoRA training run | `200 JSON` |
+| `POST` | `/api/dream/counterfactual` | Simulate adversarial counterfactual dream scenarios | `200 JSON` |
+| `POST` | `/api/dream/train_lora` | Trigger ORPO/SimPO/KTO/DPO GPU LoRA training run | `200 JSON` |
+| `POST` | `/api/dream/fuse_lora` | Compile & fuse LoRA adapter weights into Modelfile | `200 JSON` |
+| `GET` | `/api/dream/online_ewc` | Lifelong Online EWC++ running Fisher matrix status | `200 JSON` |
 | `GET` | `/api/dream/telemetry` | Machine dreaming VRAM, EWC & loss telemetry | `200 JSON` |
 | `GET` | `/api/system/info` | Host Vitals, OS Version, and Uptime | `200 JSON` |
 | `GET` | `/api/system/version` | Active Build Hash & Boot Timestamp | `200 JSON` |
@@ -219,10 +226,13 @@ The primary persistence engine is PostgreSQL 16+ on port `5432` with the `vector
 To execute the authoritative diagnostic and test suites:
 
 ```bash
-# Sovereign Cockpit 10-Pillar Comprehensive Audit
+# Full 10-Pillar Cockpit Audit
 python check_deep.py
 
-# Advanced Phase 3 & 4 v3 Sovereign Cognitive Test Suite
+# Phase 3 & 4 v4 Sovereign Hyper-Evolution Test Suite
+python test_phase3_and_4_v4_evolution.py
+
+# Phase 3 & 4 v3 Sovereign Cognitive Test Suite
 python test_phase3_and_4_v3_sovereign.py
 python test_advanced_phases_3_and_4.py
 

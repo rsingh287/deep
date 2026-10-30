@@ -1,5 +1,5 @@
 <!-- ============================================================== -->
-<!-- 🛠️ SOVEREIGN TOOL FORGE & MACHINE DREAMING COCKPIT MODAL (v3) -->
+<!-- 🛠️ SOVEREIGN TOOL FORGE & MACHINE DREAMING COCKPIT MODAL (v4 Ultra-Evolution) -->
 <!-- ============================================================== -->
 <div class="modal-overlay" id="toolForgeAndDreamModal" style="display:none; position:fixed; inset:0; background:rgba(3,7,18,0.85); backdrop-filter:blur(12px); z-index:9999; justify-content:center; align-items:center; padding:20px;">
   <div class="modal-card" style="width:100%; max-width:1080px; max-height:92vh; background:linear-gradient(145deg, rgba(15,23,42,0.96), rgba(8,14,26,0.98)); border:1px solid rgba(168,85,247,0.35); border-radius:20px; box-shadow:0 25px 65px rgba(0,0,0,0.75), 0 0 40px rgba(168,85,247,0.18); display:flex; flex-direction:column; overflow:hidden; animation:modalSlideUp 0.25s ease-out;">
@@ -13,7 +13,7 @@
             SOVEREIGN COGNITIVE FOUNDRY & CONTINUOUS META-LEARNER
             <span id="forgeCudaBadge" style="font-size:0.7rem; padding:2px 8px; border-radius:12px; background:rgba(34,197,94,0.15); border:1px solid rgba(34,197,94,0.35); color:#4ade80; font-weight:700;">RTX GPU ACTIVE</span>
           </div>
-          <div style="font-size:0.75rem; color:var(--text-muted);">Self-Synthesizing Tool Forge v3 • SimPO & DPO GPU LoRA Optimization • EWC Fisher Guardrails</div>
+          <div style="font-size:0.75rem; color:var(--text-muted);">Tool Forge v4 (Genetic Mutation & Differential Shadow) • ORPO / SimPO / KTO LoRA • Online EWC++ & Counterfactual Dreams</div>
         </div>
       </div>
       <button onclick="closeToolForgeAndDreamModal()" style="background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); color:#94a3b8; border-radius:10px; width:34px; height:34px; font-size:1.1rem; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all 0.2s;" onmouseover="this.style.color='#fff'; this.style.borderColor='rgba(239,68,68,0.5)';" onmouseout="this.style.color='#94a3b8'; this.style.borderColor='rgba(255,255,255,0.1)';">✕</button>
@@ -21,8 +21,8 @@
 
     <!-- Sub-Nav Tabs -->
     <div style="display:flex; gap:8px; padding:10px 24px; background:rgba(15,23,42,0.8); border-bottom:1px solid rgba(255,255,255,0.06);">
-      <button id="tabBtnToolForge" onclick="switchForgeTab('forge')" style="background:rgba(168,85,247,0.2); border:1px solid rgba(168,85,247,0.4); color:#c084fc; border-radius:8px; padding:6px 14px; font-size:0.8rem; font-weight:700; cursor:pointer; transition:all 0.2s;">🛠️ Tool Forge Studio (v3)</button>
-      <button id="tabBtnDreaming" onclick="switchForgeTab('dream')" style="background:transparent; border:1px solid rgba(255,255,255,0.1); color:#94a3b8; border-radius:8px; padding:6px 14px; font-size:0.8rem; font-weight:700; cursor:pointer; transition:all 0.2s;">🌙 Machine Dreaming & Meta-Learning (v3)</button>
+      <button id="tabBtnToolForge" onclick="switchForgeTab('forge')" style="background:rgba(168,85,247,0.2); border:1px solid rgba(168,85,247,0.4); color:#c084fc; border-radius:8px; padding:6px 14px; font-size:0.8rem; font-weight:700; cursor:pointer; transition:all 0.2s;">🛠️ Tool Forge Studio (v4)</button>
+      <button id="tabBtnDreaming" onclick="switchForgeTab('dream')" style="background:transparent; border:1px solid rgba(255,255,255,0.1); color:#94a3b8; border-radius:8px; padding:6px 14px; font-size:0.8rem; font-weight:700; cursor:pointer; transition:all 0.2s;">🌙 Machine Dreaming & Meta-Learning (v4)</button>
     </div>
 
     <!-- Modal Body -->
@@ -84,6 +84,8 @@
             <input id="forgeRunToolArgs" type="text" placeholder='{"celsius": 100}' style="flex:1.5; background:rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.15); border-radius:8px; padding:8px 12px; color:#fff; font-size:0.82rem; font-family:monospace;">
             <button onclick="runForgeToolInteractive()" style="background:#8b5cf6; border:none; color:#fff; font-weight:700; border-radius:8px; padding:8px 16px; font-size:0.82rem; cursor:pointer;">Execute Tool</button>
             <button onclick="runForgeFuzzInteractive()" style="background:rgba(245,158,11,0.2); border:1px solid rgba(245,158,11,0.4); color:#fbbf24; font-weight:700; border-radius:8px; padding:8px 14px; font-size:0.82rem; cursor:pointer;">Run Fuzz Battery</button>
+            <button onclick="runForgeMutateInteractive()" style="background:rgba(168,85,247,0.2); border:1px solid rgba(168,85,247,0.4); color:#c084fc; font-weight:700; border-radius:8px; padding:8px 14px; font-size:0.82rem; cursor:pointer;">🧬 Mutate & Optimize</button>
+            <button onclick="runForgeShadowCompareInteractive()" style="background:rgba(14,165,233,0.2); border:1px solid rgba(14,165,233,0.4); color:#38bdf8; font-weight:700; border-radius:8px; padding:8px 14px; font-size:0.82rem; cursor:pointer;">⚖️ Shadow Compare</button>
           </div>
           <pre id="forgeRunResult" style="display:none; background:rgba(0,0,0,0.5); border:1px solid rgba(168,85,247,0.2); border-radius:8px; padding:12px; color:#a7f3d0; font-family:monospace; font-size:0.75rem; max-height:160px; overflow-y:auto; margin:0;"></pre>
         </div>
@@ -176,10 +178,20 @@
         <!-- Action Control Bar -->
         <div style="display:flex; gap:12px; align-items:center; background:rgba(15,23,42,0.7); border:1px solid rgba(168,85,247,0.3); border-radius:14px; padding:16px;">
           <div style="flex:1;">
-            <div style="font-size:0.95rem; font-weight:800; color:#fff;">Trigger Autonomous Machine Dreaming Cycle</div>
-            <div style="font-size:0.75rem; color:#94a3b8;">Consolidates REM memory, synthesizes self-play pairs, runs GPU SimPO/DPO training, and evaluates canary.</div>
+            <div style="font-size:0.95rem; font-weight:800; color:#fff;">Autonomous Machine Dreaming & Multi-Objective Alignment (v4)</div>
+            <div style="font-size:0.75rem; color:#94a3b8;">Consolidates REM memory, simulates counterfactual scenarios, runs ORPO/SimPO LoRA training with Online EWC++, and fuses adapter.</div>
           </div>
-          <button id="btnTriggerDreamCycle" onclick="triggerFullDreamCycleLive()" style="background:linear-gradient(135deg, #9333ea, #6366f1); border:none; color:#fff; font-weight:800; border-radius:10px; padding:10px 22px; font-size:0.85rem; cursor:pointer; box-shadow:0 0 15px rgba(147,51,234,0.4); transition:all 0.2s;">🌙 Trigger Nightly Dream</button>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <select id="dreamObjectiveSelect" style="background:rgba(0,0,0,0.4); border:1px solid rgba(255,255,255,0.2); border-radius:8px; padding:8px 12px; color:#fff; font-size:0.82rem; font-weight:700;">
+              <option value="simpo" selected>SimPO (Margin γ=0.5)</option>
+              <option value="orpo">ORPO (Odds Ratio SFT+OR)</option>
+              <option value="kto">KTO (Prospect Value Loss)</option>
+              <option value="dpo">DPO (Bradley-Terry Reference)</option>
+            </select>
+            <button onclick="runDreamCounterfactualLive()" style="background:rgba(239,68,68,0.2); border:1px solid rgba(239,68,68,0.4); color:#f87171; font-weight:700; border-radius:8px; padding:8px 12px; font-size:0.82rem; cursor:pointer;">⚔️ Counterfactuals</button>
+            <button onclick="runDreamFuseLoRALive()" style="background:rgba(14,165,233,0.2); border:1px solid rgba(14,165,233,0.4); color:#38bdf8; font-weight:700; border-radius:8px; padding:8px 12px; font-size:0.82rem; cursor:pointer;">⚡ Fuse Modelfile</button>
+            <button id="btnTriggerDreamCycle" onclick="triggerFullDreamCycleLive()" style="background:linear-gradient(135deg, #9333ea, #6366f1); border:none; color:#fff; font-weight:800; border-radius:10px; padding:10px 20px; font-size:0.85rem; cursor:pointer; box-shadow:0 0 15px rgba(147,51,234,0.4); transition:all 0.2s;">🌙 Trigger Nightly Dream</button>
+          </div>
         </div>
         <pre id="dreamCycleLog" style="display:none; background:rgba(0,0,0,0.5); border:1px solid rgba(14,165,233,0.3); border-radius:8px; padding:12px; color:#93c5fd; font-family:monospace; font-size:0.75rem; max-height:160px; overflow-y:auto; margin:0;"></pre>
 
@@ -365,7 +377,7 @@ async function triggerFullDreamCycleLive() {
     const res = await fetch('/api/dream/full_nightly_cycle', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ objective: 'simpo' })
+      body: JSON.stringify({ objective: document.getElementById('dreamObjectiveSelect') ? document.getElementById('dreamObjectiveSelect').value : 'simpo' })
     });
     const data = await res.json();
     logPre.innerText = JSON.stringify(data, null, 2);

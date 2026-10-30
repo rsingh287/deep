@@ -258,3 +258,73 @@ def api_delete_tool(tool_name):
         return jsonify({"success": success, "tool_name": tool_name})
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
+
+
+@tool_forge_bp.route("/api/forge/mutate", methods=["POST"])
+def api_mutate_tool():
+    """Runs autonomous genetic mutation and Pareto fitness optimization on a tool."""
+    try:
+        data = request.json or {}
+        tool_name = data.get("tool_name")
+        if not tool_name:
+            return jsonify({"success": False, "error": "tool_name is required."}), 400
+        strategies = data.get("strategies")
+        forge = get_tool_forge()
+        res = forge.mutate_and_optimize_tool(tool_name, strategies=strategies)
+        return jsonify(res)
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@tool_forge_bp.route("/api/forge/shadow_compare", methods=["POST"])
+def api_shadow_compare():
+    """Runs differential shadow execution comparing two tool versions for semantic equivalence."""
+    try:
+        data = request.json or {}
+        tool_name = data.get("tool_name")
+        if not tool_name:
+            return jsonify({"success": False, "error": "tool_name is required."}), 400
+        ver_a = data.get("version_a")
+        ver_b = data.get("version_b")
+        test_inputs = data.get("test_inputs")
+        forge = get_tool_forge()
+        res = forge.differential_shadow_compare(tool_name, ver_a=ver_a, ver_b=ver_b, test_inputs=test_inputs)
+        return jsonify(res)
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@tool_forge_bp.route("/api/forge/synthesize_openapi", methods=["POST"])
+def api_synthesize_openapi():
+    """Autonomously synthesizes a dynamic tool from an OpenAPI/REST endpoint schema."""
+    try:
+        data = request.json or {}
+        tool_name = data.get("tool_name")
+        endpoint_url = data.get("endpoint_url")
+        if not tool_name or not endpoint_url:
+            return jsonify({"success": False, "error": "tool_name and endpoint_url are required."}), 400
+        description = data.get("description", "Autonomously synthesized API integration tool.")
+        http_method = data.get("http_method", "GET")
+        parameters = data.get("parameters", [])
+        forge = get_tool_forge()
+        res = forge.synthesize_from_openapi(tool_name, description, endpoint_url, http_method, parameters)
+        return jsonify(res)
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@tool_forge_bp.route("/api/forge/self_heal", methods=["POST"])
+def api_self_heal_tool():
+    """Triggers emergency self-healing on a failing synthesized tool."""
+    try:
+        data = request.json or {}
+        tool_name = data.get("tool_name")
+        failing_input = data.get("failing_input", {})
+        error_message = data.get("error_message", "Unknown runtime failure")
+        if not tool_name:
+            return jsonify({"success": False, "error": "tool_name is required."}), 400
+        forge = get_tool_forge()
+        res = forge.self_heal_tool(tool_name, failing_input, error_message)
+        return jsonify(res)
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
